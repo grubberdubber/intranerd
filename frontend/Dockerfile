@@ -11,8 +11,8 @@ ENV INTRANERD_API_BASE=$INTRANERD_API_BASE
 COPY index.html ./
 COPY src ./src
 COPY assets ./assets
-COPY frontend/scripts/build.mjs ./build.mjs
-RUN node build.mjs
+COPY frontend/scripts/build.mjs ./frontend/scripts/build.mjs
+RUN node frontend/scripts/build.mjs
 
 FROM nginx:1.27-alpine AS runtime
 RUN rm -f /etc/nginx/conf.d/default.conf
