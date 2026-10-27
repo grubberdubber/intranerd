@@ -1,0 +1,14 @@
+node_modules
+package-lock.json
+coverage
+dist
+test-results
+playwright-report
+blob-report
+playwright/.cache
+legacy
+docs/openapi.yaml
+.env
+.env.*
+*.min.js
+*.min.css

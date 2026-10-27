@@ -1,0 +1,36 @@
+# Dependencias y artefactos
+**/node_modules
+**/.venv
+**/dist
+coverage
+test-results
+playwright-report
+blob-report
+playwright/.cache
+
+# Control de versiones y CI
+.git
+.gitignore
+.github
+
+# Entornos y secretos (nunca deben viajar en la imagen)
+.env
+.env.*
+!.env.example
+**/*.pem
+**/*.key
+
+# Documentación y pruebas que no se sirven en runtime
+docs/*
+!docs/openapi.yaml
+tests
+backend/tests
+legacy
+AGENTS.md
+README.md
+Makefile
+
+# Sistema
+.DS_Store
+*.log
+npm-debug.log*

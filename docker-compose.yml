@@ -1,0 +1,99 @@
+# ============================================================================
+# IntraNerd · Stack completo: API + SPA
+# La base de datos SQLite vive en el volumen `backend_data`; los archivos
+# subidos, en `backend_uploads`. El perfil `backup` genera copias lógicas.
+# Uso: cp .env.example .env && docker compose up -d --build
+# ============================================================================
+name: intranerd
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    init: true
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 4000
+      DATABASE_PATH: /app/data/intranerd.db
+      UPLOAD_DIR: /app/uploads
+      SEED_ON_START: ${SEED_ON_START:-true}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-10}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
+      TZ: ${TZ:-America/Santiago}
+    volumes:
+      - backend_data:/app/data
+      - backend_uploads:/app/uploads
+    ports:
+      - '127.0.0.1:${API_PORT:-4000}:4000'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:4000/api/v1/health']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+    networks:
+      - intranerd
+    security_opt:
+      - no-new-privileges:true
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        INTRANERD_API_BASE: ${INTRANERD_API_BASE:-/api}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '${APP_PORT:-8080}:80'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - intranerd
+    security_opt:
+      - no-new-privileges:true
+    logging: *logging
+
+  # Respaldo lógico programable de la base SQLite. Se ejecuta con:
+  #   docker compose --profile backup run --rm db-backup
+  db-backup:
+    image: alpine:3.20
+    profiles: ['backup']
+    restart: 'no'
+    volumes:
+      - backend_data:/data:ro
+      - ./backups:/backups
+    command:
+      [
+        'sh',
+        '-c',
+        'apk add --no-cache sqlite >/dev/null && sqlite3 /data/intranerd.db ".backup ''/backups/intranerd-$(date +%Y%m%d-%H%M%S).db''" && ls -lh /backups',
+      ]
+    networks:
+      - intranerd
+    logging: *logging
+
+volumes:
+  backend_data:
+    name: intranerd_backend_data
+  backend_uploads:
+    name: intranerd_backend_uploads
+
+networks:
+  intranerd:
+    name: intranerd_network
+    driver: bridge

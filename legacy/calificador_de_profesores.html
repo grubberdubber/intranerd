@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IntraNerd · Opiniones Profesores</title>
+<style>
+ :root{
+  --blue:#1e40af;
+  --muted:#6b7280;
+  --bg:#f5f7fa;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --success:#10b981;
+  --danger:#ef4444;
+  --star-gold: #FFD700;
+ }
+ *{box-sizing:border-box}
+ body{
+  margin:0;
+  font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+  background:var(--bg);
+  color:#0f172a;
+ }
+ header{
+  background:linear-gradient(90deg,var(--blue),var(--accent));
+  color:white;
+  padding:18px 16px;
+  text-align:center;
+ }
+ header h1{margin:0;font-size:1.6rem}
+ header p{margin:6px 0 0;font-size:0.9rem;opacity:0.95}
+
+ .wrap{max-width:1100px;margin:20px auto;padding:12px}
+ .grid{display:grid;gap:14px;grid-template-columns:1fr 420px}
+ @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+ .card{background:var(--card);border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);border:1px solid rgba(2,6,23,0.04)}
+ h2{margin:0 0 8px;font-size:1.05rem;color:var(--blue)}
+ .lead{margin:0;color:var(--muted);font-size:0.9rem}
+
+ form{display:grid;gap:8px}
+ label{font-size:0.85rem;color:var(--muted)}
+ input[type=text], textarea, select{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #e6edf3;font-size:0.95rem;background:transparent}
+ textarea{min-height:80px;resize:vertical}
+
+ .btn{display:inline-block;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+ .btn-primary{background:var(--accent);color:white}
+ .btn-ghost{background:transparent;border:1px solid #e6edf3}
+ .btn-danger{background:var(--danger);color:white}
+
+ .list{display:grid;gap:8px;margin-top:8px}
+ .teacher-card{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:10px;border:1px solid #eef3ff;background:linear-gradient(180deg,#fff,#fbfdff);margin-bottom:12px}
+ .teacher-card img{width:110px;height:110px;border-radius:8px;object-fit:cover;border:1px solid #e2e8f0}
+
+ .content{flex:1}
+ .teacher-name{font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+ .meta{font-size:0.85rem;color:var(--muted);margin-top:6px}
+
+ /* Stars */
+ .stars{display:inline-block;user-select:none}
+ .stars span{font-size:26px;cursor:pointer;color:#ccc;transition:0.12s;margin-right:2px}
+ .stars span.selected{color:var(--star-gold)} /* amarillo clásico */
+ .avg-block{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:0.95rem;color:var(--muted)}
+
+ .opinion{background:#fafafa;padding:10px;border-radius:8px;margin-top:10px;border-left:4px solid var(--accent)}
+ .evidence{margin-top:8px;padding:8px;background:#fff;border-radius:8px;border:1px solid #e6edf3}
+ .evidence img, .evidence video{max-width:240px;border-radius:6px;display:block;margin-top:6px}
+
+ footer{margin-top:18px;text-align:center;color:var(--muted);font-size:0.85rem;padding:16px}
+
+/* small layout tweaks for professor header row */
+.header-row {display:flex;align-items:center;gap:12px}
+.stats {font-size:0.85rem;color:var(--muted);display:flex;gap:12px;align-items:center}
+.add-prof-row{display:flex;gap:8px;align-items:flex-end}
+.example-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.example-thumb{width:78px;height:60px;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent}
+.example-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.example-thumb:hover{border-color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1>IntraNerd · Opiniones y Calificaciones de Profesores</h1>
+  <p>Tu mejor plataforma de calificación de Profesores</p>
+</header>
+
+<div class="wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <strong>IntraNerd</strong><br><span style="color:var(--muted)">Opiniones y calificaciones</span>
+    </div>
+    <div style="color:var(--muted)">Local — Guardado en tu navegador</div>
+  </div>
+
+  <div class="grid">
+    <!-- LISTA DE PROFESORES (RENDER DINÁMICO) -->
+    <div>
+      <h2>Profesores</h2>
+      <div id="professorsList" class="list"></div>
+    </div>
+
+    <!-- FORMULARIOS -->
+    <aside>
+      <div class="card">
+        <h2>Agregar Profesor</h2>
+        <p class="lead">Añade un profesor para que otros lo califiquen.</p>
+        <form id="addProfessorForm">
+          <label>Nombre del profesor</label>
+          <input type="text" id="newProfName" placeholder="Ej: Profa. Ana Pérez" required>
+
+          <label>Asignatura</label>
+          <input type="text" id="newProfSubject" placeholder="Ej: Física">
+
+          <label>Foto (URL) o sube una</label>
+          <input type="text" id="newProfPhotoUrl" placeholder="https://... (opcional)">
+          <input type="file" id="newProfPhotoFile" accept="image/*">
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary" type="submit">Agregar profesor</button>
+            <button class="btn btn-ghost" type="button" onclick="document.getElementById('addProfessorForm').reset()">Limpiar</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="card">
+        <h2>Escribe tu opinión</h2>
+        <p class="lead">Deja tu calificación y comentario sobre un profesor.</p>
+
+        <form id="reviewForm">
+          <label>Tu nombre</label>
+          <input type="text" id="alumno" placeholder="Ej: Rodrigo A." required>
+
+          <label>Profesor</label>
+          <select id="profesorSelect" required></select>
+
+          <label>Calificación (1–5 estrellas)</label>
+          <div class="stars" id="rating-stars">
+            <span data-value="1">★</span>
+            <span data-value="2">★</span>
+            <span data-value="3">★</span>
+            <span data-value="4">★</span>
+            <span data-value="5">★</span>
+          </div>
+
+          <input type="hidden" id="rating" required>
+
+          <label>Opinión</label>
+          <textarea id="opinion" rows="4" placeholder="Escribe tu opinión..." required></textarea>
+
+          <label>Evidencia (opcional)</label>
+          <input type="file" id="evidencia" accept="image/*,video/*,application/pdf">
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary" type="submit">Enviar Opinión</button>
+            <button class="btn btn-ghost" type="button" onclick="document.getElementById('reviewForm').reset(); clearRating()">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer>© 2025 — IntraNerd</footer>
+</div>
+
+<script>
+/* -------------------------------
+  Data model + persistence
+---------------------------------*/
+const KEY_PROFS = 'intra_professors_v1';
+
+function uid(prefix='p'){
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function now(){ return new Date().toLocaleString(); }
+
+function loadProfs(){
+  try {
+    return JSON.parse(localStorage.getItem(KEY_PROFS)) || [];
+  } catch(e){
+    return [];
+  }
+}
+function saveProfs(arr){
+  localStorage.setItem(KEY_PROFS, JSON.stringify(arr));
+}
+
+/* Initialize default professors if none */
+function defaultProfessors(){
+  return [
+    {
+      id: 'p1',
+      name: 'Prof. Sebastián Moya',
+      subject: 'Matemáticas',
+      photo: 'https://images.generated.photos/kz0xO_SS_PxF5vDJwsBhb1kKEuWiRiwXQDq6rqcQsmI/rs:fit:512:512/czM6Ly9p/ZGVudGl0eS1w/cm9kL3Bob3Rvcy9w/Zy8wMDAwMDEuanBn.jpg',
+      ratings: [5,4],
+      reviews: [
+        {id: uid('r'), student:'Camila R.', text:'Súper claro para explicar.', rating:5, evidence:null, when: now()},
+        {id: uid('r'), student:'Andrés T.', text:'Bueno, pero deja mucha tarea.', rating:4, evidence:null, when: now()}
+      ],
+      createdAt: now()
+    },
+    {
+      id: 'p2',
+      name: 'Prof. Valentina Ortega',
+      subject: 'Lenguaje',
+      photo: 'https://cdn.pixabay.com/photo/2016/02/19/11/53/woman-1209678_1280.jpg',
+      ratings: [5,4],
+      reviews: [
+        {id: uid('r'), student:'Diego S.', text:'Muy paciente.', rating:5, evidence:null, when: now()},
+        {id: uid('r'), student:'Sofía A.', text:'Exigente pero justa.', rating:4, evidence:null, when: now()}
+      ],
+      createdAt: now()
+    },
+    {
+      id: 'p3',
+      name: 'Prof. Tomás Villagrán',
+      subject: 'Historia',
+      photo: 'https://xsgames.co/randomusers/assets/avatars/male/32.jpg',
+      ratings: [4],
+      reviews: [
+        {id: uid('r'), student:'Martina N.', text:'Explica rápido pero sabe mucho.', rating:4, evidence:null, when: now()}
+      ],
+      createdAt: now()
+    }
+  ];
+}
+
+/* Ensure initial data exists */
+let professors = loadProfs();
+if(!professors || professors.length === 0){
+  professors = defaultProfessors();
+  saveProfs(professors);
+}
+
+/* -------------------------------
+  Renderers
+---------------------------------*/
+const professorsList = document.getElementById('professorsList');
+const profesorSelect = document.getElementById('profesorSelect');
+
+function computeStats(prof){
+  const count = (prof.ratings && prof.ratings.length) ? prof.ratings.length : 0;
+  const total = (prof.ratings && prof.ratings.length) ? prof.ratings.reduce((a,b)=>a+b,0) : 0;
+  const avg = count ? (total / count) : 0;
+  return {count, total, avg};
+}
+
+function renderProfessors(){
+  // refresh select
+  profesorSelect.innerHTML = '';
+  professorsList.innerHTML = '';
+  professors.forEach((prof, idx) => {
+    // update select
+    const opt = document.createElement('option');
+    opt.value = prof.id;
+    opt.textContent = prof.name;
+    profesorSelect.appendChild(opt);
+
+    // card
+    const div = document.createElement('div');
+    div.className = 'teacher-card';
+    div.dataset.id = prof.id;
+
+    const img = document.createElement('img');
+    img.src = prof.photo || '';
+    img.alt = prof.name;
+    img.onerror = () => { img.src = 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg'; };
+
+    const content = document.createElement('div');
+    content.className = 'content';
+
+    // header row
+    const headerRow = document.createElement('div');
+    headerRow.className = 'header-row';
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'teacher-name';
+    nameDiv.textContent = prof.name;
+
+    // stats
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'stats';
+    const {count, total, avg} = computeStats(prof);
+
+    // visual average stars (rounded to nearest integer for visual)
+    const avgBlock = document.createElement('div');
+    avgBlock.className = 'avg-block';
+    const avgStars = document.createElement('div');
+    avgStars.className = 'stars';
+    const rounded = Math.round(avg); // visual rounding
+    for(let i=1;i<=5;i++){
+      const s = document.createElement('span');
+      s.textContent = '★';
+      if(i <= rounded) s.classList.add('selected');
+      avgStars.appendChild(s);
+    }
+    const txt = document.createElement('div');
+    txt.innerHTML = `<strong>${avg.toFixed(1)}★</strong> <span style="color:var(--muted)">(${total} pts · ${count} cal.)</span>`;
+
+    avgBlock.appendChild(avgStars);
+    avgBlock.appendChild(txt);
+
+    headerRow.appendChild(nameDiv);
+    headerRow.appendChild(avgBlock);
+
+    // subject and meta
+    const subj = document.createElement('div');
+    subj.className = 'meta';
+    subj.textContent = prof.subject ? (prof.subject) : '—';
+
+    content.appendChild(headerRow);
+    content.appendChild(subj);
+
+    // reviews
+    if(prof.reviews && prof.reviews.length){
+      prof.reviews.forEach(r => {
+        const op = document.createElement('div');
+        op.className = 'opinion';
+        op.innerHTML = `<strong>${escapeHtml(r.student)}</strong> (${r.rating}★): ${escapeHtml(r.text)} <div style="color:var(--muted);margin-top:6px;font-size:0.85rem">${escapeHtml(r.when)}</div>`;
+        if(r.evidence){
+          const ev = document.createElement('div');
+          ev.className = 'evidence';
+          if(r.evidence.startsWith('data:') && r.evidence.indexOf('image/')!==-1){
+            ev.innerHTML = `<strong>Evidencia:</strong><br><img src="${r.evidence}" alt="evidencia">`;
+          } else if (r.evidence.startsWith('data:') && r.evidence.indexOf('video/')!==-1){
+            ev.innerHTML = `<strong>Evidencia:</strong><br><video src="${r.evidence}" controls></video>`;
+          } else if (r.evidence.startsWith('data:')){
+            ev.innerHTML = `<strong>Evidencia:</strong> <a href="${r.evidence}" target="_blank">Abrir archivo</a>`;
+          } else {
+            // external URL
+            if(r.evidence.match(/\.(jpg|jpeg|png|gif|webp)$/i)){
+              ev.innerHTML = `<strong>Evidencia:</strong><br><img src="${r.evidence}" alt="evidencia">`;
+            } else {
+              ev.innerHTML = `<strong>Evidencia:</strong> <a href="${r.evidence}" target="_blank">Abrir evidencia</a>`;
+            }
+          }
+          op.appendChild(ev);
+        }
+        content.appendChild(op);
+      });
+    }
+
+    // actions: delete professor
+    const actionsDiv = document.createElement('div');
+    actionsDiv.style.display = 'flex';
+    actionsDiv.style.flexDirection = 'column';
+    actionsDiv.style.gap = '8px';
+    actionsDiv.style.marginLeft = '12px';
+    actionsDiv.style.alignSelf = 'flex-start';
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn btn-ghost';
+    btnDel.textContent = 'Eliminar prof.';
+    btnDel.onclick = () => {
+      if(!confirm('Eliminar este profesor y todas sus calificaciones?')) return;
+      professors = professors.filter(p=>p.id !== prof.id);
+      saveProfs(professors);
+      renderProfessors();
+    };
+
+    actionsDiv.appendChild(btnDel);
+
+    div.appendChild(img);
+    div.appendChild(content);
+    div.appendChild(actionsDiv);
+
+    professorsList.appendChild(div);
+  });
+}
+
+/* initial render */
+renderProfessors();
+
+/* -------------------------------
+  Star selector for review form
+---------------------------------*/
+function enableStarSelector(block, inputField = null) {
+  const stars = block.querySelectorAll("span");
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      const value = Number(star.getAttribute("data-value"));
+      // marcar todas las estrellas con valor <= seleccionado
+      stars.forEach(s => {
+        const v = Number(s.getAttribute("data-value"));
+        if (v <= value) s.classList.add("selected"); else s.classList.remove("selected");
+      });
+      if (inputField) inputField.value = value;
+    });
+    // hover preview
+    star.addEventListener("mouseover", () => {
+      const value = Number(star.getAttribute("data-value"));
+      stars.forEach(s => {
+        const v = Number(s.getAttribute("data-value"));
+        if (v <= value) s.classList.add("selected"); else s.classList.remove("selected");
+      });
+    });
+    star.addEventListener("mouseout", () => {
+      const current = inputField && inputField.value ? Number(inputField.value) : 0;
+      stars.forEach(s => {
+        const v = Number(s.getAttribute("data-value"));
+        if (v <= current) s.classList.add("selected"); else s.classList.remove("selected");
+      });
+    });
+  });
+}
+const ratingInput = document.getElementById("rating");
+enableStarSelector(document.getElementById("rating-stars"), ratingInput);
+function clearRating(){ ratingInput.value = ""; document.querySelectorAll("#rating-stars span").forEach(s=>s.classList.remove('selected')); }
+
+/* -------------------------------
+  Add professor handler
+---------------------------------*/
+document.getElementById('addProfessorForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('newProfName').value.trim();
+  const subject = document.getElementById('newProfSubject').value.trim();
+  const photoUrl = document.getElementById('newProfPhotoUrl').value.trim();
+  const file = document.getElementById('newProfPhotoFile').files[0];
+
+  if(!name){
+    alert('Ingrese nombre del profesor.');
+    return;
+  }
+
+  const id = uid('p');
+  const newProf = {
+    id,
+    name,
+    subject,
+    photo: null,
+    ratings: [],
+    reviews: [],
+    createdAt: now()
+  };
+
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      newProf.photo = reader.result;
+      professors.push(newProf);
+      saveProfs(professors);
+      document.getElementById('addProfessorForm').reset();
+      renderProfessors();
+      alert('Profesor agregado.');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    newProf.photo = photoUrl || 'https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg';
+    professors.push(newProf);
+    saveProfs(professors);
+    document.getElementById('addProfessorForm').reset();
+    renderProfessors();
+    alert('Profesor agregado.');
+  }
+});
+
+/* -------------------------------
+  Submit review handler
+---------------------------------*/
+document.getElementById('reviewForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const alumno = document.getElementById('alumno').value.trim();
+  const profId = document.getElementById('profesorSelect').value;
+  const opinionText = document.getElementById('opinion').value.trim();
+  const rating = Number(document.getElementById('rating').value || 0);
+  const evidenciaFile = document.getElementById('evidencia').files[0];
+
+  if(!alumno || !opinionText || !rating || rating < 1){
+    alert('Por favor completa tu nombre, opinión y selecciona una calificación (1–5).');
+    return;
+  }
+
+  const prof = professors.find(p=>p.id === profId);
+  if(!prof){ alert('Profesor no encontrado'); return; }
+
+  const review = { id: uid('r'), student: alumno, text: opinionText, rating, evidence: null, when: now() };
+
+  if(evidenciaFile){
+    const reader = new FileReader();
+    reader.onload = () => {
+      review.evidence = reader.result; // data URL (persiste en localStorage)
+      prof.reviews.push(review);
+      prof.ratings.push(rating);
+      saveProfs(professors);
+      document.getElementById('reviewForm').reset();
+      clearRating();
+      renderProfessors();
+      alert('Opinión enviada. Gracias.');
+    };
+    reader.readAsDataURL(evidenciaFile);
+  } else {
+    prof.reviews.push(review);
+    prof.ratings.push(rating);
+    saveProfs(professors);
+    document.getElementById('reviewForm').reset();
+    clearRating();
+    renderProfessors();
+    alert('Opinión enviada. Gracias.');
+  }
+});
+
+/* escape simple for display */
+function escapeHtml(s){
+  if(!s) return '';
+  return String(s)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;');
+}
+
+/* Make sure select is populated (renderProfessors does it). */
+renderProfessors();
+
+</script>
+</body>
+</html>
+

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Cuaderno">
+  <defs><linearGradient id="ibg-notebook" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#ibg-notebook)"/>
+  <circle cx="200" cy="142" r="100" fill="#dbeafe" opacity=".6"/>
+  <rect x="130" y="78" width="140" height="160" rx="12" fill="#dc2626"/><rect x="146" y="94" width="108" height="128" rx="6" fill="#fef2f2"/><path d="M168 128h64M168 152h64M168 176h40" stroke="#b91c1c" stroke-width="8" stroke-linecap="round"/><path d="M130 108h-16M130 140h-16M130 172h-16" stroke="#991b1b" stroke-width="10" stroke-linecap="round"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Inter, Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#1e40af">Cuaderno</text>
+</svg>

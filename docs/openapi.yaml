@@ -1,0 +1,1976 @@
+openapi: 3.0.3
+info:
+  title: IntraNerd API
+  version: 1.0.0
+  description: |
+    API REST de la plataforma escolar IntraNerd. Cubre los ocho módulos:
+    notas semestrales, talleres, personas extraviadas, calificación de
+    profesores, objetos perdidos, calendario escolar, anuncios y tareas.
+
+    **Base canónica:** `/api/v1`; alias sin versión: `/api`.
+    **Persistencia:** SQLite (`node:sqlite`) en un volumen Docker.
+    **Formato de éxito:** `{ "success": true, "data": …, "error": null }`.
+    **Formato de error:** `{ "success": false, "data": null, "error": "…", "details": … }`.
+    **Notas:** escala chilena 1.0–7.0, aprobación desde 4.0.
+    **Archivos:** multipart con campo `photo`/`evidence` (JPEG, PNG, WebP, GIF,
+    MP4, WebM; máx. 10 MB) o `photoUrl` con URL/ruta.
+    **Roles:** la SPA firma el contenido con el perfil local (alumno, profesor,
+    dirección); la API no implementa autenticación en esta versión.
+  contact:
+    name: Equipo IntraNerd
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8080/api
+    description: Stack Docker (Nginx → API)
+  - url: http://localhost:4000/api/v1
+    description: API directa en desarrollo
+tags:
+  - name: Salud
+  - name: Notas
+  - name: Personas extraviadas
+  - name: Profesores
+  - name: Objetos perdidos
+  - name: Calendario
+  - name: Talleres
+  - name: Anuncios
+  - name: Tareas
+paths:
+  /health:
+    get:
+      tags: [Salud]
+      summary: Estado de la API y de SQLite
+      responses:
+        "200":
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          status:
+                            type: string
+                            example: ok
+                          service:
+                            type: string
+                          version:
+                            type: string
+                          uptime:
+                            type: integer
+                          timestamp:
+                            type: string
+                            format: date-time
+  /grades:
+    get:
+      tags: [Notas]
+      summary: Asignaturas, notas, promedios y resumen del alumno
+      parameters:
+        - name: studentName
+          in: query
+          description: Si se omite, devuelve todas las asignaturas.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Listado con cálculos
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/GradeBoard"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /grades/subjects:
+    post:
+      tags: [Notas]
+      summary: Crear asignatura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectInput"
+      responses:
+        "201":
+          description: Asignatura creada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Subject"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /grades/subjects/{id}:
+    parameters:
+      - $ref: "#/components/parameters/SubjectId"
+    get:
+      tags: [Notas]
+      summary: Detalle de asignatura con notas y promedios
+      responses:
+        "200":
+          description: Asignatura
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Subject"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Notas]
+      summary: Editar asignatura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubjectUpdate"
+      responses:
+        "200":
+          description: Asignatura actualizada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Subject"
+    delete:
+      tags: [Notas]
+      summary: Eliminar asignatura y sus notas
+      responses:
+        "200":
+          description: Asignatura eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /grades/subjects/{id}/grades:
+    post:
+      tags: [Notas]
+      summary: Agregar nota a un semestre
+      parameters:
+        - $ref: "#/components/parameters/SubjectId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeInput"
+      responses:
+        "201":
+          description: Nota agregada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          grade:
+                            $ref: "#/components/schemas/Grade"
+                          subject:
+                            $ref: "#/components/schemas/Subject"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /grades/entries/{gradeId}:
+    parameters:
+      - name: gradeId
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [Notas]
+      summary: Editar una nota
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeUpdate"
+      responses:
+        "200":
+          description: Nota y asignatura recalculada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          grade:
+                            $ref: "#/components/schemas/Grade"
+                          subject:
+                            $ref: "#/components/schemas/Subject"
+    delete:
+      tags: [Notas]
+      summary: Eliminar una nota
+      responses:
+        "200":
+          description: Nota eliminada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          subject:
+                            $ref: "#/components/schemas/Subject"
+
+  /missing-persons:
+    get:
+      tags: [Personas extraviadas]
+      summary: Listar reportes
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [MISSING, FOUND]
+        - name: q
+          in: query
+          description: Búsqueda por nombre, lugar o contacto (sin distinguir mayúsculas ni acentos)
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Reportes paginados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/MissingPerson"
+    post:
+      tags: [Personas extraviadas]
+      summary: Crear reporte de emergencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MissingPersonInput"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MissingPersonInput"
+      responses:
+        "201":
+          description: Reporte creado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MissingPerson"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /missing-persons/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Personas extraviadas]
+      summary: Detalle de un reporte
+      responses:
+        "200":
+          description: Reporte
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MissingPerson"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Personas extraviadas]
+      summary: Editar reporte
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MissingPersonUpdate"
+      responses:
+        "200":
+          description: Reporte actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MissingPerson"
+    delete:
+      tags: [Personas extraviadas]
+      summary: Eliminar reporte
+      responses:
+        "200":
+          description: Reporte eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /missing-persons/{id}/status:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    patch:
+      tags: [Personas extraviadas]
+      summary: Cambiar estado MISSING/FOUND
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [MISSING, FOUND]
+      responses:
+        "200":
+          description: Estado actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MissingPerson"
+  /missing-persons/{id}/found:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    patch:
+      tags: [Personas extraviadas]
+      summary: Marcar como encontrado (atajo)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                found:
+                  type: boolean
+                  default: true
+      responses:
+        "200":
+          description: Reporte marcado como encontrado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/MissingPerson"
+
+  /teachers:
+    get:
+      tags: [Profesores]
+      summary: Directorio con promedio, puntos y distribución
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: subject
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Profesores paginados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/Teacher"
+    post:
+      tags: [Profesores]
+      summary: Crear profesor
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                subject: { type: string }
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Profesor creado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Teacher"
+  /teachers/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Profesores]
+      summary: Detalle con reseñas y distribución
+      responses:
+        "200":
+          description: Profesor
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Teacher"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Profesores]
+      summary: Editar profesor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                subject: { type: string }
+                photoUrl: { type: string }
+      responses:
+        "200":
+          description: Profesor actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Teacher"
+    delete:
+      tags: [Profesores]
+      summary: Eliminar profesor y sus reseñas
+      responses:
+        "200":
+          description: Profesor eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /teachers/{id}/reviews:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Profesores]
+      summary: Reseñas del profesor
+      responses:
+        "200":
+          description: Reseñas
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Review"
+    post:
+      tags: [Profesores]
+      summary: Calificar y opinar (1–5 estrellas)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Reseña creada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          review:
+                            $ref: "#/components/schemas/Review"
+                          teacher:
+                            $ref: "#/components/schemas/Teacher"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /teachers/{id}/reviews/{reviewId}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+      - name: reviewId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Profesores]
+      summary: Eliminar una reseña
+      responses:
+        "200":
+          description: Reseña eliminada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Teacher"
+
+  /lost-found:
+    get:
+      tags: [Objetos perdidos]
+      summary: Doble panel de objetos encontrados y avisos de pérdida
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [FOUND, LOST]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [OPEN, CLAIMED, RETURNED]
+        - name: q
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Publicaciones paginadas
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/LostFoundItem"
+    post:
+      tags: [Objetos perdidos]
+      summary: Publicar objeto encontrado o aviso de pérdida
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LostFoundInput"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/LostFoundInput"
+      responses:
+        "201":
+          description: Publicación creada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/LostFoundItem"
+  /lost-found/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Objetos perdidos]
+      summary: Detalle de publicación
+      responses:
+        "200":
+          description: Publicación
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/LostFoundItem"
+    patch:
+      tags: [Objetos perdidos]
+      summary: Editar publicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LostFoundUpdate"
+      responses:
+        "200":
+          description: Publicación actualizada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/LostFoundItem"
+    delete:
+      tags: [Objetos perdidos]
+      summary: Eliminar publicación
+      responses:
+        "200":
+          description: Publicación eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /lost-found/{id}/status:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    patch:
+      tags: [Objetos perdidos]
+      summary: Cambiar estado de la publicación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [OPEN, CLAIMED, RETURNED]
+      responses:
+        "200":
+          description: Estado actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/LostFoundItem"
+
+  /calendar:
+    get:
+      tags: [Calendario]
+      summary: Eventos y feriados de un año
+      parameters:
+        - $ref: "#/components/parameters/Year"
+      responses:
+        "200":
+          description: Calendario anual
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/CalendarYear"
+  /calendar/holidays:
+    get:
+      tags: [Calendario]
+      summary: Feriados chilenos calculados
+      parameters:
+        - $ref: "#/components/parameters/Year"
+      responses:
+        "200":
+          description: Feriados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Holiday"
+  /calendar/events:
+    get:
+      tags: [Calendario]
+      summary: Consultar evaluaciones
+      parameters:
+        - $ref: "#/components/parameters/Year"
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [STUDENT, TEACHER, ALUMNO, PROFESOR]
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: authorName
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Eventos
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/CalendarEvent"
+    post:
+      tags: [Calendario]
+      summary: Programar prueba o evaluación
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalendarEventInput"
+      responses:
+        "201":
+          description: Evento creado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/CalendarEvent"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /calendar/events/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Calendario]
+      summary: Detalle de evento
+      responses:
+        "200":
+          description: Evento
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/CalendarEvent"
+    patch:
+      tags: [Calendario]
+      summary: Editar evento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CalendarEventUpdate"
+      responses:
+        "200":
+          description: Evento actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/CalendarEvent"
+    delete:
+      tags: [Calendario]
+      summary: Eliminar evento
+      responses:
+        "200":
+          description: Evento eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+
+  /workshops:
+    get:
+      tags: [Talleres]
+      summary: Catálogo con cupos disponibles
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: available
+          in: query
+          schema: { type: boolean }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Talleres paginados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/Workshop"
+    post:
+      tags: [Talleres]
+      summary: Crear taller
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkshopInput"
+      responses:
+        "201":
+          description: Taller creado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Workshop"
+        "422":
+          $ref: "#/components/responses/Validation"
+  /workshops/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Talleres]
+      summary: Detalle con inscripciones
+      responses:
+        "200":
+          description: Taller
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Workshop"
+    patch:
+      tags: [Talleres]
+      summary: Editar taller (valida cupo vs. inscritos)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkshopUpdate"
+      responses:
+        "200":
+          description: Taller actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Workshop"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      tags: [Talleres]
+      summary: Eliminar taller e inscripciones
+      responses:
+        "200":
+          description: Taller eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /workshops/{id}/enrollments:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Talleres]
+      summary: Listar inscripciones
+      responses:
+        "200":
+          description: Inscripciones
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Enrollment"
+    post:
+      tags: [Talleres]
+      summary: Inscribir alumno (control transaccional de cupos)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [studentName]
+              properties:
+                studentName: { type: string }
+                studentEmail: { type: string, format: email }
+      responses:
+        "201":
+          description: Inscripción creada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          enrollment:
+                            $ref: "#/components/schemas/Enrollment"
+                          workshop:
+                            $ref: "#/components/schemas/Workshop"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /workshops/{id}/enrollments/{enrollmentId}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+      - name: enrollmentId
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Talleres]
+      summary: Anular inscripción
+      responses:
+        "200":
+          description: Inscripción eliminada y cupo liberado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Workshop"
+
+  /announcements:
+    get:
+      tags: [Anuncios]
+      summary: Feed de comunicados
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [GENERAL, URGENT, EVENT, SUSPENSION, ACADEMIC]
+        - name: pinned
+          in: query
+          schema: { type: boolean }
+        - name: q
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Anuncios paginados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/Announcement"
+    post:
+      tags: [Anuncios]
+      summary: Publicar comunicado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementInput"
+      responses:
+        "201":
+          description: Comunicado creado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Announcement"
+  /announcements/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Anuncios]
+      summary: Detalle de comunicado
+      responses:
+        "200":
+          description: Comunicado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Announcement"
+    patch:
+      tags: [Anuncios]
+      summary: Editar comunicado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementUpdate"
+      responses:
+        "200":
+          description: Comunicado actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Announcement"
+    delete:
+      tags: [Anuncios]
+      summary: Eliminar comunicado
+      responses:
+        "200":
+          description: Comunicado eliminado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /announcements/{id}/pin:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    patch:
+      tags: [Anuncios]
+      summary: Fijar o desfijar comunicado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pinned]
+              properties:
+                pinned: { type: boolean }
+      responses:
+        "200":
+          description: Comunicado actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Announcement"
+
+  /tasks:
+    get:
+      tags: [Tareas]
+      summary: Listar tareas con checklist personal
+      parameters:
+        - name: subject
+          in: query
+          schema: { type: string }
+        - name: studentName
+          in: query
+          schema: { type: string }
+        - name: completed
+          in: query
+          description: Requiere studentName.
+          schema: { type: boolean }
+        - name: q
+          in: query
+          schema: { type: string }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Tareas paginadas
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        allOf:
+                          - $ref: "#/components/schemas/Paginated"
+                          - type: object
+                            properties:
+                              items:
+                                type: array
+                                items:
+                                  $ref: "#/components/schemas/Task"
+        "422":
+          $ref: "#/components/responses/Validation"
+    post:
+      tags: [Tareas]
+      summary: Publicar tarea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskInput"
+      responses:
+        "201":
+          description: Tarea creada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Task"
+  /tasks/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Tareas]
+      summary: Detalle con checklist
+      responses:
+        "200":
+          description: Tarea
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Task"
+    patch:
+      tags: [Tareas]
+      summary: Editar tarea
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskUpdate"
+      responses:
+        "200":
+          description: Tarea actualizada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Task"
+    delete:
+      tags: [Tareas]
+      summary: Eliminar tarea y sus registros
+      responses:
+        "200":
+          description: Tarea eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Envelope"
+  /tasks/{id}/completion:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    patch:
+      tags: [Tareas]
+      summary: Marcar o desmarcar tarea para un alumno
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [studentName]
+              properties:
+                studentName: { type: string }
+                completed: { type: boolean, default: true }
+      responses:
+        "200":
+          description: Checklist actualizado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Task"
+  /tasks/{id}/completions:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      tags: [Tareas]
+      summary: Registros de completado
+      responses:
+        "200":
+          description: Registros
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Completion"
+  /tasks/{id}/completions/{studentName}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+      - name: studentName
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Tareas]
+      summary: Eliminar registro de completado
+      responses:
+        "200":
+          description: Registro eliminado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/Task"
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+    SubjectId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Year:
+      name: year
+      in: query
+      schema:
+        type: integer
+        minimum: 1900
+        maximum: 2100
+        default: 2026
+  responses:
+    Validation:
+      description: Error de validación Zod
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    Conflict:
+      description: Conflicto (duplicado, cupo lleno, capacidad inconsistente)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+  schemas:
+    Envelope:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: {}
+        error:
+          type: string
+          nullable: true
+    ErrorEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        data:
+          type: object
+          nullable: true
+          example: null
+        error:
+          type: string
+          example: Datos de entrada inválidos.
+        details:
+          oneOf:
+            - type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  message: { type: string }
+                  code: { type: string }
+            - type: object
+              additionalProperties: true
+    Paginated:
+      type: object
+      properties:
+        items:
+          type: array
+          items: {}
+        pagination:
+          type: object
+          properties:
+            page: { type: integer }
+            limit: { type: integer }
+            total: { type: integer }
+            totalPages: { type: integer }
+            hasNextPage: { type: boolean }
+            hasPreviousPage: { type: boolean }
+    GradeBoard:
+      type: object
+      properties:
+        studentName:
+          type: string
+          nullable: true
+        subjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subject"
+        summary:
+          type: object
+          properties:
+            subjectCount: { type: integer }
+            gradedSubjectCount: { type: integer }
+            approvedCount: { type: integer }
+            failedCount: { type: integer }
+            pendingCount: { type: integer }
+            generalAverage:
+              type: number
+              nullable: true
+            passingGrade:
+              type: number
+              example: 4
+    Subject:
+      type: object
+      properties:
+        id: { type: string, example: sub_abc123 }
+        name: { type: string }
+        studentName: { type: string }
+        teacherName:
+          type: string
+          nullable: true
+        color:
+          type: string
+          nullable: true
+        grades:
+          type: object
+          properties:
+            semester1:
+              type: array
+              items:
+                $ref: "#/components/schemas/Grade"
+            semester2:
+              type: array
+              items:
+                $ref: "#/components/schemas/Grade"
+        semesterAverages:
+          type: object
+          properties:
+            semester1:
+              type: number
+              nullable: true
+            semester2:
+              type: number
+              nullable: true
+        finalAverage:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum: [APROBADO, REPROBADO, SIN_NOTAS]
+        approved:
+          type: boolean
+          nullable: true
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    SubjectInput:
+      type: object
+      required: [name, studentName]
+      properties:
+        name: { type: string, maxLength: 100 }
+        studentName: { type: string, maxLength: 120 }
+        teacherName: { type: string, maxLength: 120 }
+        color:
+          type: string
+          pattern: "^#[0-9a-fA-F]{6}$"
+          example: "#1e40af"
+    SubjectUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        studentName: { type: string }
+        teacherName: { type: string }
+        color: { type: string, pattern: "^#[0-9a-fA-F]{6}$" }
+    Grade:
+      type: object
+      properties:
+        id: { type: string, example: grd_abc123 }
+        subjectId: { type: string }
+        semester:
+          type: integer
+          enum: [1, 2]
+        value:
+          type: number
+          minimum: 1
+          maximum: 7
+          example: 6.5
+        label:
+          type: string
+          nullable: true
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    GradeInput:
+      type: object
+      required: [semester, value]
+      properties:
+        semester:
+          type: integer
+          enum: [1, 2]
+        value:
+          type: number
+          minimum: 1
+          maximum: 7
+        label: { type: string, maxLength: 80 }
+    GradeUpdate:
+      type: object
+      properties:
+        semester: { type: integer, enum: [1, 2] }
+        value: { type: number, minimum: 1, maximum: 7 }
+        label: { type: string, maxLength: 80 }
+    MissingPerson:
+      type: object
+      properties:
+        id: { type: string, example: msp_abc123 }
+        name: { type: string }
+        age:
+          type: integer
+          nullable: true
+        description: { type: string }
+        lastSeenPlace: { type: string }
+        contact: { type: string }
+        photoUrl:
+          type: string
+          nullable: true
+        exampleImageUrl:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [MISSING, FOUND]
+        found: { type: boolean }
+        foundAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    MissingPersonInput:
+      type: object
+      required: [name, description, lastSeenPlace, contact]
+      properties:
+        name: { type: string, maxLength: 120 }
+        age: { type: integer, minimum: 0, maximum: 120 }
+        description: { type: string, maxLength: 2000 }
+        lastSeenPlace: { type: string, maxLength: 200 }
+        contact: { type: string, maxLength: 200 }
+        photo:
+          type: string
+          format: binary
+        photoUrl: { type: string }
+        exampleImageUrl: { type: string }
+        status: { type: string, enum: [MISSING, FOUND] }
+    MissingPersonUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        age: { type: integer, minimum: 0, maximum: 120 }
+        description: { type: string }
+        lastSeenPlace: { type: string }
+        contact: { type: string }
+        photoUrl: { type: string }
+        exampleImageUrl: { type: string }
+        status: { type: string, enum: [MISSING, FOUND] }
+    Teacher:
+      type: object
+      properties:
+        id: { type: string, example: tch_abc123 }
+        name: { type: string }
+        subject:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        reviewCount: { type: integer }
+        totalPoints: { type: integer }
+        averageRating:
+          type: number
+          nullable: true
+          example: 4.5
+        ratingDistribution:
+          type: object
+          additionalProperties:
+            type: integer
+          example: { "1": 0, "2": 0, "3": 1, "4": 2, "5": 3 }
+        createdAt: { type: string, format: date-time }
+    Review:
+      type: object
+      properties:
+        id: { type: string, example: rev_abc123 }
+        teacherId: { type: string }
+        studentName: { type: string }
+        text: { type: string }
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        evidenceUrl:
+          type: string
+          nullable: true
+        createdAt: { type: string, format: date-time }
+    ReviewInput:
+      type: object
+      required: [studentName, text, rating]
+      properties:
+        studentName: { type: string, maxLength: 120 }
+        text: { type: string, maxLength: 2000 }
+        rating: { type: integer, minimum: 1, maximum: 5 }
+        evidence:
+          type: string
+          format: binary
+        evidenceUrl: { type: string }
+    LostFoundItem:
+      type: object
+      properties:
+        id: { type: string, example: lf_abc123 }
+        type:
+          type: string
+          enum: [FOUND, LOST]
+        reportedBy: { type: string }
+        contact: { type: string }
+        description: { type: string }
+        location:
+          type: string
+          nullable: true
+        photoUrl:
+          type: string
+          nullable: true
+        exampleImageUrl:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [OPEN, CLAIMED, RETURNED]
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    LostFoundInput:
+      type: object
+      required: [type, reportedBy, contact, description]
+      properties:
+        type: { type: string, enum: [FOUND, LOST] }
+        reportedBy: { type: string }
+        contact: { type: string }
+        description: { type: string }
+        location: { type: string }
+        photo:
+          type: string
+          format: binary
+        photoUrl: { type: string }
+        exampleImageUrl: { type: string }
+        status: { type: string, enum: [OPEN, CLAIMED, RETURNED] }
+    LostFoundUpdate:
+      type: object
+      properties:
+        type: { type: string, enum: [FOUND, LOST] }
+        reportedBy: { type: string }
+        contact: { type: string }
+        description: { type: string }
+        location: { type: string }
+        photoUrl: { type: string }
+        exampleImageUrl: { type: string }
+        status: { type: string, enum: [OPEN, CLAIMED, RETURNED] }
+    CalendarEvent:
+      type: object
+      properties:
+        id: { type: string, example: cal_abc123 }
+        title: { type: string }
+        description:
+          type: string
+          nullable: true
+        date:
+          type: string
+          format: date
+        role:
+          type: string
+          enum: [STUDENT, TEACHER]
+        authorName: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CalendarEventInput:
+      type: object
+      required: [title, date, role, authorName]
+      properties:
+        title: { type: string, maxLength: 150 }
+        description: { type: string, maxLength: 2000 }
+        date: { type: string, format: date }
+        role:
+          type: string
+          enum: [STUDENT, TEACHER, alumno, profesor]
+        authorName: { type: string, maxLength: 120 }
+    CalendarEventUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        date: { type: string, format: date }
+        role: { type: string, enum: [STUDENT, TEACHER] }
+        authorName: { type: string }
+    CalendarYear:
+      type: object
+      properties:
+        year: { type: integer }
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/CalendarEvent"
+        holidays:
+          type: array
+          items:
+            $ref: "#/components/schemas/Holiday"
+    Holiday:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        name: { type: string }
+        type:
+          type: string
+          enum: [FIXED, MOVABLE]
+    Workshop:
+      type: object
+      properties:
+        id: { type: string, example: wks_abc123 }
+        name: { type: string }
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        schedule:
+          type: string
+          nullable: true
+        location:
+          type: string
+          nullable: true
+        teacherName:
+          type: string
+          nullable: true
+        capacity: { type: integer }
+        enrolledCount: { type: integer }
+        availableSpots: { type: integer }
+        isFull: { type: boolean }
+        enrollments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Enrollment"
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    WorkshopInput:
+      type: object
+      required: [name, capacity]
+      properties:
+        name: { type: string, maxLength: 120 }
+        description: { type: string, maxLength: 2000 }
+        category: { type: string, maxLength: 80 }
+        schedule: { type: string, maxLength: 200 }
+        location: { type: string, maxLength: 200 }
+        teacherName: { type: string, maxLength: 120 }
+        capacity: { type: integer, minimum: 1, maximum: 500 }
+    WorkshopUpdate:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        category: { type: string }
+        schedule: { type: string }
+        location: { type: string }
+        teacherName: { type: string }
+        capacity: { type: integer, minimum: 1, maximum: 500 }
+    Enrollment:
+      type: object
+      properties:
+        id: { type: string, example: enr_abc123 }
+        workshopId: { type: string }
+        studentName: { type: string }
+        studentEmail:
+          type: string
+          nullable: true
+        createdAt: { type: string, format: date-time }
+    Announcement:
+      type: object
+      properties:
+        id: { type: string, example: ann_abc123 }
+        title: { type: string }
+        content: { type: string }
+        category:
+          type: string
+          enum: [GENERAL, URGENT, EVENT, SUSPENSION, ACADEMIC]
+        authorName: { type: string }
+        authorRole:
+          type: string
+          enum: [DIRECTION, TEACHER, STUDENT_COUNCIL, ADMIN]
+        pinned: { type: boolean }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    AnnouncementInput:
+      type: object
+      required: [title, content, authorName]
+      properties:
+        title: { type: string, maxLength: 150 }
+        content: { type: string, maxLength: 5000 }
+        category:
+          type: string
+          enum: [GENERAL, URGENT, EVENT, SUSPENSION, ACADEMIC]
+        authorName: { type: string, maxLength: 120 }
+        authorRole:
+          type: string
+          enum: [DIRECTION, TEACHER, STUDENT_COUNCIL, ADMIN]
+        pinned: { type: boolean }
+    AnnouncementUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        content: { type: string }
+        category: { type: string }
+        authorName: { type: string }
+        authorRole: { type: string }
+        pinned: { type: boolean }
+    Task:
+      type: object
+      properties:
+        id: { type: string, example: tsk_abc123 }
+        title: { type: string }
+        description:
+          type: string
+          nullable: true
+        subject: { type: string }
+        dueDate:
+          type: string
+          format: date
+          nullable: true
+        createdBy: { type: string }
+        completed: { type: boolean }
+        completedBy:
+          type: array
+          items:
+            type: string
+        completedCount: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    TaskInput:
+      type: object
+      required: [title, subject, createdBy]
+      properties:
+        title: { type: string, maxLength: 150 }
+        description: { type: string, maxLength: 2000 }
+        subject: { type: string, maxLength: 100 }
+        dueDate: { type: string, format: date }
+        createdBy: { type: string, maxLength: 120 }
+    TaskUpdate:
+      type: object
+      properties:
+        title: { type: string }
+        description: { type: string }
+        subject: { type: string }
+        dueDate: { type: string, format: date }
+        createdBy: { type: string }
+    Completion:
+      type: object
+      properties:
+        taskId: { type: string }
+        studentName: { type: string }
+        completedAt: { type: string, format: date-time }

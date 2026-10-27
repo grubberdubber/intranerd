@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IntraNerd - Gestión de Notas</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f7fa;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0078d7, #005fa3);
+      color: white;
+      text-align: center;
+      padding: 2rem 1rem;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2.5rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #0078d7;
+      margin-bottom: 1rem;
+    }
+
+    .asignatura {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      background: #fafafa;
+    }
+
+    .asignatura-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.4rem;
+      margin-top: 0.3rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #0078d7;
+      color: white;
+      border: none;
+      padding: 0.6rem 1rem;
+      margin-top: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: #005fa3;
+      transform: translateY(-1px);
+    }
+
+    .btn-secundario {
+      background: #00a859;
+    }
+
+    .btn-secundario:hover {
+      background: #007e43;
+    }
+
+    .btn-eliminar {
+      background: #d9534f;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      font-weight: bold;
+    }
+
+    #resultado {
+      background: #eaf5ff;
+      border-left: 5px solid #0078d7;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      border-radius: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, #0078d7, #005fa3);
+      color: white;
+      margin-top: 2.5rem;
+    }
+
+    .nota {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+
+    .nota input {
+      flex: 1;
+    }
+
+    .btn-grande {
+      display: block;
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1rem;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bienvenido a IntraNerd</h1>
+    <p>Tu mejor plataforma de gestión de notas</p>
+  </header>
+
+  <main>
+    <section id="calculo">
+      <h2>Calculadora de Promedios Semestrales</h2>
+
+      <button class="btn-grande" onclick="agregarAsignatura()">➕ Agregar Asignatura</button>
+      <div id="asignaturas"></div>
+
+      <button class="btn-grande" onclick="calcularPromedio()">📊 Calcular Promedios</button>
+
+      <div id="resultado"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 IntraNerd. Todos los derechos reservados.</p>
+  </footer>
+
+  <script>
+    let contadorAsignaturas = 0;
+
+    function agregarAsignatura() {
+      contadorAsignaturas++;
+      const contenedor = document.getElementById('asignaturas');
+      const div = document.createElement('div');
+      div.classList.add('asignatura');
+      div.setAttribute('id', `asignatura_${contadorAsignaturas}`);
+
+      div.innerHTML = `
+        <div class="asignatura-header">
+          <h3>Asignatura ${contadorAsignaturas}</h3>
+          <button class="btn-eliminar" onclick="eliminarAsignatura(${contadorAsignaturas})">X</button>
+        </div>
+        <label>Nombre de la asignatura:</label>
+        <input type="text" id="nombre${contadorAsignaturas}" placeholder="Ej: Matemáticas" required>
+        
+        <h4>Primer Semestre</h4>
+        <div class="notas" id="notas1_${contadorAsignaturas}">
+          <div class="nota">
+            <input type="number" step="0.1" min="1.0" max="7.0" class="nota-input" placeholder="1.0 - 7.0">
+            <button class="btn-eliminar" onclick="this.parentElement.remove()">X</button>
+          </div>
+        </div>
+        <button class="btn-secundario" onclick="agregarNota(${contadorAsignaturas}, 1)">➕ Agregar Nota</button>
+        
+        <h4>Segundo Semestre</h4>
+        <div class="notas" id="notas2_${contadorAsignaturas}">
+          <div class="nota">
+            <input type="number" step="0.1" min="1.0" max="7.0" class="nota-input" placeholder="1.0 - 7.0">
+            <button class="btn-eliminar" onclick="this.parentElement.remove()">X</button>
+          </div>
+        </div>
+        <button class="btn-secundario" onclick="agregarNota(${contadorAsignaturas}, 2)">➕ Agregar Nota</button>
+      `;
+      contenedor.appendChild(div);
+    }
+
+    function eliminarAsignatura(id) {
+      document.getElementById(`asignatura_${id}`).remove();
+    }
+
+    function agregarNota(idAsignatura, semestre) {
+      const contenedorNotas = document.getElementById(`notas${semestre}_${idAsignatura}`);
+      const divNota = document.createElement('div');
+      divNota.classList.add('nota');
+      divNota.innerHTML = `
+        <input type="number" step="0.1" min="1.0" max="7.0" class="nota-input" placeholder="1.0 - 7.0">
+        <button class="btn-eliminar" onclick="this.parentElement.remove()">X</button>
+      `;
+      contenedorNotas.appendChild(divNota);
+    }
+
+    function calcularPromedio() {
+      const asignaturas = document.querySelectorAll('.asignatura');
+      let totalPromedios = 0;
+      let cantidadAsignaturas = 0;
+      let resultadoHTML = "";
+
+      asignaturas.forEach((asig, i) => {
+        const nombre = asig.querySelector('input[type="text"]').value || `Asignatura ${i + 1}`;
+        const notas1 = asig.querySelectorAll('h4:nth-of-type(1) ~ .notas .nota-input');
+        const notas2 = asig.querySelectorAll('h4:nth-of-type(2) ~ .notas .nota-input');
+        let suma1 = 0, suma2 = 0, validas1 = 0, validas2 = 0;
+
+        notas1.forEach(n => {
+          const valor = parseFloat(n.value);
+          if (!isNaN(valor) && valor >= 1.0 && valor <= 7.0) { suma1 += valor; validas1++; }
+        });
+
+        notas2.forEach(n => {
+          const valor = parseFloat(n.value);
+          if (!isNaN(valor) && valor >= 1.0 && valor <= 7.0) { suma2 += valor; validas2++; }
+        });
+
+        const promedio1 = validas1 > 0 ? (Math.round((suma1 / validas1) * 10) / 10).toFixed(1) : null;
+        const promedio2 = validas2 > 0 ? (Math.round((suma2 / validas2) * 10) / 10).toFixed(1) : null;
+
+        let promedioFinal = null;
+        if (promedio1 && promedio2) {
+          promedioFinal = (Math.round(((parseFloat(promedio1) + parseFloat(promedio2)) / 2) * 10) / 10).toFixed(1);
+        } else if (promedio1) {
+          promedioFinal = promedio1;
+        } else if (promedio2) {
+          promedioFinal = promedio2;
+        }
+
+        if (promedioFinal !== null) {
+          const color = promedioFinal >= 4.0 ? "green" : "red";
+          const estado = promedioFinal >= 4.0 ? "Aprobado" : "Reprobado";
+          totalPromedios += parseFloat(promedioFinal);
+          cantidadAsignaturas++;
+          resultadoHTML += `
+            <p><strong>${nombre}</strong> — 
+            Promedio Final: <span style="color:${color}">${promedioFinal}</span> 
+            (${estado})</p>`;
+        }
+      });
+
+      if (cantidadAsignaturas > 0) {
+        const promedioGeneral = (Math.round((totalPromedios / cantidadAsignaturas) * 10) / 10).toFixed(1);
+        resultadoHTML += `<hr><p><strong>Promedio General:</strong> ${promedioGeneral}</p>`;
+      } else {
+        resultadoHTML = "<p>No hay asignaturas válidas para calcular.</p>";
+      }
+
+      document.getElementById('resultado').innerHTML = resultadoHTML;
+    }
+  </script>
+</body>
+</html>

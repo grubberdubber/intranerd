@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IntraNerd</title>
+<style>
+  body {
+    font-family: "Segoe UI", sans-serif;
+    margin: 0;
+    background: #f5f7fa;
+    color: #333;
+  }
+  header {
+    background: #1e40af;
+    color: white;
+    padding: 15px 20px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 2em;
+  }
+  header p {
+    margin: 5px 0 0;
+    font-style: italic;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  select, input[type=text], input[type=number] {
+    padding: 5px 10px;
+    font-size: 15px;
+  }
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  .month {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fafafa;
+  }
+  .month h3 {
+    text-transform: capitalize;
+    text-align: center;
+    background: #2563eb;
+    color: white;
+    padding: 5px;
+    border-radius: 4px;
+  }
+  .days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 12px;
+  }
+  .day {
+    border: 1px solid #eee;
+    min-height: 80px;
+    position: relative;
+    padding: 2px;
+    background: white;
+  }
+  .day span.date {
+    font-weight: bold;
+    font-size: 12px;
+  }
+  .holiday {
+    background: #fee2e2 !important;
+    color: #b91c1c;
+  }
+  .events {
+    font-size: 11px;
+    margin-top: 2px;
+    text-align: left;
+  }
+  .add-btn {
+    font-size: 11px;
+    background: #e0f2fe;
+    border: 1px solid #60a5fa;
+    color: #0369a1;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 2px;
+    border-radius: 4px;
+  }
+  footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 12px;
+    color: #555;
+  }
+  .event-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border: 2px solid #2563eb;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+  .event-popup input, .event-popup textarea, .event-popup button {
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>IntraNerd</h1>
+  <p>"Organiza tus pruebas escolares fácilmente"</p>
+</header>
+
+<div class="container">
+  <div class="top-bar">
+    <div>
+      <label>Eres: </label>
+      <select id="rol" onchange="updateRoleName()">
+        <option value="alumno">Alumno</option>
+        <option value="profesor">Profesor</option>
+      </select>
+      <input type="text" id="nombreUsuario" placeholder="Tu nombre">
+    </div>
+    <div>
+      <button onclick="prevYear()">◀ Año anterior</button>
+      <input type="number" id="yearInput" value="2025" min="1900" max="2100" onchange="updateCalendar()">
+      <button onclick="nextYear()">Año siguiente ▶</button>
+    </div>
+  </div>
+
+  <div id="calendar" class="calendar"></div>
+</div>
+
+<footer>
+  © 2025 IntraNerd - Creado para alumnos y profesores
+</footer>
+
+<script>
+const holidays = {
+  1: [1],
+  5: [1, 21],
+  9: [18, 19],
+  12: [25]
+};
+
+function updateCalendar() {
+  const year = parseInt(document.getElementById("yearInput").value);
+  const calendar = document.getElementById("calendar");
+  calendar.innerHTML = "";
+
+  const monthNames = [
+    "Enero","Febrero","Marzo","Abril","Mayo","Junio",
+    "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
+  ];
+
+  for (let m = 0; m < 12; m++) {
+    const monthDiv = document.createElement("div");
+    monthDiv.className = "month";
+
+    const title = document.createElement("h3");
+    title.textContent = monthNames[m] + " " + year;
+
+    const daysDiv = document.createElement("div");
+    daysDiv.className = "days";
+
+    // Encabezados (lunes primero)
+    const weekdays = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+    weekdays.forEach(d => {
+      const header = document.createElement("div");
+      header.style.fontWeight = "bold";
+      header.style.background = "#e5e7eb";
+      header.style.border = "1px solid #ddd";
+      header.style.padding = "4px 0";
+      header.textContent = d;
+      daysDiv.appendChild(header);
+    });
+
+    // Convertir el primer día a formato lunes=0…domingo=6
+    const rawFirstDay = new Date(year, m, 1).getDay();
+    const firstDay = (rawFirstDay + 6) % 7;
+
+    // Espacios vacíos antes del día 1
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      empty.className = "day";
+      empty.style.background = "#f9fafb";
+      daysDiv.appendChild(empty);
+    }
+
+    const daysInMonth = new Date(year, m + 1, 0).getDate();
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+
+      if (holidays[m + 1]?.includes(d)) dayDiv.classList.add("holiday");
+
+      dayDiv.innerHTML = `
+        <span class="date">${d}</span>
+        <div class="events" id="events-${year}-${m+1}-${d}"></div>
+        <button class="add-btn" onclick="addEvent(${year}, ${m+1}, ${d})">Agregar prueba</button>
+      `;
+
+      daysDiv.appendChild(dayDiv);
+    }
+
+    monthDiv.appendChild(title);
+    monthDiv.appendChild(daysDiv);
+    calendar.appendChild(monthDiv);
+  }
+}
+
+function prevYear() {
+  const input = document.getElementById("yearInput");
+  input.value = parseInt(input.value) - 1;
+  updateCalendar();
+}
+
+function nextYear() {
+  const input = document.getElementById("yearInput");
+  input.value = parseInt(input.value) + 1;
+  updateCalendar();
+}
+
+function addEvent(year, month, day) {
+  const rol = document.getElementById("rol").value;
+  const nombre = document.getElementById("nombreUsuario").value.trim();
+
+  if (!nombre) {
+    alert("Por favor ingresa tu nombre antes de agregar una prueba.");
+    return;
+  }
+
+  const popup = document.createElement("div");
+  popup.className = "event-popup";
+  popup.innerHTML = `
+    <h3>Agregar prueba para ${day}/${month}/${year}</h3>
+    <input id="titulo" placeholder="Nombre de la prueba">
+    <textarea id="descripcion" rows="4" placeholder="Descripción o contenidos de la prueba"></textarea>
+    <button onclick="guardarEvento(${year},${month},${day},'${rol}','${nombre}')">Guardar</button>
+    <button onclick="this.parentElement.remove()">Cancelar</button>
+  `;
+  document.body.appendChild(popup);
+}
+
+function guardarEvento(year, month, day, rol, nombre) {
+  const titulo = document.getElementById("titulo").value.trim();
+  const descripcion = document.getElementById("descripcion").value.trim();
+  if (!titulo) {
+    alert("Por favor ingresa un nombre para la prueba");
+    return;
+  }
+
+  const eventsDiv = document.getElementById(`events-${year}-${month}-${day}`);
+  const event = document.createElement("div");
+  event.innerHTML = `<strong>${titulo}</strong><br><em>${descripcion}</em><br><small>Publicado por ${rol}: ${nombre}</small>`;
+  eventsDiv.appendChild(event);
+
+  document.querySelector(".event-popup").remove();
+}
+
+function updateRoleName() {
+  const rol = document.getElementById("rol").value;
+  const input = document.getElementById("nombreUsuario");
+  input.placeholder = rol === "alumno" ? "Nombre del alumno" : "Nombre del profesor";
+}
+
+updateCalendar();
+updateRoleName();
+</script>
+</body>
+</html>
+

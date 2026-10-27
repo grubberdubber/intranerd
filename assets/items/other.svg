@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Objeto">
+  <defs><linearGradient id="ibg-other" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#ibg-other)"/>
+  <circle cx="200" cy="142" r="100" fill="#dbeafe" opacity=".6"/>
+  <rect x="132" y="112" width="136" height="104" rx="14" fill="#0891b2"/><path d="M164 112V96c0-20 16-36 36-36s36 16 36 36v16" fill="none" stroke="#164e63" stroke-width="12" stroke-linecap="round"/><circle cx="200" cy="164" r="20" fill="#cffafe"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Inter, Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#1e40af">Objeto</text>
+</svg>

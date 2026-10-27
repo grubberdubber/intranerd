@@ -1,0 +1,32 @@
+/* ==========================================================================
+   IntraNerd · Hoja de estilos principal
+   Punto único de entrada. Los estilos se organizan por responsabilidad:
+   tokens → base → layout → componentes → vistas.
+   ========================================================================== */
+
+@import url('./tokens.css');
+@import url('./base.css');
+@import url('./layout.css');
+
+/* Componentes reutilizables */
+@import url('./components/buttons.css');
+@import url('./components/forms.css');
+@import url('./components/cards.css');
+@import url('./components/badges.css');
+@import url('./components/tabs.css');
+@import url('./components/modal.css');
+@import url('./components/toast.css');
+@import url('./components/skeleton.css');
+@import url('./components/stars.css');
+
+/* Vistas */
+@import url('./views/dashboard.css');
+@import url('./views/grades.css');
+@import url('./views/missing.css');
+@import url('./views/teachers.css');
+@import url('./views/lostfound.css');
+@import url('./views/calendar.css');
+@import url('./views/workshops.css');
+@import url('./views/announcements.css');
+@import url('./views/tasks.css');
+@import url('./views/not-found.css');

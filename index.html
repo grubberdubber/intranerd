@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e40af" />
+    <meta
+      name="description"
+      content="IntraNerd — plataforma integral de gestión escolar para alumnos, profesores y administración."
+    />
+    <title>IntraNerd · Plataforma Escolar</title>
+    <link rel="icon" href="assets/illustrations/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="src/styles/main.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Saltar al contenido principal</a>
+
+    <div id="app" class="app-shell" data-ready="false">
+      <div class="boot-screen" role="status" aria-live="polite">
+        <span class="boot-screen__mark" aria-hidden="true">IN</span>
+        <span class="boot-screen__label">Cargando IntraNerd…</span>
+      </div>
+    </div>
+
+    <div id="modal-root"></div>
+    <div
+      id="toast-root"
+      class="toast-stack"
+      role="status"
+      aria-live="polite"
+      aria-atomic="false"
+    ></div>
+
+    <noscript>
+      <p class="noscript">IntraNerd necesita JavaScript habilitado para funcionar.</p>
+    </noscript>
+
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

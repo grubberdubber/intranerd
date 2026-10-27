@@ -1,0 +1,165 @@
+/* ==========================================================================
+   Estados de carga, esqueletos y estados vacíos
+   ========================================================================== */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xs);
+  background: var(--slate-100);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: skeleton-shimmer 1.35s infinite;
+}
+
+.skeleton--text {
+  height: 12px;
+  margin: 5px 0;
+}
+
+.skeleton--title {
+  width: 42%;
+  height: 20px;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton--card {
+  height: 148px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton--avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.skeleton--thumb {
+  width: 112px;
+  height: 96px;
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+}
+
+.skeleton--row {
+  height: 92px;
+  border-radius: var(--radius-md);
+}
+
+.skeleton--chart {
+  height: 180px;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-group {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.skeleton-group--row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.skeleton-group--row .skeleton--body {
+  flex: 1;
+  display: grid;
+  gap: var(--space-2);
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(37, 99, 235, 0.2);
+  border-top-color: var(--brand-600);
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+.spinner--sm {
+  width: 14px;
+  height: 14px;
+}
+
+.spinner--light {
+  border-color: rgba(255, 255, 255, 0.28);
+  border-top-color: var(--white);
+}
+
+.loading-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Estado vacío
+   -------------------------------------------------------------------------- */
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-5);
+  text-align: center;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, var(--surface), var(--slate-50));
+}
+
+.empty-state__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: var(--brand-50);
+  color: var(--brand-600);
+}
+
+.empty-state__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.empty-state__title {
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.empty-state__text {
+  max-width: 42ch;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.empty-state--compact {
+  padding: var(--space-6) var(--space-4);
+}

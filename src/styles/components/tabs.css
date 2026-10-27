@@ -1,0 +1,113 @@
+/* ==========================================================================
+   Tabs, segmented controls y filtros
+   ========================================================================== */
+
+.tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--slate-100);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  transition:
+    background var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+
+.tab:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.tab.is-active {
+  background: var(--surface);
+  color: var(--brand-700);
+  box-shadow: var(--shadow-xs);
+}
+
+.tab__count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: var(--radius-full);
+  background: var(--slate-200);
+  color: var(--text-soft);
+  font-size: 0.65rem;
+  line-height: 18px;
+  text-align: center;
+}
+
+.tab.is-active .tab__count {
+  background: var(--brand-100);
+  color: var(--brand-700);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--slate-50);
+}
+
+.segmented__btn {
+  padding: 6px 11px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.segmented__btn.is-active {
+  background: var(--surface);
+  color: var(--brand-700);
+  box-shadow: var(--shadow-xs);
+}
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filter-pill {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  transition:
+    background var(--duration) var(--ease),
+    color var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
+}
+
+.filter-pill:hover {
+  border-color: var(--brand-100);
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.filter-pill.is-active {
+  border-color: var(--brand-600);
+  background: var(--brand-600);
+  color: var(--white);
+}

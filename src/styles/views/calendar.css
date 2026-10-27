@@ -1,0 +1,293 @@
+/* ==========================================================================
+   Vista · Calendario escolar de pruebas
+   ========================================================================== */
+
+.calendar-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.calendar-year {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.calendar-year__value {
+  min-width: 76px;
+  text-align: center;
+  font-size: var(--text-md);
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.calendar-identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.calendar-identity .select {
+  width: auto;
+  min-height: 34px;
+  padding-block: 5px;
+  font-size: var(--text-xs);
+}
+
+.calendar-identity .input {
+  width: 170px;
+  min-height: 34px;
+  padding-block: 5px;
+  font-size: var(--text-xs);
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--slate-200);
+}
+
+.legend-dot--today {
+  background: var(--brand-600);
+}
+
+.legend-dot--holiday {
+  background: #fecaca;
+}
+
+.legend-dot--event {
+  background: var(--warning-400, var(--warning-500));
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: var(--space-4);
+}
+
+.month-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.month-card__title {
+  padding: 9px var(--space-4);
+  background: linear-gradient(120deg, var(--brand-800), var(--brand-600));
+  color: var(--white);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.02em;
+}
+
+.month-card__weekdays,
+.month-card__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.month-card__weekdays {
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--slate-50);
+}
+
+.month-card__weekday {
+  text-align: center;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.month-card__days {
+  padding: var(--space-1);
+}
+
+.day-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 54px;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  text-align: left;
+  transition: background var(--duration) var(--ease);
+}
+
+.day-cell:hover {
+  background: var(--brand-50);
+}
+
+.day-cell--empty {
+  cursor: default;
+  background: transparent;
+}
+
+.day-cell__number {
+  display: inline-grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 650;
+  color: var(--text-soft);
+}
+
+.day-cell--today .day-cell__number {
+  background: var(--brand-600);
+  color: var(--white);
+  font-weight: 750;
+}
+
+.day-cell--holiday {
+  background: var(--danger-50);
+}
+
+.day-cell--holiday .day-cell__number {
+  color: var(--danger-700);
+}
+
+.day-cell__events {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.day-event {
+  display: block;
+  width: 100%;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: var(--warning-50);
+  color: var(--warning-700);
+  font-size: 0.58rem;
+  font-weight: 650;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-cell__more {
+  font-size: 0.56rem;
+  color: var(--text-muted);
+  padding-left: 2px;
+}
+
+/* Modal de día */
+.day-modal__header {
+  display: grid;
+  gap: 2px;
+}
+
+.day-modal__date {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.day-events {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.day-event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--slate-50);
+}
+
+.day-event-item__body {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.day-event-item__title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.day-event-item__desc {
+  font-size: var(--text-xs);
+  color: var(--text-soft);
+}
+
+.day-event-item__author {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.day-event-item__delete {
+  flex: 0 0 auto;
+}
+
+.calendar-empty {
+  padding: var(--space-3);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .calendar-year {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .calendar-identity {
+    width: 100%;
+  }
+
+  .calendar-identity .input {
+    flex: 1;
+    width: auto;
+  }
+
+  .month-card__days {
+    padding: 2px;
+  }
+
+  .day-cell {
+    min-height: 46px;
+  }
+}

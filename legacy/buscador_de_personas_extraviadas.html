@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IntraNerd · Personas Extraviadas</title>
+<style>
+  :root{
+    --blue:#1e40af;
+    --muted:#6b7280;
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --accent:#2563eb;
+    --success:#10b981;
+    --danger:#ef4444;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background:var(--bg);
+    color:#0f172a;
+  }
+  header{
+    background:linear-gradient(90deg,var(--blue),var(--accent));
+    color:white;
+    padding:18px 16px;
+    text-align:center;
+  }
+  header h1{margin:0;font-size:1.6rem}
+  header p{margin:6px 0 0;font-size:0.95rem;opacity:0.95}
+
+  .wrap{max-width:1100px;margin:20px auto;padding:12px}
+  .grid{display:grid;gap:14px;grid-template-columns:1fr 420px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border-radius:10px;padding:12px;box-shadow:0 6px 18px rgba(2,6,23,0.06);border:1px solid rgba(2,6,23,0.04)}
+  h2{margin:0 0 8px;font-size:1.05rem;color:var(--blue)}
+  .lead{margin:0;color:var(--muted);font-size:0.9rem}
+
+  form{display:grid;gap:8px}
+  label{font-size:0.85rem;color:var(--muted)}
+  input[type=text], input[type=tel], input[type=number], textarea, select {
+    width:100%;padding:8px 10px;border-radius:8px;border:1px solid #e6edf3;font-size:0.95rem;background:transparent
+  }
+  textarea{min-height:90px;resize:vertical}
+
+  .btn{display:inline-block;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .btn-primary{background:var(--accent);color:white}
+  .btn-ghost{background:transparent;border:1px solid #e6edf3}
+  .btn-danger{background:var(--danger);color:white}
+
+  .list{display:grid;gap:12px;margin-top:8px}
+  .report{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;border:1px solid #eef3ff;background:linear-gradient(180deg,#fff,#fbfdff)}
+  .report .thumb{width:120px;height:120px;flex-shrink:0;border-radius:8px;overflow:hidden;display:grid;place-items:center;background:#f1f5f9;border:1px solid #e2e8f0}
+  .report .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .report .info{flex:1}
+  .report .meta{font-size:0.9rem;color:var(--muted)}
+  .report .actions{display:flex;flex-direction:column;gap:6px}
+  .found-badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--success);color:white;font-weight:700;font-size:12px;margin-left:8px}
+
+  .example-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+  .example-thumb{width:78px;height:60px;border-radius:6px;overflow:hidden;cursor:pointer;border:2px solid transparent}
+  .example-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .example-thumb:hover{border-color:var(--accent)}
+
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:0.9rem;padding:16px}
+  small.note{display:block;color:var(--muted);font-size:0.85rem;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <h1>IntraNerd · Personas Extraviadas</h1>
+  <p>Tu mejor plataforma de encontrar personas extraviadas</p>
+</header>
+
+<div class="wrap">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <strong>IntraNerd</strong><br><span style="color:var(--muted)">Reportes de personas extraviadas en entornos escolares</span>
+    </div>
+    <div style="color:var(--muted)">Guardado en tu navegador (localStorage)</div>
+  </div>
+
+  <div class="grid">
+    <!-- LISTA DE REPORTES -->
+    <div>
+      <div class="card">
+        <h2>Reportes recientes</h2>
+        <p class="lead">Últimos reportes de personas extraviadas en la comunidad escolar</p>
+        <div id="reportsList" class="list"></div>
+        <div id="reportsEmpty" style="display:none;padding:12px;color:var(--muted);">No hay reportes aún.</div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO -->
+    <aside>
+      <div class="card">
+        <h2>Reportar persona extraviada</h2>
+        <p class="lead">Agrega la información que tengas. Cuanta más información, mejor.</p>
+        <form id="reportForm">
+          <label>Nombre de la persona</label>
+          <input type="text" id="pName" placeholder="Ej: Juan Pérez" required>
+
+          <label>Edad (aprox.)</label>
+          <input type="number" id="pAge" placeholder="Ej: 14" min="0">
+
+          <label>Descripción (ropa, rasgos, etc.)</label>
+          <textarea id="pDesc" placeholder="Descripción detallada..." required></textarea>
+
+          <label>Último lugar visto</label>
+          <input type="text" id="pPlace" placeholder="Ej: Patio central / Aula 5" required>
+
+          <label>Contacto de reporte</label>
+          <input type="text" id="pContact" placeholder="Nombre o teléfono / correo" required>
+
+          <label>Foto / Evidencia (opcional)</label>
+          <input type="file" id="pPhoto" accept="image/*,video/*">
+
+          <small class="note">O haz clic en una imagen de ejemplo para usarla rápidamente:</small>
+          <div class="example-row" id="exampleThumbs"></div>
+
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary" type="submit">Reportar</button>
+            <button class="btn btn-ghost" type="button" onclick="document.getElementById('reportForm').reset()">Limpiar</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="card">
+        <h2>Buscar / Filtrar</h2>
+        <p class="lead">Filtra por nombre, lugar o estado</p>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre o lugar">
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-primary" onclick="applyFilter()">Aplicar</button>
+          <button class="btn btn-ghost" onclick="resetFilter()">Limpiar filtro</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <footer>© 2025 — IntraNerd · Tu mejor plataforma de encontrar personas extraviadas</footer>
+</div>
+
+<script>
+/* Example images (externas estables) */
+const EXAMPLE_IMAGES = [
+  "https://upload.wikimedia.org/wikipedia/commons/3/3f/Person_icon.png",
+  "https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=600&q=80",
+  "https://xsgames.co/randomusers/assets/avatars/female/68.jpg",
+  "https://xsgames.co/randomusers/assets/avatars/male/28.jpg"
+];
+
+/* localStorage key */
+const KEY_REPORTS = 'intranerd_missing_v1';
+
+/* DOM */
+const reportsList = document.getElementById('reportsList');
+const reportsEmpty = document.getElementById('reportsEmpty');
+const exampleThumbs = document.getElementById('exampleThumbs');
+const searchInput = document.getElementById('searchInput');
+
+/* Populate example thumbnails */
+function renderExampleThumbs(){
+  exampleThumbs.innerHTML = '';
+  EXAMPLE_IMAGES.forEach(url=>{
+    const div = document.createElement('div');
+    div.className = 'example-thumb';
+    const img = document.createElement('img');
+    img.src = url;
+    img.alt = 'ejemplo';
+    div.appendChild(img);
+    div.onclick = () => {
+      // store chosen url temporarily on the form element
+      document.getElementById('reportForm').dataset.chosenImg = url;
+      // visual feedback
+      document.querySelectorAll('.example-thumb').forEach(t=>t.style.borderColor='transparent');
+      div.style.borderColor = 'var(--accent)';
+    };
+    exampleThumbs.appendChild(div);
+  });
+}
+
+/* load/save */
+function loadReports(){ try { return JSON.parse(localStorage.getItem(KEY_REPORTS)) || []; } catch { return []; } }
+function saveReports(arr){ localStorage.setItem(KEY_REPORTS, JSON.stringify(arr)); }
+
+/* helper */
+function uid(prefix='r'){ return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function now(){ return new Date().toLocaleString(); }
+function escapeHtml(s){ if(!s) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;'); }
+
+/* Render reports (with optional filter) */
+function renderReports(filterText=''){
+  const arr = loadReports();
+  reportsList.innerHTML = '';
+  const filtered = arr.filter(r => {
+    if(!filterText) return true;
+    const t = filterText.toLowerCase();
+    return (r.name && r.name.toLowerCase().includes(t)) ||
+           (r.place && r.place.toLowerCase().includes(t)) ||
+           (r.contact && r.contact.toLowerCase().includes(t));
+  });
+  if(filtered.length === 0){
+    reportsEmpty.style.display = 'block';
+    return;
+  } else reportsEmpty.style.display = 'none';
+
+  filtered.reverse().forEach(report => {
+    const div = document.createElement('div');
+    div.className = 'report';
+
+    // thumb
+    const thumb = document.createElement('div'); thumb.className = 'thumb';
+    if(report.photo && report.photo.startsWith('data:')){
+      const img = document.createElement('img'); img.src = report.photo; thumb.appendChild(img);
+    } else if(report.photo && report.photo.startsWith('http')){
+      const img = document.createElement('img'); img.src = report.photo; thumb.appendChild(img);
+    } else if(report.exampleImg){
+      const img = document.createElement('img'); img.src = report.exampleImg; thumb.appendChild(img);
+    } else {
+      const img = document.createElement('img'); img.src = EXAMPLE_IMAGES[0]; thumb.appendChild(img);
+    }
+
+    // info
+    const info = document.createElement('div'); info.className = 'info';
+    const title = document.createElement('div');
+    title.innerHTML = `<strong>${escapeHtml(report.name)}</strong> ${report.found ? '<span class="found-badge">ENCONTRADO</span>' : ''}`;
+    const meta = document.createElement('div'); meta.className = 'meta';
+    meta.innerHTML = `Edad: ${escapeHtml(report.age || '—')} · Último lugar: ${escapeHtml(report.place || '—')}`;
+    const desc = document.createElement('div'); desc.style.marginTop='8px';
+    desc.textContent = report.desc || '';
+    const contact = document.createElement('div'); contact.className='meta';
+    contact.style.marginTop='8px';
+    contact.innerHTML = `<strong>Contacto:</strong> ${escapeHtml(report.contact)} · <small style="color:var(--muted)">Reportado: ${escapeHtml(report.when)}</small>`;
+
+    // evidence viewer (if photo is data URL or http)
+    if(report.photo && (report.photo.startsWith('data:') || report.photo.startsWith('http'))){
+      const ev = document.createElement('div'); ev.className='meta';
+      ev.style.marginTop='8px';
+      const a = document.createElement('a'); a.href = report.photo; a.target='_blank'; a.textContent = 'Ver foto/evidencia';
+      ev.appendChild(a);
+      info.appendChild(ev);
+    }
+
+    info.appendChild(title);
+    info.appendChild(meta);
+    info.appendChild(desc);
+    info.appendChild(contact);
+
+    // actions
+    const actions = document.createElement('div'); actions.className='actions';
+    const btnFound = document.createElement('button'); btnFound.className='btn btn-primary'; btnFound.textContent = report.found ? 'Marcar como NO encontrado' : 'Marcar como ENCONTRADO';
+    btnFound.onclick = () => toggleFound(report.id);
+    const btnDelete = document.createElement('button'); btnDelete.className='btn btn-ghost'; btnDelete.textContent = 'Eliminar';
+    btnDelete.onclick = () => deleteReport(report.id);
+    actions.appendChild(btnFound);
+    actions.appendChild(btnDelete);
+
+    div.appendChild(thumb);
+    div.appendChild(info);
+    div.appendChild(actions);
+
+    reportsList.appendChild(div);
+  });
+}
+
+/* add report */
+document.getElementById('reportForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('pName').value.trim();
+  const age = document.getElementById('pAge').value;
+  const desc = document.getElementById('pDesc').value.trim();
+  const place = document.getElementById('pPlace').value.trim();
+  const contact = document.getElementById('pContact').value.trim();
+  const file = document.getElementById('pPhoto').files[0];
+  const chosenImg = this.dataset.chosenImg || null;
+
+  if(!name || !desc || !place || !contact){
+    alert('Por favor completa nombre, descripción, lugar y contacto.');
+    return;
+  }
+
+  const arr = loadReports();
+  const id = uid();
+
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => {
+      const photoData = reader.result;
+      arr.push({ id, name, age, desc, place, contact, photo: photoData, exampleImg: null, when: now(), found:false });
+      saveReports(arr);
+      this.reset();
+      delete this.dataset.chosenImg;
+      document.querySelectorAll('.example-thumb').forEach(t=>t.style.borderColor='transparent');
+      renderReports(searchInput.value.trim());
+      alert('Reporte guardado. Gracias.');
+    };
+    reader.readAsDataURL(file);
+  } else {
+    // use chosen example image if present
+    const exampleImg = chosenImg || null;
+    arr.push({ id, name, age, desc, place, contact, photo: null, exampleImg, when: now(), found:false });
+    saveReports(arr);
+    this.reset();
+    delete this.dataset.chosenImg;
+    document.querySelectorAll('.example-thumb').forEach(t=>t.style.borderColor='transparent');
+    renderReports(searchInput.value.trim());
+    alert('Reporte guardado. Gracias.');
+  }
+});
+
+/* toggle found */
+function toggleFound(id){
+  const arr = loadReports();
+  const idx = arr.findIndex(r=>r.id===id);
+  if(idx===-1) return;
+  arr[idx].found = !arr[idx].found;
+  saveReports(arr);
+  renderReports(searchInput.value.trim());
+}
+
+/* delete */
+function deleteReport(id){
+  if(!confirm('Eliminar este reporte?')) return;
+  let arr = loadReports();
+  arr = arr.filter(r=>r.id!==id);
+  saveReports(arr);
+  renderReports(searchInput.value.trim());
+}
+
+/* filter */
+function applyFilter(){
+  const q = searchInput.value.trim();
+  renderReports(q);
+}
+function resetFilter(){
+  searchInput.value = '';
+  renderReports('');
+}
+
+/* initialize with samples if empty */
+(function initSample(){
+  if(!localStorage.getItem(KEY_REPORTS)){
+    const sample = [
+      { id: uid(), name: "Sofía Ramos", age: 13, desc: "Sudadera gris, mochila rosa, cabello largo castaño.", place: "Patio central", contact: "Mamá: 912345678", photo: null, exampleImg: EXAMPLE_IMAGES[1], when: now(), found:false },
+      { id: uid(), name: "Matías Oliva", age: 15, desc: "Camisa azul, zapatillas blancas.", place: "Entrada principal", contact: "Profe: López", photo: null, exampleImg: EXAMPLE_IMAGES[2], when: now(), found:false }
+    ];
+    saveReports(sample);
+  }
+})();
+
+/* utilities */
+function renderInitial(){
+  renderExampleThumbs();
+  renderReports('');
+}
+renderInitial();
+
+</script>
+</body>
+</html>

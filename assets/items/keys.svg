@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Llaves">
+  <defs><linearGradient id="ibg-keys" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#ibg-keys)"/>
+  <circle cx="200" cy="142" r="100" fill="#dbeafe" opacity=".6"/>
+  <circle cx="158" cy="135" r="34" fill="none" stroke="#d97706" stroke-width="16"/><path d="M184 159l62 62M226 201l18-18M248 223l18-18" stroke="#d97706" stroke-width="16" stroke-linecap="round"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Inter, Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#1e40af">Llaves</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Mochila">
+  <defs><linearGradient id="ibg-backpack" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="400" height="300" fill="url(#ibg-backpack)"/>
+  <circle cx="200" cy="142" r="100" fill="#dbeafe" opacity=".6"/>
+  <path d="M145 105h110c17 0 30 13 30 30v105c0 17-13 30-30 30H145c-17 0-30-13-30-30V135c0-17 13-30 30-30Z" fill="#2563eb"/><path d="M165 105V88c0-19 16-35 35-35s35 16 35 35v17" fill="none" stroke="#1e3a8a" stroke-width="14" stroke-linecap="round"/><rect x="170" y="160" width="60" height="48" rx="10" fill="#dbeafe"/><path d="M145 210h110" stroke="#1e40af" stroke-width="10"/>
+  <text x="200" y="270" text-anchor="middle" font-family="Inter, Segoe UI, sans-serif" font-size="18" font-weight="700" fill="#1e40af">Mochila</text>
+</svg>

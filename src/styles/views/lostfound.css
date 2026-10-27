@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Vista · Objetos perdidos y encontrados
+   ========================================================================== */
+
+.lostfound-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+}
+
+.item-card {
+  display: grid;
+  grid-template-rows: 150px auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.item-card__media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: var(--slate-100);
+  overflow: hidden;
+}
+
+.item-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-card__badge {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+}
+
+.item-card__body {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.item-card__title {
+  font-size: var(--text-sm);
+  font-weight: 730;
+  overflow-wrap: anywhere;
+}
+
+.item-card__meta {
+  display: grid;
+  gap: 2px;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.item-card__meta strong {
+  color: var(--text-soft);
+  font-weight: 650;
+}
+
+.item-card__footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
+.item-card__date {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.item-card.is-resolved {
+  opacity: 0.72;
+}
+
+.lostfound-panel {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.lostfound-empty {
+  grid-column: 1 / -1;
+}
+
+.lostfound-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--brand-100);
+  border-radius: var(--radius-md);
+  background: var(--brand-50);
+  color: var(--brand-900);
+  font-size: var(--text-xs);
+}
+
+.lostfound-note svg {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+  color: var(--brand-600);
+}
