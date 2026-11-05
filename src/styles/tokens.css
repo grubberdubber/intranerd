@@ -104,6 +104,10 @@
   --topbar-height: 72px;
   --content-max: 1440px;
 
+  /* Accesibilidad */
+  --focus-ring: #1d4ed8;
+  --focus-ring-inverse: #fbbf24;
+
   /* Movimiento */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 180ms;

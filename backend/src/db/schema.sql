@@ -196,3 +196,27 @@ CREATE TABLE IF NOT EXISTS task_completions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_completions_task ON task_completions (task_id);
+
+-- ---------------------------------------------------------------------------
+-- Módulo 9 · Contacto, soporte y accesibilidad
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         TEXT PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL,
+  role       TEXT NOT NULL DEFAULT 'OTHER'
+             CHECK (role IN ('STUDENT', 'GUARDIAN', 'TEACHER', 'DIRECTION', 'OTHER')),
+  topic      TEXT NOT NULL DEFAULT 'OTHER'
+             CHECK (topic IN ('SUPPORT', 'ACCESSIBILITY', 'ACADEMIC',
+                              'COMMUNITY', 'SUGGESTION', 'OTHER')),
+  subject    TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  consent    INTEGER NOT NULL DEFAULT 0 CHECK (consent IN (0, 1)),
+  status     TEXT NOT NULL DEFAULT 'NEW'
+             CHECK (status IN ('NEW', 'READ', 'RESOLVED')),
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_contact_status ON contact_messages (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_email ON contact_messages (email);

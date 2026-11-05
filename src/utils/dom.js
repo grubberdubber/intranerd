@@ -134,20 +134,45 @@ export function formToObject(form) {
 export function setFieldError(input, message) {
   if (!input) return;
   input.setAttribute('aria-invalid', 'true');
-  const field = input.closest('.field');
+  const field = input.closest('.field') || input.parentElement;
   if (!field) return;
+
+  const baseId = input.id || input.name || 'field';
+  const errorId = `${baseId}-error`;
+
   let error = field.querySelector('.field__error');
   if (!error) {
     error = document.createElement('span');
     error.className = 'field__error';
+    error.id = errorId;
+    error.dataset.fieldErrorFor = baseId;
     field.appendChild(error);
   }
   error.textContent = message;
+
+  // Asocia el error sin perder las pistas que ya describían al campo.
+  const describedBy = new Set(
+    (input.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean),
+  );
+  describedBy.add(error.id);
+  input.setAttribute('aria-describedby', [...describedBy].join(' '));
 }
 
 export function clearFieldErrors(root) {
   qsa('[aria-invalid="true"]', root).forEach((input) => input.removeAttribute('aria-invalid'));
-  qsa('.field__error', root).forEach((error) => error.remove());
+
+  qsa('.field__error', root).forEach((error) => {
+    const errorId = error.id;
+    error.remove();
+    if (!errorId) return;
+    qsa('[aria-describedby]', root).forEach((node) => {
+      const tokens = (node.getAttribute('aria-describedby') || '')
+        .split(/\s+/)
+        .filter((token) => token && token !== errorId);
+      if (tokens.length) node.setAttribute('aria-describedby', tokens.join(' '));
+      else node.removeAttribute('aria-describedby');
+    });
+  });
 }
 
 export function onEscape(handler) {

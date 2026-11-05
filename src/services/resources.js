@@ -727,6 +727,22 @@ export const tasksRepo = createResource({
   },
 });
 
+/* -------------------------------------------------------------------------- */
+/* 9 · Contacto y soporte                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * El formulario funciona con la misma estrategia que el resto de módulos:
+ * la API guarda el mensaje en la bandeja del colegio y, si no está disponible,
+ * queda respaldado en localStorage. No se expone un listado público.
+ */
+export const contactRepo = createResource({
+  name: 'message',
+  endpoint: '/contact',
+  storageKey: STORAGE_KEYS.contact,
+  seed: () => [],
+});
+
 export const repos = {
   subjects: subjectsRepo,
   missing: missingRepo,
@@ -737,4 +753,5 @@ export const repos = {
   workshops: workshopsRepo,
   announcements: announcementsRepo,
   tasks: tasksRepo,
+  contact: contactRepo,
 };

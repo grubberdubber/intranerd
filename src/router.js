@@ -12,6 +12,7 @@ import { mount as mountCalendar } from './views/calendar.js';
 import { mount as mountWorkshops } from './views/workshops.js';
 import { mount as mountAnnouncements } from './views/announcements.js';
 import { mount as mountTasks } from './views/tasks.js';
+import { mount as mountContact } from './views/contact.js';
 
 /**
  * Router por hash. No requiere servidor especial ni recarga de página:
@@ -27,6 +28,7 @@ const VIEWS = {
   workshops: mountWorkshops,
   announcements: mountAnnouncements,
   tasks: mountTasks,
+  contact: mountContact,
 };
 
 const DEFAULT_ROUTE = NAV_ITEMS[0];
@@ -102,13 +104,26 @@ function renderError(container, route, error) {
 
 export function createRouter(layout) {
   let activeRouteId = null;
+  let activeCleanup = null;
   let renderToken = 0;
+
+  function cleanupActiveView() {
+    if (typeof activeCleanup !== 'function') return;
+    try {
+      activeCleanup();
+    } catch (error) {
+      console.warn('[IntraNerd] Error al limpiar la vista anterior.', error);
+    } finally {
+      activeCleanup = null;
+    }
+  }
 
   async function render(route, { force = false } = {}) {
     if (!force && activeRouteId === route.id) return;
     activeRouteId = route.id;
     const token = ++renderToken;
 
+    cleanupActiveView();
     layout.setActive(route.id);
     layout.setTitle(route.label);
 
@@ -122,7 +137,14 @@ export function createRouter(layout) {
     }
 
     try {
-      await mountView(container);
+      const cleanup = await mountView(container);
+      // Si mientras montaba llegó otra navegación, limpiamos de inmediato los
+      // recursos de esta vista descartada (suscripciones, timers, etc.).
+      if (token !== renderToken) {
+        if (typeof cleanup === 'function') cleanup();
+        return;
+      }
+      if (typeof cleanup === 'function') activeCleanup = cleanup;
     } catch (error) {
       if (token !== renderToken) return;
       renderError(container, route, error);
@@ -135,6 +157,7 @@ export function createRouter(layout) {
 
     if (!route) {
       activeRouteId = null;
+      cleanupActiveView();
       layout.setActive(null);
       layout.setTitle('Página no encontrada');
       const container = el('div', { class: 'view', dataset: { route: 'not-found' } });

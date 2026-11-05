@@ -153,6 +153,24 @@ export async function mount(container) {
     const completed = tasks.length - pendingTasks.length;
     const completion = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
 
+    const mascot = el(
+      'figure',
+      { class: 'hero__mascot' },
+      el('span', {
+        class: 'hero__mascot-bubble',
+        attrs: { 'aria-hidden': 'true' },
+        text: '¡Vamos!',
+      }),
+      el('img', {
+        src: 'assets/mascots/nerdi.webp',
+        alt: 'Nerdi, el búho mascota de IntraNerd, con sus gafas y un libro.',
+        width: '470',
+        height: '520',
+        loading: 'lazy',
+        decoding: 'async',
+      }),
+    );
+
     const hero = el(
       'section',
       { class: 'hero' },
@@ -181,33 +199,38 @@ export async function mount(container) {
       ),
       el(
         'div',
-        { class: 'hero__stats' },
+        { class: 'hero__aside' },
+        mascot,
         el(
           'div',
-          { class: 'hero-stat' },
-          el('strong', {
-            class: 'hero-stat__value',
-            text: average === null ? '—' : formatNumber(average),
-          }),
-          el('span', { class: 'hero-stat__label', text: 'Promedio general' }),
-        ),
-        el(
-          'div',
-          { class: 'hero-stat' },
-          el('strong', { class: 'hero-stat__value', text: String(pendingTasks.length) }),
-          el('span', { class: 'hero-stat__label', text: 'Tareas pendientes' }),
-        ),
-        el(
-          'div',
-          { class: 'hero-stat' },
-          el('strong', { class: 'hero-stat__value', text: String(activeMissing.length) }),
-          el('span', { class: 'hero-stat__label', text: 'Reportes activos' }),
-        ),
-        el(
-          'div',
-          { class: 'hero-stat' },
-          el('strong', { class: 'hero-stat__value', text: String(upcoming.length) }),
-          el('span', { class: 'hero-stat__label', text: 'Pruebas próximas' }),
+          { class: 'hero__stats' },
+          el(
+            'div',
+            { class: 'hero-stat' },
+            el('strong', {
+              class: 'hero-stat__value',
+              text: average === null ? '—' : formatNumber(average),
+            }),
+            el('span', { class: 'hero-stat__label', text: 'Promedio general' }),
+          ),
+          el(
+            'div',
+            { class: 'hero-stat' },
+            el('strong', { class: 'hero-stat__value', text: String(pendingTasks.length) }),
+            el('span', { class: 'hero-stat__label', text: 'Tareas pendientes' }),
+          ),
+          el(
+            'div',
+            { class: 'hero-stat' },
+            el('strong', { class: 'hero-stat__value', text: String(activeMissing.length) }),
+            el('span', { class: 'hero-stat__label', text: 'Reportes activos' }),
+          ),
+          el(
+            'div',
+            { class: 'hero-stat' },
+            el('strong', { class: 'hero-stat__value', text: String(upcoming.length) }),
+            el('span', { class: 'hero-stat__label', text: 'Pruebas próximas' }),
+          ),
         ),
       ),
     );
@@ -257,7 +280,7 @@ export async function mount(container) {
           el('h2', { class: 'section__title', text: 'Accesos rápidos' }),
           el('p', {
             class: 'section__description',
-            text: 'Los ocho módulos de IntraNerd, siempre a un clic.',
+            text: 'Todos los módulos de IntraNerd, siempre a un clic.',
           }),
         ),
       ),

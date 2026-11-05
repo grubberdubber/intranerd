@@ -26,8 +26,27 @@
     transform var(--duration) var(--ease);
 }
 
+.stars__star svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  transition: fill var(--duration) var(--ease);
+}
+
 .stars__star.is-filled {
   color: var(--gold-400);
+}
+
+/* Las estrellas activas se rellenan en dorado; las vacías quedan como
+   contorno para que la diferencia se lea de un vistazo. */
+.stars__star.is-filled svg,
+.stars--interactive .stars__star:hover svg,
+.stars--interactive .stars__star.is-preview svg {
+  fill: currentColor;
+}
+
+.stars__star.is-filled svg {
+  filter: drop-shadow(0 1px 1px rgb(180 83 9 / 22%));
 }
 
 .stars--interactive .stars__star {

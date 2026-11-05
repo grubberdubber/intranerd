@@ -155,9 +155,9 @@ export function seedDatabase({ force = false } = {}) {
 
     const missingPeople = [
       {
-        name: 'Sofía Ramos',
+        name: 'Tomás Ramos',
         age: 13,
-        description: 'Sudadera gris, mochila rosa, cabello largo castaño.',
+        description: 'Polerón azul, mochila azul, cabello corto castaño.',
         place: 'Patio central',
         contact: 'Mamá: +56 9 1234 5678',
         photo:

@@ -9,6 +9,7 @@ import calendarRoutes from './calendar.routes.js';
 import workshopsRoutes from './workshops.routes.js';
 import announcementsRoutes from './announcements.routes.js';
 import tasksRoutes from './tasks.routes.js';
+import contactRoutes from './contact.routes.js';
 
 const router = Router();
 
@@ -37,6 +38,7 @@ router.get('/', (_req, res) => {
       '/api/v1/workshops',
       '/api/v1/announcements',
       '/api/v1/tasks',
+      '/api/v1/contact',
     ],
   });
 });
@@ -49,5 +51,6 @@ router.use('/calendar', calendarRoutes);
 router.use('/workshops', workshopsRoutes);
 router.use('/announcements', announcementsRoutes);
 router.use('/tasks', tasksRoutes);
+router.use('/contact', contactRoutes);
 
 export default router;

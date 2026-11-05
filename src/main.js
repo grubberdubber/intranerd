@@ -1,7 +1,7 @@
 import { APP_NAME } from './config.js';
 import { createLayout } from './components/layout.js';
 import { createRouter } from './router.js';
-import { migrateLegacyData } from './services/migrate.js';
+import { applyDataFixes, migrateLegacyData } from './services/migrate.js';
 import { toast } from './components/toast.js';
 import { el } from './utils/dom.js';
 
@@ -10,8 +10,9 @@ import { el } from './utils/dom.js';
  *
  * Orden de arranque:
  *  1. Migrar datos de los HTML originales (si existen).
- *  2. Construir el layout (sidebar, topbar, perfil, estado de conexión).
- *  3. Iniciar el router por hash y montar la primera vista.
+ *  2. Aplicar correcciones puntuales sobre datos ya guardados.
+ *  3. Construir el layout (sidebar, topbar, perfil, estado de conexión).
+ *  4. Iniciar el router por hash y montar la primera vista.
  */
 function boot() {
   const root = document.getElementById('app');
@@ -20,6 +21,7 @@ function boot() {
   }
 
   migrateLegacyData();
+  applyDataFixes();
 
   const layout = createLayout(root);
   const router = createRouter(layout);

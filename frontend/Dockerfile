@@ -11,6 +11,7 @@ ENV INTRANERD_API_BASE=$INTRANERD_API_BASE
 COPY index.html ./
 COPY src ./src
 COPY assets ./assets
+COPY docs ./docs
 COPY frontend/scripts/build.mjs ./frontend/scripts/build.mjs
 RUN node frontend/scripts/build.mjs
 

@@ -28,6 +28,12 @@ const defaults = {
     maxImageSize: 2.5 * 1024 * 1024,
     maxEvidenceSize: 4 * 1024 * 1024,
   },
+  contact: {
+    email: 'soporte@intranerd.cl',
+    phone: '+56 2 2345 6789',
+    hours: 'Lunes a viernes · 08:30 a 17:30',
+    responseTime: 'Respondemos en un plazo de 24 horas hábiles.',
+  },
 };
 
 function merge(base, override) {

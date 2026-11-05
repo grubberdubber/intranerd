@@ -50,12 +50,21 @@ export function createStarRating({ value = 0, onChange = null, label = 'Califica
   const buttons = [];
   const paint = (preview = null) => {
     const active = preview ?? current;
+    const focusable = current >= 1 && current <= 5 ? current : 1;
     buttons.forEach((button, index) => {
       const isActive = index + 1 <= active;
       button.classList.toggle('is-filled', isActive);
       button.classList.toggle('is-preview', preview !== null && isActive);
       button.setAttribute('aria-checked', String(current === index + 1));
+      // Roving tabindex: el grupo ocupa un solo tab stop (patrón radiogroup).
+      button.tabIndex = index + 1 === focusable ? 0 : -1;
     });
+  };
+
+  const select = (value) => {
+    current = value;
+    paint();
+    if (typeof onChange === 'function') onChange(current);
   };
 
   for (let index = 1; index <= 5; index += 1) {
@@ -70,11 +79,7 @@ export function createStarRating({ value = 0, onChange = null, label = 'Califica
       },
       html: icon('star', { size: 29, strokeWidth: 1.5 }),
       on: {
-        click: () => {
-          current = index;
-          paint();
-          if (typeof onChange === 'function') onChange(current);
-        },
+        click: () => select(index),
         mouseenter: () => paint(index),
         mouseleave: () => paint(),
         focus: () => paint(index),
@@ -84,6 +89,26 @@ export function createStarRating({ value = 0, onChange = null, label = 'Califica
     buttons.push(button);
     wrapper.appendChild(button);
   }
+
+  wrapper.addEventListener('keydown', (event) => {
+    const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End'];
+    if (!keys.includes(event.key)) return;
+    event.preventDefault();
+
+    const focused = buttons.indexOf(document.activeElement);
+    const from = focused === -1 ? Math.max(current - 1, 0) : focused;
+    let next = from;
+    if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = buttons.length - 1;
+    else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      next = (from + 1) % buttons.length;
+    } else {
+      next = (from - 1 + buttons.length) % buttons.length;
+    }
+
+    select(next + 1);
+    buttons[next].focus();
+  });
 
   wrapper.getValue = () => current;
   wrapper.setValue = (nextValue) => {

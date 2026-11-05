@@ -7,9 +7,9 @@
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-85ea2d)](docs/openapi.yaml)
 
 IntraNerd es el núcleo de gestión de una comunidad escolar. Reúne en una sola
-plataforma los ocho módulos del establecimiento: notas semestrales, talleres,
+plataforma los nueve módulos del establecimiento: notas semestrales, talleres,
 personas extraviadas, valoración de profesores, objetos perdidos, calendario de
-evaluaciones, comunicados y tareas.
+evaluaciones, comunicados, tareas y contacto/soporte.
 
 La aplicación es una **SPA offline-first**: toda la información se guarda en
 `localStorage`, por lo que funciona sin conexión y sin depender de un servidor.
@@ -30,6 +30,7 @@ suite de pruebas y una especificación OpenAPI.
 | 6   | **Calendario escolar**        | Navegación anual, feriados chilenos, selector de rol, eventos por día con autor                            |
 | 7   | **Comunicados**               | Feed oficial, fijado de anuncios, categorías y autoría                                                     |
 | 8   | **Tareas**                    | Publicación por asignatura, fechas de entrega y checklist personal por alumno                              |
+| 9   | **Contacto y soporte**        | Formulario accesible, API + respaldo local, canales directos y enlace a la solución tecnológica (OpenAPI)  |
 
 ---
 
@@ -68,7 +69,10 @@ flowchart LR
 │   ├── services/              # storage, HTTP, API, sesión y repositorios
 │   ├── styles/                # CSS modular (tokens, layout, vistas)
 │   └── utils/                 # DOM, formato, fechas, archivos
-├── assets/                    # Ilustraciones, avatares y miniaturas SVG
+├── assets/                    # Marca SVG, mascotas WebP, fuente Inter e ilustraciones
+│   ├── brand/                 # Logo claro/inverso y favicon
+│   ├── mascots/               # Nerdi (oficial) y alternativas conservadas
+│   └── fonts/                 # Inter variable autoalojada (OFL)
 ├── backend/
 │   ├── src/
 │   │   ├── db/                # Conexión, schema.sql, migración y seed
@@ -135,21 +139,20 @@ docker compose --profile backup run --rm db-backup
 
 ## Desarrollo local
 
-Requisitos: Node.js 24+ (no hace falta PostgreSQL ni Docker).
+Requisitos: Node.js 24+ y pnpm 12+ (no hace falta PostgreSQL ni Docker).
 
 ```bash
-# 1. Dependencias
-npm install
-npm --prefix backend install
+# 1. Dependencias del workspace (raíz + backend)
+pnpm install
 
 # 2. Variables del backend (opcional; los valores por defecto ya funcionan)
 cp backend/.env.example backend/.env
 
 # 3. API en :4000 (crea y siembra SQLite automáticamente)
-npm run dev:api
+pnpm dev:api
 
 # 4. SPA en :5173 con proxy /api → :4000
-npm run dev
+pnpm dev
 ```
 
 La SPA también puede abrirse como sitio estático: al no depender de un bundler,
@@ -179,7 +182,10 @@ conserva la base entre reinicios.
 ## API REST
 
 La especificación completa está en [`docs/openapi.yaml`](docs/openapi.yaml)
-(OpenAPI 3.0.3, 33 rutas). Base canónica: `/api/v1`; alias sin versión: `/api`.
+(OpenAPI 3.0.3, 34 rutas). Base canónica: `/api/v1`; alias sin versión: `/api`.
+La SPA también sirve esa especificación en `/docs/openapi.yaml` para que el
+enlace “Ver la solución tecnológica” del módulo de contacto funcione en
+producción.
 
 ```bash
 curl -s http://localhost:4000/api/v1/health | jq
@@ -197,6 +203,7 @@ curl -s http://localhost:4000/api/v1/workshops | jq
 | Calendario | `GET /calendar`, `GET/POST /calendar/events`, `GET /calendar/holidays`      |
 | Anuncios   | `GET/POST /announcements`, `PATCH /announcements/{id}/pin`                  |
 | Tareas     | `GET/POST /tasks`, `PATCH /tasks/{id}/completion`                           |
+| Contacto   | `POST /contact` (sin listado público; confirma recepción)                   |
 
 Todas las respuestas usan una envoltura uniforme:
 
@@ -239,6 +246,27 @@ npm --prefix backend test # 10 pruebas del backend con node:test
 - **Backend:** suite HTTP propia con `node:test`.
 
 CI ejecuta formato, lint, tests, Playwright y build de imágenes en cada push.
+
+---
+
+## Marca, mascota y tipografía
+
+- **Marca:** `assets/brand/intranerd-mark.svg` (libro abierto + gafas) para
+  fondos claros, `intranerd-mark-inverse.svg` para el sidebar azul y
+  `favicon.svg` para la pestaña. Los logos originales quedan en
+  `assets/brand/source/`.
+- **Mascota:** **Nerdi**, el búho, se usa en el panel general y en la vista de
+  contacto (`assets/mascots/nerdi.webp`). El niño y el robot de la lámina
+  original se conservan en `assets/mascots/alternativas/` para futuras campañas.
+- **Tipografía:** Inter variable, autoalojada en `assets/fonts/` y declarada en
+  `src/styles/fonts.css` con `font-display: swap`. **No se carga Google Fonts en
+  tiempo de ejecución**: no hay peticiones a `fonts.googleapis.com` ni
+  `fonts.gstatic.com`, ni cookies de terceros. La licencia OFL se conserva en
+  `assets/fonts/OFL.txt`.
+- **Accesibilidad:** objetivo WCAG 2.2 AA: navegación completa por teclado, foco
+  visible, contraste AA, regiones vivas, formularios con errores asociados,
+  `prefers-reduced-motion` y textos alternativos. El módulo de contacto permite
+  reportar barreras directamente al equipo.
 
 ---
 

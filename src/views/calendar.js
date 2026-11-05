@@ -212,7 +212,7 @@ function openDayModal(dateISO) {
         { class: 'field' },
         el(
           'label',
-          { class: 'field__label' },
+          { class: 'field__label', attrs: { for: 'event-subject' } },
           'Asignatura ',
           el('span', { class: 'field__optional', text: '(opcional)' }),
         ),
@@ -225,7 +225,7 @@ function openDayModal(dateISO) {
       { class: 'field' },
       el(
         'label',
-        { class: 'field__label' },
+        { class: 'field__label', attrs: { for: 'event-description' } },
         'Descripción ',
         el('span', { class: 'field__optional', text: '(opcional)' }),
       ),

@@ -61,10 +61,10 @@ export function seedMissing() {
   return [
     {
       id: uid('missing'),
-      name: 'Sofía Ramos',
+      name: 'Tomás Ramos',
       age: 13,
       desc:
-        'Sudadera gris con capucha, mochila rosa y cabello largo castaño. ' +
+        'Polerón azul con capucha, mochila azul y cabello corto castaño. ' +
         'Se le vio por última vez cerca del patio central.',
       place: 'Patio central',
       contact: 'Mamá: +56 9 1234 5678',

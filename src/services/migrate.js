@@ -11,6 +11,7 @@ import { uid } from '../utils/id.js';
  */
 
 const MIGRATION_KEY = 'migration.legacy.v1';
+const DATA_FIXES_KEY = 'fixes.demo.v1';
 
 const LEGACY_KEYS = {
   teachers: 'intra_professors_v1',
@@ -122,6 +123,45 @@ function migrateLostFound(items, type) {
       createdAt: normalizeDate(item.createdAt || item.when),
       resolvedAt: item.resolved ? normalizeDate(item.resolvedAt || item.when) : null,
     }));
+}
+
+const LEGACY_MISSING_DESC =
+  'Sudadera gris con capucha, mochila rosa y cabello largo castaño. ' +
+  'Se le vio por última vez cerca del patio central.';
+const NEW_MISSING_DESC =
+  'Polerón azul con capucha, mochila azul y cabello corto castaño. ' +
+  'Se le vio por última vez cerca del patio central.';
+
+/**
+ * Correcciones puntuales sobre datos de demostración ya guardados.
+ *
+ * Se ejecutan una sola vez y solo tocan el registro demo exacto, de modo que
+ * los reportes creados o editados por el usuario nunca se sobrescriben.
+ */
+export function applyDataFixes() {
+  if (storage.get(DATA_FIXES_KEY, null)) return;
+
+  try {
+    const missing = storage.get(STORAGE_KEYS.missing, null);
+    if (Array.isArray(missing)) {
+      let changed = false;
+      const updated = missing.map((person) => {
+        if (!person || person.name !== 'Sofía Ramos') return person;
+        changed = true;
+        return {
+          ...person,
+          name: 'Tomás Ramos',
+          desc: person.desc === LEGACY_MISSING_DESC ? NEW_MISSING_DESC : person.desc,
+        };
+      });
+      if (changed) storage.set(STORAGE_KEYS.missing, updated);
+    }
+
+    storage.set(DATA_FIXES_KEY, { completedAt: new Date().toISOString() });
+  } catch (error) {
+    // Una corrección fallida nunca debe impedir que la app arranque.
+    console.warn('[IntraNerd] No se pudieron aplicar las correcciones de datos.', error);
+  }
 }
 
 export function migrateLegacyData() {

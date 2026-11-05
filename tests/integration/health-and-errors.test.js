@@ -40,11 +40,11 @@ describe('API · salud y contrato de errores', () => {
     expect(data.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
-  it('GET /api/v1 lista los ocho módulos', async () => {
+  it('GET /api/v1 lista los nueve módulos', async () => {
     const res = await api.client.get('/api/v1');
     const data = expectSuccess(res, 200);
 
-    expect(data.modules).toHaveLength(8);
+    expect(data.modules).toHaveLength(9);
     expect(data.modules).toEqual(
       expect.arrayContaining([
         '/api/v1/grades',
@@ -55,6 +55,7 @@ describe('API · salud y contrato de errores', () => {
         '/api/v1/workshops',
         '/api/v1/announcements',
         '/api/v1/tasks',
+        '/api/v1/contact',
       ]),
     );
   });

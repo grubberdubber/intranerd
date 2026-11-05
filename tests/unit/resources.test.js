@@ -25,6 +25,7 @@ describe('services/resources · repositorios por módulo', () => {
     expect(Object.keys(repos).sort()).toEqual([
       'announcements',
       'calendar',
+      'contact',
       'found',
       'lost',
       'missing',
@@ -60,10 +61,12 @@ describe('services/resources · repositorios por módulo', () => {
       }),
     );
 
-    for (const repo of Object.values(repos)) {
+    for (const [key, repo] of Object.entries(repos)) {
       const items = await repo.list();
       expect(Array.isArray(items), repo.name).toBe(true);
-      expect(items.length, repo.name).toBeGreaterThan(0);
+      // Contacto es una bandeja privada de envío: no tiene seed público.
+      if (key === 'contact') expect(items).toEqual([]);
+      else expect(items.length, repo.name).toBeGreaterThan(0);
     }
   });
 

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="intranerd-favicon-title">
+  <title id="intranerd-favicon-title">IntraNerd</title>
+  <rect width="64" height="64" rx="15" fill="#1e40af"/>
+  <g transform="translate(7 7) scale(.78125)" fill="none" fill-rule="evenodd">
+    <path d="M4 16.8c8.9-3.2 18.6-2.2 28 4.5v31.2C22.6 45.8 12.9 44.9 4 48.1V16.8Z" fill="#ffffff"/>
+    <path d="M60 16.8c-8.9-3.2-18.6-2.2-28 4.5v31.2c9.4-6.7 19.1-7.6 28-4.4V16.8Z" fill="#dbeafe"/>
+    <path d="M32 21.3v31.2" stroke="#1e3a8a" stroke-width="2.2" stroke-linecap="round"/>
+    <g stroke="#0f766e" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18.2" cy="20.7" r="8.2" fill="#eff6ff"/>
+      <circle cx="45.8" cy="20.7" r="8.2" fill="#eff6ff"/>
+      <path d="M26.4 20.7c2.1-2.7 5.7-3.2 8.2-1.1.9.7 1.6 1.6 2.1 2.6"/>
+      <path d="M10 20.7H6.1M54 20.7h3.9"/>
+    </g>
+    <path d="M35.6 21.3v13.9l-3.6-2.3-3.6 2.3V21.3h7.2Z" fill="#fbbf24"/>
+  </g>
+</svg>

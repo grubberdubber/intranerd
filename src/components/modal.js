@@ -6,6 +6,7 @@ import { icon } from './icon.js';
  * Devuelve una API mínima para que las vistas controlen su contenido.
  */
 const openModals = [];
+let modalCounter = 0;
 
 function getRoot() {
   let root = document.getElementById('modal-root');
@@ -16,12 +17,38 @@ function getRoot() {
   return root;
 }
 
+/**
+ * Aísla el contenido de fondo mientras hay un modal abierto. Además del focus
+ * trap, `inert` impide que lectores de pantalla y Tab alcancen la aplicación.
+ */
+function setBackgroundInert(inert) {
+  Array.from(document.body.children).forEach((child) => {
+    if (child.id === 'modal-root' || child.id === 'toast-root') return;
+    if (child.tagName === 'SCRIPT' || child.tagName === 'NOSCRIPT') return;
+    if (inert) {
+      if (!child.hasAttribute('data-intranerd-inert')) {
+        child.dataset.intranerdInert = child.inert ? 'true' : 'false';
+      }
+      child.inert = true;
+    } else if (child.hasAttribute('data-intranerd-inert')) {
+      child.inert = child.dataset.intranerdInert === 'true';
+      delete child.dataset.intranerdInert;
+    }
+  });
+}
+
 function lockBody() {
-  if (openModals.length === 1) document.body.classList.add('is-locked');
+  if (openModals.length === 1) {
+    document.body.classList.add('is-locked');
+    setBackgroundInert(true);
+  }
 }
 
 function unlockBody() {
-  if (openModals.length === 0) document.body.classList.remove('is-locked');
+  if (openModals.length === 0) {
+    document.body.classList.remove('is-locked');
+    setBackgroundInert(false);
+  }
 }
 
 function focusableElements(container) {
@@ -52,7 +79,9 @@ export function openModal(options = {}) {
   } = options;
 
   const previousFocus = document.activeElement;
-  const titleId = `modal-title-${Date.now()}`;
+  modalCounter += 1;
+  const titleId = `modal-title-${modalCounter}`;
+  const descriptionId = `modal-description-${modalCounter}`;
   const root = getRoot();
 
   const close = (reason = 'dismiss') => {
@@ -79,7 +108,9 @@ export function openModal(options = {}) {
     { class: 'modal__heading' },
     eyebrow ? el('span', { class: 'modal__eyebrow', text: eyebrow }) : null,
     el('h2', { class: 'modal__title', id: titleId, text: title }),
-    description ? el('p', { class: 'modal__description', text: description }) : null,
+    description
+      ? el('p', { class: 'modal__description', id: descriptionId, text: description })
+      : null,
   );
 
   const header = el('header', { class: 'modal__header' }, heading, closeButton);
@@ -95,7 +126,13 @@ export function openModal(options = {}) {
     'section',
     {
       class: `modal${size === 'sm' ? ' modal--sm' : size === 'lg' ? ' modal--lg' : size === 'xl' ? ' modal--xl' : ''}`,
-      attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': titleId, tabindex: '-1' },
+      attrs: {
+        role: 'dialog',
+        'aria-modal': 'true',
+        'aria-labelledby': titleId,
+        ...(description ? { 'aria-describedby': descriptionId } : {}),
+        tabindex: '-1',
+      },
     },
     header,
     bodyNode,

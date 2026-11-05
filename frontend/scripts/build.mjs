@@ -24,7 +24,7 @@ for (const file of required) {
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 
-for (const entry of ['index.html', 'src', 'assets']) {
+for (const entry of ['index.html', 'src', 'assets', 'docs']) {
   await cp(join(root, entry), join(dist, entry), { recursive: true });
 }
 

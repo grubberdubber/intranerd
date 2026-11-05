@@ -75,6 +75,14 @@ export const NAV_ITEMS = [
     icon: 'tasks',
     description: 'Deberes por asignatura y checklist personal de avance.',
   },
+  {
+    id: 'contact',
+    path: '/contacto',
+    label: 'Contacto y soporte',
+    shortLabel: 'Contacto',
+    icon: 'mail',
+    description: 'Escríbenos: soporte técnico, accesibilidad y comunidad.',
+  },
 ];
 
 export const SUBJECTS = [
@@ -120,6 +128,23 @@ export const PRIORITIES = [
   { id: 'alta', label: 'Alta', tone: 'danger' },
   { id: 'media', label: 'Media', tone: 'warning' },
   { id: 'baja', label: 'Baja', tone: 'success' },
+];
+
+export const CONTACT_ROLES = [
+  { id: 'student', label: 'Alumno/a' },
+  { id: 'guardian', label: 'Apoderado/a' },
+  { id: 'teacher', label: 'Profesor/a' },
+  { id: 'direction', label: 'Dirección / administración' },
+  { id: 'other', label: 'Otro' },
+];
+
+export const CONTACT_TOPICS = [
+  { id: 'support', label: 'Soporte técnico' },
+  { id: 'accessibility', label: 'Accesibilidad' },
+  { id: 'academic', label: 'Consulta académica' },
+  { id: 'community', label: 'Convivencia y comunidad' },
+  { id: 'suggestion', label: 'Sugerencia o idea' },
+  { id: 'other', label: 'Otro motivo' },
 ];
 
 export const LOSTFOUND_CATEGORIES = [
@@ -184,4 +209,5 @@ export const STORAGE_KEYS = {
   announcements: 'announcements.posts',
   tasks: 'tasks.items',
   profile: 'session.profile',
+  contact: 'contact.messages',
 };

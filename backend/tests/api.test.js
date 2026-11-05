@@ -371,6 +371,43 @@ test('tareas: checklist por alumno y filtro de completadas', async () => {
   assert.equal(undone.body.data.task.completedBy.length, 0);
 });
 
+test('contacto: registra la consulta sin exponer una bandeja pública', async () => {
+  const created = await api('/contact', {
+    method: 'POST',
+    body: {
+      name: 'Camila Test',
+      email: 'Camila.Test@Colegio.CL',
+      role: 'student',
+      topic: 'accessibility',
+      subject: 'Barrera de accesibilidad',
+      message: 'El foco se pierde al navegar el calendario con teclado.',
+      consent: true,
+    },
+  });
+
+  assert.equal(created.status, 201);
+  assert.equal(created.body.data.status, 'NEW');
+  assert.equal(created.body.data.received, true);
+  assert.match(created.body.data.id, /^msg_/);
+  assert.equal(created.body.data.email, undefined);
+  assert.equal(created.body.data.message, undefined);
+
+  const invalid = await api('/contact', {
+    method: 'POST',
+    body: {
+      name: 'Sin consentimiento',
+      email: 'sin-consentimiento@test.cl',
+      subject: 'Prueba',
+      message: 'Este mensaje no debe guardarse sin autorización explícita.',
+      consent: false,
+    },
+  });
+  assert.equal(invalid.status, 422);
+
+  const list = await api('/contact');
+  assert.equal(list.status, 404);
+});
+
 test('el alias /api expone los mismos módulos que /api/v1', async () => {
   const root = base.replace('/api/v1', '/api');
   const response = await fetch(`${root}/health`);

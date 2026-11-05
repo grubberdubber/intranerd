@@ -3,9 +3,10 @@ info:
   title: IntraNerd API
   version: 1.0.0
   description: |
-    API REST de la plataforma escolar IntraNerd. Cubre los ocho módulos:
+    API REST de la plataforma escolar IntraNerd. Cubre los nueve módulos:
     notas semestrales, talleres, personas extraviadas, calificación de
-    profesores, objetos perdidos, calendario escolar, anuncios y tareas.
+    profesores, objetos perdidos, calendario escolar, anuncios, tareas y
+    contacto/soporte.
 
     **Base canónica:** `/api/v1`; alias sin versión: `/api`.
     **Persistencia:** SQLite (`node:sqlite`) en un volumen Docker.
@@ -35,6 +36,7 @@ tags:
   - name: Talleres
   - name: Anuncios
   - name: Tareas
+  - name: Contacto
 paths:
   /health:
     get:
@@ -1403,6 +1405,37 @@ paths:
                       data:
                         $ref: "#/components/schemas/Task"
 
+  /contact:
+    post:
+      tags: [Contacto]
+      summary: Registrar una consulta de contacto o soporte
+      description: |
+        Recibe el formulario público del módulo 9 y lo guarda en la bandeja
+        privada del colegio. No existe un `GET` público: los mensajes contienen
+        datos personales y solo se consultan por administración directa.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactMessageInput"
+      responses:
+        "201":
+          description: Consulta registrada
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Envelope"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ContactMessageReceipt"
+        "422":
+          $ref: "#/components/responses/Validation"
+        "429":
+          description: Demasiadas peticiones por minuto
+
 components:
   parameters:
     Id:
@@ -1974,3 +2007,35 @@ components:
         taskId: { type: string }
         studentName: { type: string }
         completedAt: { type: string, format: date-time }
+    ContactMessageInput:
+      type: object
+      required: [name, email, subject, message, consent]
+      properties:
+        name: { type: string, maxLength: 120 }
+        email:
+          type: string
+          format: email
+          maxLength: 180
+          example: camila@colegio.cl
+        role:
+          type: string
+          enum: [STUDENT, GUARDIAN, TEACHER, DIRECTION, OTHER]
+          default: OTHER
+        topic:
+          type: string
+          enum: [SUPPORT, ACCESSIBILITY, ACADEMIC, COMMUNITY, SUGGESTION, OTHER]
+          default: OTHER
+        subject: { type: string, maxLength: 140 }
+        message: { type: string, maxLength: 4000 }
+        consent:
+          type: boolean
+          description: Debe ser `true`; sin autorización no se almacena la consulta.
+          example: true
+    ContactMessageReceipt:
+      type: object
+      description: Confirmación mínima; no devuelve el contenido del mensaje.
+      properties:
+        id: { type: string, example: msg_abc123 }
+        status: { type: string, example: NEW }
+        createdAt: { type: string, format: date-time }
+        received: { type: boolean, example: true }

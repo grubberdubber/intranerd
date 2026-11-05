@@ -34,3 +34,4 @@ Makefile
 .DS_Store
 *.log
 npm-debug.log*
+pnpm-debug.log*

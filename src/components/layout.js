@@ -1,6 +1,6 @@
 import { APP_NAME, config } from '../config.js';
 import { NAV_ITEMS } from '../data/constants.js';
-import { el, qs, qsa } from '../utils/dom.js';
+import { clearFieldErrors, el, qs, qsa, setFieldError } from '../utils/dom.js';
 import { formatLongDate } from '../utils/format.js';
 import { connection } from '../services/api.js';
 import {
@@ -30,7 +30,6 @@ export function createLayout(root) {
         class: 'nav-link',
         href: `#${item.path}`,
         dataset: { route: item.id },
-        attrs: { 'aria-label': item.label },
         html: `${iconMarkup}<span class="nav-link__label">${item.label}</span>`,
       }),
     );
@@ -53,11 +52,18 @@ export function createLayout(root) {
 
   const sidebar = el(
     'aside',
-    { class: 'sidebar', id: 'sidebar' },
+    {
+      class: 'sidebar',
+      id: 'sidebar',
+      attrs: { 'aria-label': 'Navegación principal de IntraNerd' },
+    },
     el(
       'a',
       { class: 'sidebar__brand', href: '#/panel' },
-      el('span', { class: 'sidebar__mark', text: 'IN' }),
+      el('span', {
+        class: 'sidebar__mark',
+        html: `<img src="assets/brand/intranerd-mark-inverse.svg" alt="" width="42" height="42" decoding="async" />`,
+      }),
       el(
         'span',
         { class: 'sidebar__brand-text' },
@@ -133,34 +139,70 @@ export function createLayout(root) {
     attrs: { tabindex: '-1' },
   });
 
+  // Región viva que anuncia cada cambio de módulo a lectores de pantalla.
+  const routeAnnouncer = el('div', {
+    class: 'sr-only',
+    attrs: { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' },
+  });
+
   const layout = el(
     'div',
     { class: 'app-layout' },
     overlay,
     sidebar,
     el('div', { class: 'app-main' }, topbar, main),
+    routeAnnouncer,
   );
 
   root.replaceChildren(layout);
   root.dataset.ready = 'true';
 
-  function closeNav() {
+  const mobileQuery = window.matchMedia('(max-width: 900px)');
+
+  /**
+   * En móvil el sidebar está fuera de pantalla: `inert` evita que sus enlaces
+   * reciban foco cuando el menú está cerrado. En escritorio siempre es visible.
+   */
+  function syncSidebarInert() {
+    const hidden = mobileQuery.matches && !root.classList.contains('is-nav-open');
+    sidebar.inert = hidden;
+    if (hidden) sidebar.setAttribute('aria-hidden', 'true');
+    else sidebar.removeAttribute('aria-hidden');
+  }
+
+  function closeNav({ restoreFocus = false } = {}) {
+    const hadFocus = sidebar.contains(document.activeElement);
     root.classList.remove('is-nav-open');
     menuButton.setAttribute('aria-expanded', 'false');
+    menuButton.setAttribute('aria-label', 'Abrir menú de navegación');
+    if (restoreFocus || (hadFocus && mobileQuery.matches)) {
+      menuButton.focus({ preventScroll: true });
+    }
+    syncSidebarInert();
   }
 
   function toggleNav() {
     const open = !root.classList.contains('is-nav-open');
     root.classList.toggle('is-nav-open', open);
     menuButton.setAttribute('aria-expanded', String(open));
+    menuButton.setAttribute(
+      'aria-label',
+      open ? 'Cerrar menú de navegación' : 'Abrir menú de navegación',
+    );
+    syncSidebarInert();
     if (open) {
       requestAnimationFrame(() => qs('.nav-link', sidebar)?.focus());
     }
   }
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && root.classList.contains('is-nav-open')) closeNav();
+    if (event.key === 'Escape' && root.classList.contains('is-nav-open')) {
+      closeNav({ restoreFocus: true });
+    }
   });
+
+  mobileQuery.addEventListener('change', syncSidebarInert);
+  syncSidebarInert();
 
   function renderConnection({ mode, enabled }) {
     const isApi = mode === 'api';
@@ -189,6 +231,7 @@ export function createLayout(root) {
       ),
     );
     userChip.title = `${current.name} · ${current.roleLabel}`;
+    userChip.setAttribute('aria-label', `Editar perfil de ${current.name}`);
   }
 
   function openProfileModal() {
@@ -200,6 +243,7 @@ export function createLayout(root) {
       placeholder: 'Ej: Camila Rojas',
       required: true,
       autocomplete: 'name',
+      attrs: { 'aria-describedby': 'profile-name-hint' },
     });
 
     const roleSelect = el(
@@ -228,6 +272,7 @@ export function createLayout(root) {
         nameInput,
         el('span', {
           class: 'field__hint',
+          id: 'profile-name-hint',
           text: 'Se usará para firmar opiniones, pruebas y comunicados.',
         }),
       ),
@@ -273,11 +318,14 @@ export function createLayout(root) {
       ],
     });
 
+    nameInput.addEventListener('input', () => clearFieldErrors(form));
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
+      clearFieldErrors(form);
       const name = nameInput.value.trim();
       if (!name) {
-        nameInput.setAttribute('aria-invalid', 'true');
+        setFieldError(nameInput, 'Escribe tu nombre visible.');
         nameInput.focus();
         return;
       }
@@ -307,6 +355,7 @@ export function createLayout(root) {
     setTitle(title) {
       topbarTitle.textContent = title;
       document.title = `${title} · ${APP_NAME}`;
+      routeAnnouncer.textContent = `Sección: ${title}`;
     },
     mountView(node) {
       main.replaceChildren(node);

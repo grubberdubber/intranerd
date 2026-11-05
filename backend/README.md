@@ -1,6 +1,6 @@
 # IntraNerd · Backend API
 
-API RESTful modular que da soporte a los 8 módulos de la plataforma escolar **IntraNerd**: notas, talleres, personas extraviadas, profesores, objetos perdidos, calendario, anuncios y tareas.
+API RESTful modular que da soporte a los 9 módulos de la plataforma escolar **IntraNerd**: notas, talleres, personas extraviadas, profesores, objetos perdidos, calendario, anuncios, tareas y contacto.
 
 La implementación activa es **Node.js + Express 5 + SQLite** usando el módulo nativo `node:sqlite` (sin ORM, sin binarios nativos). Está probada de punta a punta con el test runner de Node.
 
@@ -26,20 +26,21 @@ La implementación activa es **Node.js + Express 5 + SQLite** usando el módulo 
 
 ## 2. Inicio rápido
 
-Requisitos: **Node.js 24 o superior**.
+Requisitos: **Node.js 24 o superior** y **pnpm 12+**. Desde la raíz del
+repositorio, el backend es un paquete del workspace:
 
 ```bash
+pnpm install
 cd backend
-npm install
 cp .env.example .env
-npm run db:seed      # datos de demostración (idempotente)
-npm run dev          # recarga automática
+pnpm db:seed      # datos de demostración (idempotente)
+pnpm dev          # recarga automática
 ```
 
 Producción:
 
 ```bash
-npm start
+pnpm start
 ```
 
 La API queda disponible en:
@@ -59,14 +60,17 @@ El contenedor de la API usa SQLite en `/app/data/intranerd.db` y guarda archivos
 
 ### Scripts
 
-| Script                                       | Acción                                       |
-| -------------------------------------------- | -------------------------------------------- |
-| `npm start`                                  | Inicia el servidor                           |
-| `npm run dev`                                | Inicia con `--watch`                         |
-| `npm run db:migrate`                         | Crea/verifica el esquema SQLite              |
-| `npm run db:seed`                            | Carga datos demo si la base está vacía       |
-| `npm run db:seed:force` / `npm run db:reset` | Vacía y recarga los datos demo               |
-| `npm test`                                   | Ejecuta la suite de integración (10 pruebas) |
+| Script                                 | Acción                                       |
+| -------------------------------------- | -------------------------------------------- |
+| `pnpm start`                           | Inicia el servidor                           |
+| `pnpm dev`                             | Inicia con `--watch`                         |
+| `pnpm db:migrate`                      | Crea/verifica el esquema SQLite              |
+| `pnpm db:seed`                         | Carga datos demo si la base está vacía       |
+| `pnpm db:seed:force` / `pnpm db:reset` | Vacía y recarga los datos demo               |
+| `pnpm test`                            | Ejecuta la suite de integración (11 pruebas) |
+
+También puedes ejecutar los scripts desde la raíz con
+`pnpm --filter intranerd-backend <script>` o `pnpm test:backend`.
 
 ---
 
@@ -84,7 +88,7 @@ backend/
 │   │   ├── schema.sql            # DDL idempotente
 │   │   ├── migrate.js            # CLI de esquema
 │   │   └── seed.js               # datos de demostración
-│   ├── routes/                   # 8 routers + índice /api/v1
+│   ├── routes/                   # 9 routers + índice /api/v1
 │   ├── controllers/              # HTTP: lee req.validated y responde
 │   ├── services/                 # reglas de negocio y cálculos
 │   ├── repositories/             # SQL preparado y mapeo a camelCase
@@ -259,9 +263,9 @@ Respuesta de `GET /grades`:
 
 ```bash
 curl -X POST http://localhost:4000/api/v1/missing-persons \
-  -F "name=Sofía Ramos" \
+  -F "name=Tomás Ramos" \
   -F "age=13" \
-  -F "description=Sudadera gris, mochila rosa" \
+  -F "description=Polerón azul, mochila azul" \
   -F "lastSeenPlace=Patio central" \
   -F "contact=+56 9 1234 5678" \
   -F "photo=@foto.png"
@@ -388,6 +392,36 @@ curl -X PATCH http://localhost:4000/api/v1/tasks/<id>/completion \
 
 El checklist es **personal**: cada alumno tiene su propio registro (`UNIQUE(task_id, student_name)`) y el listado devuelve `completed`, `completedBy` y `completedCount`. `completed=` exige `studentName=` (422 si falta).
 
+### 5.9 Contacto y soporte — `/contact`
+
+| Método | Ruta       | Descripción                                     |
+| ------ | ---------- | ----------------------------------------------- |
+| `POST` | `/contact` | Registra una consulta en la bandeja del colegio |
+
+```bash
+curl -X POST http://localhost:4000/api/v1/contact \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name":"Camila Rojas",
+    "email":"camila@colegio.cl",
+    "role":"student",
+    "topic":"accessibility",
+    "subject":"Contraste en el calendario",
+    "message":"El texto del día feriado se pierde sobre el fondo.",
+    "consent":true
+  }'
+```
+
+Reglas:
+
+- `role`: `STUDENT`, `GUARDIAN`, `TEACHER`, `DIRECTION` u `OTHER`.
+- `topic`: `SUPPORT`, `ACCESSIBILITY`, `ACADEMIC`, `COMMUNITY`, `SUGGESTION` u `OTHER`.
+- `consent` debe ser `true`; sin autorización explícita no se almacena nada.
+- La respuesta solo confirma `id`, `status`, `createdAt` y `received`; no
+  reexpone datos personales ni el cuerpo del mensaje.
+- No existe `GET /contact`: la bandeja contiene datos personales y se consulta
+  directamente en la base por administración.
+
 ---
 
 ## 6. Carga de archivos
@@ -424,14 +458,15 @@ Archivo: `backend/data/intranerd.db` (configurable con `DATABASE_PATH`). WAL act
 | `workshops` / `workshop_enrollments` | Talleres y cupos                            |
 | `announcements`                      | Tablón institucional                        |
 | `tasks` / `task_completions`         | Tareas y checklist por alumno               |
+| `contact_messages`                   | Bandeja privada de contacto y soporte       |
 
-Todas las claves primarias son TEXT con prefijo (`sub_`, `grd_`, `msp_`, `tch_`, `rev_`, `lfi_`, `evt_`, `wsp_`, `enr_`, `ann_`, `tsk_`, `cmp_`). Los CHECK de SQLite protegen rangos críticos (notas 1.0–7.0, rating 1–5, semestres 1–2, estados válidos, cupos > 0).
+Todas las claves primarias son TEXT con prefijo (`sub_`, `grd_`, `msp_`, `tch_`, `rev_`, `lfi_`, `evt_`, `wsp_`, `enr_`, `ann_`, `tsk_`, `cmp_`, `msg_`). Los CHECK de SQLite protegen rangos críticos (notas 1.0–7.0, rating 1–5, semestres 1–2, estados válidos, cupos > 0).
 
 Para reiniciar todo:
 
 ```bash
 rm -f backend/data/intranerd.db*
-npm --prefix backend run db:seed
+pnpm db:seed
 ```
 
 ---
@@ -455,7 +490,7 @@ npm --prefix backend run db:seed
 
 ```bash
 cd backend
-npm test
+pnpm test
 ```
 
 La suite (`tests/api.test.js`) levanta la app en un puerto efímero con una base temporal y verifica:
@@ -469,9 +504,11 @@ La suite (`tests/api.test.js`) levanta la app en un puerto efímero con una base
 7. Talleres: cupo lleno (409), duplicados y filtro de disponibilidad.
 8. Anuncios: fijado y orden del feed.
 9. Tareas: checklist personal, filtros y desmarcado.
-10. Alias `/api`.
+10. Contacto: registro, consentimiento obligatorio y ausencia de listado público.
+11. Alias `/api`.
 
-Resultado actual: **10/10 pruebas aprobadas**.
+Resultado actual: **11/11 pruebas aprobadas**. La integración con Vitest y
+Supertest añade una suite específica en `tests/integration/contact.api.test.js`.
 
 ---
 
@@ -503,8 +540,8 @@ Ejemplo de subida desde el navegador:
 
 ```js
 const form = new FormData();
-form.append('name', 'Sofía Ramos');
-form.append('description', 'Sudadera gris');
+form.append('name', 'Tomás Ramos');
+form.append('description', 'Polerón azul');
 form.append('lastSeenPlace', 'Patio central');
 form.append('contact', '+56 9 1234 5678');
 form.append('photo', fileInput.files[0]);

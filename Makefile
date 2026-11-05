@@ -4,54 +4,56 @@
 SHELL := /bin/bash
 COMPOSE := docker compose
 NODE := node
-NPM := npm
+PNPM := pnpm
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev dev-api build lint format test test-unit test-integration test-e2e \
+.PHONY: help install dev dev-api build lint format test test-unit test-integration test-backend test-e2e \
         db-migrate db-seed db-reset up down logs ps restart clean backup shell-api health
 
 help: ## Muestra los comandos disponibles
 	@awk 'BEGIN {FS = ":.*##"; printf "\nIntraNerd\n\n"} /^[a-zA-Z_-]+:.*?##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-install: ## Instala dependencias de raíz y backend
-	$(NPM) install
-	$(NPM) --prefix backend install
+install: ## Instala dependencias del workspace (raíz + backend)
+	$(PNPM) install
 
 dev: ## SPA en :5173 con proxy /api al backend local
 	$(NODE) frontend/scripts/dev.mjs
 
 dev-api: ## API con recarga en caliente (:4000)
-	$(NPM) --prefix backend run dev
+	$(PNPM) --filter intranerd-backend dev
 
 build: ## Compila la SPA en dist/
-	$(NPM) run build
+	$(PNPM) run build
 
 lint: ## Verifica formato y guardrails
-	$(NPM) run lint
+	$(PNPM) run lint
 
 format: ## Formatea el repositorio con Prettier
-	$(NPM) run format
+	$(PNPM) run format
 
 test: ## Suite completa (Vitest + cobertura)
-	$(NPM) test
+	$(PNPM) test
 
 test-unit: ## Solo pruebas unitarias
-	$(NPM) run test:unit
+	$(PNPM) run test:unit
 
 test-integration: ## Solo integración de la API (SQLite temporal)
-	$(NPM) run test:integration
+	$(PNPM) run test:integration
+
+test-backend: ## Suite HTTP del backend con node:test
+	$(PNPM) run test:backend
 
 test-e2e: ## Pruebas E2E con Playwright
-	$(NPM) run test:e2e
+	$(PNPM) run test:e2e
 
 db-migrate: ## Aplica el esquema SQLite
-	$(NPM) --prefix backend run db:migrate
+	$(PNPM) --filter intranerd-backend db:migrate
 
 db-seed: ## Carga datos demo
-	$(NPM) --prefix backend run db:seed
+	$(PNPM) --filter intranerd-backend db:seed
 
 db-reset: ## Recrea la base (solo desarrollo)
-	$(NPM) --prefix backend run db:reset
+	$(PNPM) --filter intranerd-backend db:reset
 
 up: ## Levanta el stack Docker completo
 	$(COMPOSE) up -d --build

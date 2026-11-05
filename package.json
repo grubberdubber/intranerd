@@ -3,18 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Plataforma escolar IntraNerd — gestión de notas, talleres, seguridad, profesores, objetos perdidos, calendario, anuncios y tareas.",
+  "description": "Plataforma escolar IntraNerd — notas, talleres, seguridad, profesores, objetos perdidos, calendario, anuncios, tareas y contacto.",
+  "packageManager": "pnpm@12.11.2",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "node frontend/scripts/dev.mjs",
-    "dev:api": "npm --prefix backend run dev",
-    "start:api": "npm --prefix backend start",
+    "dev:api": "pnpm --filter intranerd-backend dev",
+    "start:api": "pnpm --filter intranerd-backend start",
     "build": "INTRANERD_API_BASE=/api node frontend/scripts/build.mjs",
     "lint": "prettier --check . && node scripts/lint.mjs",
     "lint:fix": "prettier --write . && node scripts/lint.mjs",
     "format": "prettier --write .",
-    "db:migrate": "npm --prefix backend run db:migrate",
-    "db:seed": "npm --prefix backend run db:seed",
-    "db:reset": "npm --prefix backend run db:reset",
+    "db:migrate": "pnpm --filter intranerd-backend db:migrate",
+    "db:seed": "pnpm --filter intranerd-backend db:seed",
+    "db:reset": "pnpm --filter intranerd-backend db:reset",
     "docker:up": "docker compose up -d --build",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
@@ -22,19 +26,20 @@
     "test": "vitest run --coverage",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
+    "test:backend": "pnpm --filter intranerd-backend test",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --project unit",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:install": "playwright install --with-deps chromium",
-    "test:all": "npm run test:coverage && npm run test:e2e",
-    "test:ci": "npm run test:coverage && npm run test:e2e"
+    "test:all": "pnpm test:coverage && pnpm test:e2e",
+    "test:ci": "pnpm test:coverage && pnpm test:e2e"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
-    "@vitest/coverage-v8": "^3.2.4",
-    "prettier": "^3.9.9",
-    "supertest": "^7.1.4",
-    "vitest": "^3.2.4"
+    "@playwright/test": "^1.64.1",
+    "@vitest/coverage-v8": "^5.1.0",
+    "prettier": "^3.9.10",
+    "supertest": "^7.3.1",
+    "vitest": "^5.1.0"
   }
 }

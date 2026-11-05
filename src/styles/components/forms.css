@@ -83,9 +83,17 @@
 .input:focus,
 .select:focus,
 .textarea:focus {
-  outline: none;
   border-color: var(--brand-500);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14);
+}
+
+.input:focus-visible,
+.select:focus-visible,
+.textarea:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 1px;
+  border-color: var(--brand-600);
+  box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12);
 }
 
 .input[aria-invalid='true'],

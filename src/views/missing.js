@@ -233,7 +233,7 @@ function openReportModal() {
   const nameInput = el('input', {
     class: 'input',
     id: 'missing-name',
-    placeholder: 'Ej: Sofía Ramos',
+    placeholder: 'Ej: Tomás Ramos',
     required: true,
   });
   const ageInput = el('input', {
@@ -293,7 +293,7 @@ function openReportModal() {
         { class: 'field' },
         el(
           'label',
-          { class: 'field__label' },
+          { class: 'field__label', attrs: { for: 'missing-age' } },
           'Edad aproximada ',
           el('span', { class: 'field__optional', text: '(opcional)' }),
         ),

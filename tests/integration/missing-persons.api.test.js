@@ -19,7 +19,7 @@ describe('API · módulo de personas extraviadas', () => {
     expect(data.items).toHaveLength(3);
     expect(data.pagination.total).toBe(3);
     expect(data.items.map((person) => person.name)).toEqual([
-      'Sofía Ramos',
+      'Tomás Ramos',
       'Matías Oliva',
       'Benjamín Soto',
     ]);
@@ -52,7 +52,7 @@ describe('API · módulo de personas extraviadas', () => {
   it('busca por nombre, lugar y contacto sin distinguir mayúsculas', async () => {
     // SQLite NOCASE solo pliega ASCII, por eso probamos mayúsculas en texto sin tildes.
     const byName = expectSuccess(
-      await api.client.get('/api/v1/missing-persons').query({ q: 'sofía' }),
+      await api.client.get('/api/v1/missing-persons').query({ q: 'tomás' }),
       200,
     );
     expect(byName.items).toHaveLength(1);
@@ -72,7 +72,7 @@ describe('API · módulo de personas extraviadas', () => {
 
   it('combina búsqueda y estado', async () => {
     const data = expectSuccess(
-      await api.client.get('/api/v1/missing-persons').query({ q: 'Sofía', status: 'FOUND' }),
+      await api.client.get('/api/v1/missing-persons').query({ q: 'Tomás', status: 'FOUND' }),
       200,
     );
     expect(data.items).toEqual([]);
