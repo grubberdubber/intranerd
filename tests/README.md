@@ -1,6 +1,8 @@
 # Pruebas de IntraNerd
 
-Suite de pruebas de la plataforma escolar IntraNerd, organizada en tres niveles:
+Suite de pruebas de la plataforma escolar IntraNerd, organizada en tres niveles.
+Estado actual: **351 pruebas Vitest** (178 unitarias + 173 de integración),
+**11 E2E** y **11 pruebas del backend**.
 
 | Nivel       | Carpeta             | Herramienta        | Qué prueba                                                                                |
 | ----------- | ------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
@@ -11,25 +13,26 @@ Suite de pruebas de la plataforma escolar IntraNerd, organizada en tres niveles:
 ## Comandos
 
 ```bash
-npm test                  # Unitarias + integración + reporte de cobertura
-npm run test:unit         # Solo unitarias
-npm run test:integration  # Solo integración (no requiere backend levantado)
-npm run test:coverage     # Igual que npm test (cobertura explícita)
-npm run test:e2e          # Playwright; levanta la SPA en el puerto 8080
-npm run test:e2e:ui       # Playwright en modo interactivo
-npm run test:all          # Cobertura + E2E
-npm run test:e2e:install  # Instala Chromium y dependencias del sistema
+pnpm test                  # Unitarias + integración + reporte de cobertura
+pnpm test:unit             # Solo unitarias (178)
+pnpm test:integration      # Solo integración (173, no requiere backend levantado)
+pnpm test:coverage         # Igual que pnpm test (cobertura explícita)
+pnpm test:e2e              # Playwright (11); levanta la SPA en el puerto 8080
+pnpm test:e2e:ui           # Playwright en modo interactivo
+pnpm test:all              # Cobertura + E2E
+pnpm test:e2e:install      # Instala Chromium y dependencias del sistema
+pnpm test:backend          # Suite node:test del backend (11)
 ```
 
 Requisitos:
 
-- Node.js 22+ (el proyecto usa `node:sqlite`).
-- Para E2E: `npx playwright install chromium` (o `npm run test:e2e:install`).
+- Node.js 24+ (el proyecto usa `node:sqlite`) y pnpm 12+.
+- Para E2E: `pnpm exec playwright install chromium` (o `pnpm test:e2e:install`).
 - Python 3 disponible si se usa el servidor estático por defecto de Playwright.
   También se puede apuntar a otro servidor:
 
 ```bash
-E2E_BASE_URL=http://localhost:5173 E2E_START_COMMAND="npm run dev" npm run test:e2e
+E2E_BASE_URL=http://localhost:5173 E2E_START_COMMAND="pnpm dev" pnpm test:e2e
 ```
 
 ### Modo de datos en E2E
@@ -43,7 +46,7 @@ Para ejecutar los mismos flujos contra la API real (por ejemplo, con
 `docker compose up`):
 
 ```bash
-E2E_USE_API=1 E2E_BASE_URL=http://localhost:8080 npm run test:e2e
+E2E_USE_API=1 E2E_BASE_URL=http://localhost:8080 pnpm test:e2e
 ```
 
 En ese modo conviene usar una base de datos de prueba: los tests crean y borran
@@ -51,7 +54,7 @@ registros con un nombre/descripción marcados como `E2E`.
 
 ## Cobertura
 
-`npm test` genera:
+`pnpm test` genera:
 
 - Resumen en consola (`text`, `text-summary`).
 - Reporte HTML navegable en `coverage/index.html`.
@@ -109,6 +112,7 @@ Las specs usan selectores estables y accesibles, no clases de estilo:
 | Notas            | `#new-subject-name`, `#new-subject-s1`, `#new-subject-s2`, `.subject-card`, `.semester__average`, `.subject-card__final-value`, `.subject-card__status` |
 | Objetos perdidos | `#item-by`, `#item-contact`, `#item-desc`, `#item-place`, `#item-category`, `#lost-list .item-card`                                                     |
 | Calendario       | `#calendar-role`, `#calendar-name`, `[data-date="YYYY-MM-DD"]`, `#event-title`, `#event-subject`, `#event-description`, `.day-event-item`               |
+| Contacto         | `#contact-name`, `#contact-email`, `#contact-role`, `#contact-topic`, `#contact-subject`, `#contact-message`, `#contact-consent`, `.contact-success`    |
 | Modales          | `.modal[role="dialog"]`, `aria-label="Cerrar ventana"`, botones por nombre accesible                                                                    |
 
 Reglas para nuevas specs:
@@ -130,15 +134,16 @@ tests/
 ├── unit/
 │   ├── helpers/fake-browser.js      # window/localStorage/fetch falsos
 │   ├── setup-env.js                 # entorno Node para Vitest
-│   └── *.test.js                    # 15 archivos
+│   └── *.test.js                    # 16 archivos
 ├── integration/
 │   ├── helpers/api.js               # base SQLite temporal + Supertest
-│   └── *.test.js                    # 9 archivos
+│   └── *.test.js                    # 10 archivos
 └── e2e/
     ├── fixtures.js                  # app lista, localStorage limpio, navegación
     ├── grades.spec.js               # notas → promedios → aprobación
     ├── lostfound.spec.js            # publicar → resolver → eliminar
     ├── calendar.spec.js             # profesor programa → alumno visualiza
+    ├── contact.spec.js              # validación → folio → respaldo local
     ├── modules.spec.js              # humo de seguridad, profesores, talleres, comunicados y tareas
     └── navigation.mobile.spec.js    # smoke test responsive
 ```
@@ -147,7 +152,7 @@ tests/
 
 | Síntoma                               | Causa probable                            | Solución                                                             |
 | ------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------- |
-| `Executable doesn't exist`            | Chromium no instalado                     | `npm run test:e2e:install`                                           |
+| `Executable doesn't exist`            | Chromium no instalado                     | `pnpm test:e2e:install`                                              |
 | E2E todo skipped                      | La SPA no marca `#app[data-ready="true"]` | Revisar consola del navegador; comprobar `src/main.js` y el servidor |
 | `EADDRINUSE` en 8080                  | Otro servidor ocupa el puerto             | `E2E_BASE_URL`/`E2E_START_COMMAND` o liberar el puerto               |
 | Integración falla al importar backend | Variables de entorno definidas tarde      | Usar siempre `createTestApi()`                                       |

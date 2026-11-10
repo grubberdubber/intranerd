@@ -1,7 +1,7 @@
 import { EXAMPLE_AVATARS, SUBJECTS } from '../data/constants.js';
 import { teachersRepo } from '../services/resources.js';
 import { getProfile } from '../services/session.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { prepareUpload } from '../utils/files.js';
 import { initials, relativeTime } from '../utils/format.js';
 import { icon } from '../components/icon.js';
@@ -55,12 +55,13 @@ function filteredTeachers() {
   });
 }
 
-function renderEvidence(evidence) {
+function renderEvidence(evidence, author) {
   if (!evidence) return null;
   const wrapper = el('div', { class: 'review-evidence' });
+  const imageAlt = author ? `Evidencia adjunta a la opinión de ${author}` : 'Evidencia adjunta';
 
   if (evidence.startsWith('data:image/')) {
-    wrapper.appendChild(el('img', { src: evidence, alt: 'Evidencia adjunta', loading: 'lazy' }));
+    wrapper.appendChild(el('img', { src: evidence, alt: imageAlt, loading: 'lazy' }));
   } else if (evidence.startsWith('data:video/')) {
     wrapper.appendChild(el('video', { src: evidence, controls: true, preload: 'metadata' }));
   } else if (evidence.startsWith('data:')) {
@@ -69,7 +70,7 @@ function renderEvidence(evidence) {
     );
   } else if (/^https?:/i.test(evidence)) {
     if (/\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i.test(evidence)) {
-      wrapper.appendChild(el('img', { src: evidence, alt: 'Evidencia adjunta', loading: 'lazy' }));
+      wrapper.appendChild(el('img', { src: evidence, alt: imageAlt, loading: 'lazy' }));
     } else {
       wrapper.appendChild(
         el('a', { href: evidence, target: '_blank', rel: 'noopener', text: 'Abrir evidencia' }),
@@ -91,8 +92,29 @@ function reviewItem(review) {
     ),
     el('p', { class: 'review-item__text', text: review.text }),
     el('div', { class: 'review-item__meta', text: relativeTime(review.createdAt || review.when) }),
-    renderEvidence(review.evidence),
+    renderEvidence(review.evidence, review.student),
   );
+}
+
+function teacherCardById(id) {
+  return Array.from(qs('#teachers-list')?.querySelectorAll('.teacher-card') || []).find(
+    (card) => card.dataset.id === id,
+  );
+}
+
+function focusTeacherAction(id, action = 'rate') {
+  const target = teacherCardById(id)?.querySelector(`[data-action="${action}"]`);
+  target?.focus();
+  return Boolean(target);
+}
+
+function focusFirstTeacherAction() {
+  const target = qs('#teachers-list .teacher-card [data-action="rate"]');
+  if (target) {
+    target.focus();
+    return;
+  }
+  qs('#teachers-search')?.focus();
 }
 
 function teacherCard(teacher) {
@@ -100,26 +122,36 @@ function teacherCard(teacher) {
   const isExpanded = expanded.has(teacher.id);
   const visibleReviews = isExpanded ? stats.reviews : stats.reviews.slice(0, 2);
   const photo = teacher.photo;
+  const titleId = `teacher-title-${teacher.id}`;
+  const reviewsId = `teacher-reviews-${teacher.id}`;
 
   const photoNode = photo
-    ? el('img', { src: photo, alt: `Foto de ${teacher.name}`, loading: 'lazy' })
+    ? // El nombre está justo al lado: la foto no debe duplicarlo ni sugerir que es otra persona.
+      el('img', { src: photo, alt: '', loading: 'lazy' })
     : el('span', { class: 'avatar avatar--xl', text: initials(teacher.name) || 'P' });
 
   const reviewsNode = stats.count
     ? el(
         'div',
-        { class: 'teacher-card__reviews' },
+        { class: 'teacher-card__reviews', id: reviewsId },
         ...visibleReviews.map(reviewItem),
         stats.count > 2
           ? el('button', {
               class: 'btn btn--link',
               type: 'button',
+              dataset: { action: 'reviews' },
+              attrs: {
+                'aria-expanded': String(isExpanded),
+                'aria-controls': reviewsId,
+                'aria-describedby': titleId,
+              },
               text: isExpanded ? 'Mostrar menos' : `Ver las ${stats.count} opiniones`,
               on: {
                 click: () => {
                   if (isExpanded) expanded.delete(teacher.id);
                   else expanded.add(teacher.id);
                   renderList();
+                  focusTeacherAction(teacher.id, 'reviews');
                 },
               },
             })
@@ -143,7 +175,7 @@ function teacherCard(teacher) {
         el(
           'div',
           {},
-          el('h2', { class: 'teacher-card__name', text: teacher.name }),
+          el('h2', { class: 'teacher-card__name', id: titleId, text: teacher.name }),
           el('p', {
             class: 'teacher-card__subject',
             text: teacher.subject || 'Asignatura no especificada',
@@ -185,12 +217,15 @@ function teacherCard(teacher) {
       el('button', {
         class: 'btn btn--primary btn--sm',
         type: 'button',
+        dataset: { action: 'rate' },
+        attrs: { 'aria-describedby': titleId },
         html: `${icon('star', { size: 14 })}<span>Calificar</span>`,
         on: { click: () => openReviewModal(teacher) },
       }),
       el('button', {
         class: 'btn btn--danger-soft btn--sm',
         type: 'button',
+        attrs: { 'aria-describedby': titleId },
         html: `${icon('trash', { size: 14 })}<span>Eliminar</span>`,
         on: { click: () => deleteTeacher(teacher) },
       }),
@@ -316,6 +351,7 @@ async function deleteTeacher(teacher) {
     await teachersRepo.remove(teacher.id);
     teachers = teachers.filter((item) => item.id !== teacher.id);
     renderAll();
+    focusFirstTeacherAction();
     toast.success('Profesor eliminado del directorio.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar al profesor.', error);
@@ -352,7 +388,7 @@ function openAddTeacherModal() {
 
   const form = el(
     'form',
-    { class: 'form', id: 'teacher-form' },
+    { class: 'form', id: 'teacher-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -411,14 +447,15 @@ function openAddTeacherModal() {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = nameInput.value.trim();
     const subject = subjectInput.value.trim();
     if (!name) {
-      nameInput.setAttribute('aria-invalid', 'true');
+      setFieldError(nameInput, 'Escribe el nombre del profesor.');
       nameInput.focus();
-      toast.warning('Escribe el nombre del profesor.');
       return;
     }
 
@@ -440,6 +477,7 @@ function openAddTeacherModal() {
       teachers = [created, ...teachers];
       modal.close();
       renderAll();
+      focusTeacherAction(created.id);
       toast.success(`${name} agregado/a al directorio.`);
     } catch (error) {
       console.error('[IntraNerd] No se pudo agregar al profesor.', error);
@@ -480,18 +518,21 @@ function openReviewModal(preselected = null) {
   );
 
   let rating = 0;
+  const ratingHint = el('span', {
+    class: 'star-rating-field__hint',
+    id: 'review-rating-hint',
+    text: 'Selecciona de 1 a 5 estrellas.',
+  });
   const starField = createStarRating({
     value: 0,
     label: 'Calificación de 1 a 5 estrellas',
     onChange: (value) => {
       rating = value;
       ratingHint.textContent = `${value} de 5 estrellas`;
+      starField.removeAttribute('aria-invalid');
     },
   });
-  const ratingHint = el('span', {
-    class: 'star-rating-field__hint',
-    text: 'Selecciona de 1 a 5 estrellas.',
-  });
+  starField.setAttribute('aria-describedby', 'review-rating-hint');
 
   const opinionInput = el('textarea', {
     class: 'textarea',
@@ -509,7 +550,7 @@ function openReviewModal(preselected = null) {
 
   const form = el(
     'form',
-    { class: 'form', id: 'review-form' },
+    { class: 'form', id: 'review-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -564,6 +605,8 @@ function openReviewModal(preselected = null) {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const student = studentInput.value.trim();
@@ -571,10 +614,16 @@ function openReviewModal(preselected = null) {
     const teacherId = teacherSelect.value;
 
     if (!student || !text || rating < 1) {
-      if (rating < 1) ratingHint.textContent = 'Selecciona una calificación de 1 a 5 estrellas.';
-      if (!student) studentInput.setAttribute('aria-invalid', 'true');
-      if (!text) opinionInput.setAttribute('aria-invalid', 'true');
-      toast.warning('Completa tu nombre, la opinión y la calificación.');
+      if (!student) setFieldError(studentInput, 'Escribe tu nombre.');
+      if (rating < 1) {
+        ratingHint.textContent = 'Selecciona una calificación de 1 a 5 estrellas.';
+        starField.setAttribute('aria-invalid', 'true');
+      }
+      if (!text) setFieldError(opinionInput, 'Escribe tu opinión.');
+
+      if (!student) studentInput.focus();
+      else if (rating < 1) qs('[role="radio"]', starField)?.focus();
+      else opinionInput.focus();
       return;
     }
 
@@ -607,6 +656,7 @@ function openReviewModal(preselected = null) {
       teachers = teachers.map((item) => (item.id === teacher.id ? { ...item, ...updated } : item));
       modal.close();
       renderAll();
+      focusTeacherAction(teacher.id);
       toast.success('Opinión publicada. ¡Gracias por aportar!');
     } catch (error) {
       console.error('[IntraNerd] No se pudo publicar la opinión.', error);

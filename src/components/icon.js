@@ -74,6 +74,8 @@ const PATHS = {
   download:
     '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  accessibility:
+    '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="7.5" r="1.3"/><path d="M5.5 10.5c2.2.8 4.3 1.2 6.5 1.2s4.3-.4 6.5-1.2"/><path d="m9.5 13-1 6M14.5 13l1 6"/>',
   userPlus:
     '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 21a6.5 6.5 0 0 1 13 0"/><path d="M19 8v6M16 11h6"/>',
   clipboard:

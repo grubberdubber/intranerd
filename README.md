@@ -20,17 +20,36 @@ suite de pruebas y una especificación OpenAPI.
 
 ## Módulos
 
-| #   | Módulo                        | Capacidades                                                                                                |
-| --- | ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| 1   | **Notas y promedios**         | Asignaturas dinámicas, notas por semestre (1.0–7.0), promedio por semestre y final, indicadores verde/rojo |
-| 2   | **Talleres**                  | Catálogo, horarios, lugares, docentes, inscripción con control de cupos y lista de espera visual           |
-| 3   | **Personas extraviadas**      | Reportes de emergencia, foto local o de ejemplo, filtros, marcar encontrado y eliminar                     |
-| 4   | **Calificador de profesores** | Directorio por asignatura, estrellas 1–5, opiniones, evidencias, promedio y contador de valoraciones       |
-| 5   | **Objetos perdidos**          | Paneles "Encontrados" y "Avisos", categorías, miniaturas, resolución y eliminación                         |
-| 6   | **Calendario escolar**        | Navegación anual, feriados chilenos, selector de rol, eventos por día con autor                            |
-| 7   | **Comunicados**               | Feed oficial, fijado de anuncios, categorías y autoría                                                     |
-| 8   | **Tareas**                    | Publicación por asignatura, fechas de entrega y checklist personal por alumno                              |
-| 9   | **Contacto y soporte**        | Formulario accesible, API + respaldo local, canales directos y enlace a la solución tecnológica (OpenAPI)  |
+| #   | Módulo                        | Capacidades                                                                                                     |
+| --- | ----------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1   | **Notas y promedios**         | Asignaturas dinámicas, notas por semestre (1.0–7.0), promedio final, indicadores verde/rojo y simulador de meta |
+| 2   | **Talleres**                  | Catálogo, horarios, lugares, docentes, inscripción con control de cupos y lista de espera visual                |
+| 3   | **Personas extraviadas**      | Reportes de emergencia, foto local o de ejemplo, filtros, marcar encontrado y eliminar                          |
+| 4   | **Calificador de profesores** | Directorio por asignatura, estrellas 1–5, opiniones, evidencias, promedio y contador de valoraciones            |
+| 5   | **Objetos perdidos**          | Paneles "Encontrados" y "Avisos", categorías, miniaturas, coincidencias sugeridas, resolución y eliminación     |
+| 6   | **Calendario escolar**        | Navegación anual, feriados chilenos, selector de rol, eventos por día con autor                                 |
+| 7   | **Comunicados**               | Feed oficial, fijado de anuncios, categorías y autoría                                                          |
+| 8   | **Tareas**                    | Publicación por asignatura, fechas de entrega y checklist personal por alumno                                   |
+| 9   | **Contacto y soporte**        | Formulario accesible, API + respaldo local, canales directos y enlace a la solución tecnológica (OpenAPI)       |
+
+El **panel general** añade un plan semanal que combina tareas y evaluaciones
+para proponer bloques de estudio. Las coincidencias de objetos y el simulador
+de notas son reglas locales y explicables: no envían datos a servicios de IA.
+
+---
+
+## Documentación
+
+| Documento                                      | Para quién                           | Contenido                                                                       |
+| ---------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------- |
+| [`docs/GUIA-EQUIPO.md`](docs/GUIA-EQUIPO.md)   | Equipo de la escuela y principiantes | HTML, CSS, tipografías, iconos, funciones, SPA, localStorage y flujo de trabajo |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Desarrollo                           | Capas, decisiones, modelo de datos, flujos y pruebas                            |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)     | Infraestructura                      | Despliegue, variables, respaldos y operación                                    |
+| [`docs/openapi.yaml`](docs/openapi.yaml)       | Integraciones                        | Contrato REST completo de la plataforma                                         |
+
+La guía del equipo está escrita para quienes nunca han usado HTML: explica
+cada concepto desde cero y termina con un tutorial para agregar un módulo nuevo
+a la SPA.
 
 ---
 
@@ -87,7 +106,11 @@ flowchart LR
 │   └── Dockerfile
 ├── frontend/                  # Build, dev server, Nginx y Dockerfile de la SPA
 ├── tests/                     # unit / integration / e2e
-├── docs/openapi.yaml          # Especificación OpenAPI 3.0.3
+├── docs/
+│   ├── GUIA-EQUIPO.md         # Guía de aprendizaje para el equipo
+│   ├── ARCHITECTURE.md        # Decisiones técnicas y flujos
+│   ├── DEPLOYMENT.md          # Operación y despliegue
+│   └── openapi.yaml           # Especificación OpenAPI 3.0.3
 ├── scripts/lint.mjs           # Guardrails de código
 ├── docker-compose.yml
 ├── Makefile
@@ -232,11 +255,11 @@ Códigos: `200/201` éxito, `400` petición mal formada, `404` recurso,
 ## Pruebas
 
 ```bash
-npm test                  # Vitest: unitarias + integración con cobertura
-npm run test:unit         # 178 pruebas unitarias
-npm run test:integration  # 170 pruebas de API (SQLite temporal)
-npm run test:e2e          # 10 flujos Playwright (Chromium + móvil)
-npm --prefix backend test # 10 pruebas del backend con node:test
+pnpm test                  # 375 pruebas Vitest (202 unitarias + 173 de integración) con cobertura
+pnpm test:unit             # 202 pruebas unitarias
+pnpm test:integration      # 173 pruebas de API (SQLite temporal)
+pnpm test:e2e              # 11 flujos Playwright (Chromium de escritorio + móvil)
+pnpm test:backend          # 11 pruebas del backend con node:test
 ```
 
 - **Unitarias:** reglas de notas, formato/fechas, feriados, validadores,
@@ -265,22 +288,52 @@ CI ejecuta formato, lint, tests, Playwright y build de imágenes en cada push.
   `assets/fonts/OFL.txt`.
 - **Accesibilidad:** objetivo WCAG 2.2 AA: navegación completa por teclado, foco
   visible, contraste AA, regiones vivas, formularios con errores asociados,
-  `prefers-reduced-motion` y textos alternativos. El módulo de contacto permite
-  reportar barreras directamente al equipo.
+  `prefers-reduced-motion` y textos alternativos. El **Centro de accesibilidad**
+  (barra superior y footer) permite ampliar el texto, activar alto contraste y
+  reducir el movimiento; la elección persiste en `intranerd.v2:ui.preferences`.
+  La declaración completa está en el footer y el módulo de contacto permite
+  reportar barreras.
 
 ---
 
 ## Calidad de código
 
 ```bash
-npm run lint       # Prettier --check + guardrails propios
-npm run format     # Prettier --write
+pnpm lint       # Prettier --check + guardrails propios
+pnpm format     # Prettier --write
 ```
 
 Prettier fija el estilo (100 columnas, comillas simples, trailing commas).
 `scripts/lint.mjs` añade reglas que un formateador no cubre: `eval`,
 `new Function`, `debugger`, igualdad laxa, `var`, longitud de línea, sintaxis
 (`node --check`), finales LF y marcadores TODO.
+
+---
+
+## Pie de página, privacidad y cookies
+
+El footer se monta una sola vez en el layout (`src/components/footer.js`) y
+aparece al final de todos los módulos. Incluye navegación secundaria, recursos
+para el equipo, canales de contacto y accesos a los documentos legales.
+
+- **Textos legales:** `src/data/legal.js` (términos, privacidad, cookies y
+  declaración de accesibilidad, con versión y fecha). Los modales se abren sin
+  salir de la SPA.
+- **Consentimiento:** el banner inicial se muestra solo si no hay una decisión
+  guardada. La elección vive en `intranerd.v2:legal.cookieConsent` y puede
+  revisarse o retirarse desde "Preferencias de cookies" en el footer.
+- **Sin rastreo:** no hay cookies publicitarias, analítica ni peticiones a
+  dominios externos. La política lo declara de forma explícita.
+
+Para volver a probar el aviso desde la consola del navegador:
+
+```js
+localStorage.removeItem('intranerd.v2:legal.cookieConsent');
+location.reload();
+```
+
+Los textos son un borrador de proyecto escolar y requieren revisión de la
+dirección antes de publicar la plataforma fuera del establecimiento.
 
 ---
 

@@ -97,7 +97,8 @@
   place-items: center;
   width: 20px;
   height: 20px;
-  border: 1.5px solid var(--slate-300);
+  /* Borde 3:1 sobre blanco para que el control sea perceptible. */
+  border: 1.5px solid var(--border-control);
   border-radius: 6px;
   background: var(--surface);
   color: transparent;
@@ -108,13 +109,13 @@
 }
 
 .task-check input:checked + .task-check__box {
-  border-color: var(--success-600);
-  background: var(--success-600);
+  border-color: var(--success-700);
+  background: var(--success-700);
   color: var(--white);
 }
 
 .task-check input:focus-visible + .task-check__box {
-  outline: 3px solid rgba(37, 99, 235, 0.35);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -184,6 +185,12 @@
   color: var(--text-soft);
   text-transform: uppercase;
   letter-spacing: 0.06em;
+}
+
+.task-subject-group__title {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
 }
 
 .task-subject-group__header .badge {

@@ -45,14 +45,16 @@ compartida para integraciones y pruebas de contrato.
 | SQLite embebido                   | Cero servicios externos, backups por archivo, ideal para un colegio | Un solo escritor; suficiente para el volumen esperado               |
 | Imágenes como data URL / archivos | Funciona offline y no requiere object storage                       | Payload mayor; límites de 2.5–4 MB en la SPA y 10 MB en la API      |
 | Express 5                         | Manejo nativo de promesas y router maduro                           | Requiere Node.js 24+                                                |
-| Sin autenticación                 | La entrega prioriza los 8 módulos y el modo offline                 | No exponer la API a Internet sin añadir sesiones y roles            |
+| Sin autenticación                 | La entrega prioriza los 9 módulos y el modo offline                 | No exponer la API a Internet sin añadir sesiones y roles            |
 
 ## 3. Frontend
 
 ### Capas
 
 - `src/views/`: una vista por módulo, sin acceso directo a `fetch`.
-- `src/components/`: layout, modal, toasts, estrellas, file picker, estados.
+- `src/components/`: layout, footer, documentos legales, consentimiento de
+  cookies, centro de accesibilidad, modal, toasts, estrellas, file picker y
+  estados.
 - `src/services/`:
   - `storage.js`: prefijo versionado, serialización segura, fallback en memoria
     y evento `intranerd:storage`.
@@ -61,12 +63,33 @@ compartida para integraciones y pruebas de contrato.
   - `session.js`: perfil y rol local para autoría de contenido.
   - `migrate.js`: importa datos de los prototipos antiguos en `legacy/`.
 - `src/data/`: catálogos, feriados y seeds de demostración.
+- `src/utils/`: formato, cálculos de notas, filtros y reglas de sugerencias
+  (`gradeGoals.js`, `lostFoundMatches.js`, `studyPlan.js`).
 - `src/styles/`: tokens, layout y CSS por vista.
+
+### Cálculos y sugerencias locales
+
+El panel y los módulos incluyen tres apoyos que funcionan sin red ni servicios
+externos:
+
+- `utils/gradeGoals.js`: calcula el promedio por semestre o la próxima nota
+  necesaria para una meta final. Supone que el otro semestre mantiene su
+  promedio actual.
+- `utils/lostFoundMatches.js`: compara categoría, palabras, lugar y fechas de
+  los objetos encontrados y perdidos. Devuelve una puntuación y razones para
+  que la persona confirme el cruce.
+- `utils/studyPlan.js`: reparte tareas y evaluaciones en los próximos días,
+  prioriza atrasos y entrega como máximo tres bloques diarios.
+
+Son reglas deterministas y testeables; no hay IA generativa ni envío de datos a
+terceros en estas funciones.
 
 ### Persistencia
 
 1. La SPA hidrata cada repositorio desde `localStorage` con namespace
-   `intranerd.v2:*`.
+   `intranerd.v2:*`. La decisión de privacidad se guarda en
+   `intranerd.v2:legal.cookieConsent` y las preferencias de accesibilidad en
+   `intranerd.v2:ui.preferences`; ambas se gestionan desde el footer.
 2. Si la API está habilitada (`config.api.enabled`), cada repositorio intenta
    la operación remota mediante los adaptadores de `services/resources.js`.
 3. Los errores de red/5xx degradan a almacenamiento local y se emite el evento
@@ -80,6 +103,12 @@ compartida para integraciones y pruebas de contrato.
 - Skip link, roles ARIA, `aria-live` para toasts y foco atrapado en modales.
 - Navegación lateral colapsable; grids fluidos y targets táctiles ≥ 44 px.
 - Contraste AA sobre la paleta institucional (`#1e40af`, `#2563eb`).
+- Centro de accesibilidad con tamaño de texto (100/112,5/125 %), alto contraste
+  y movimiento reducido. Se aplica como atributos `data-*` en `<html>` desde
+  `services/preferences.js` y se traduce en CSS sin tocar los datos.
+- Se respetan `prefers-reduced-motion`, `prefers-contrast` y `forced-colors`.
+- Declaración de accesibilidad versionada en `data/legal.js` y accesible desde
+  el footer.
 
 ## 4. Backend
 
@@ -109,7 +138,7 @@ Cada módulo comparte:
 - Listados: `data = { items, pagination }`.
 - Cabeceras: `X-Request-Id`, `X-Content-Type-Options`, `X-Frame-Options`,
   `Referrer-Policy`, `Permissions-Policy` y HSTS en producción.
-- OpenAPI 3.0.3 en `docs/openapi.yaml` (33 rutas).
+- OpenAPI 3.0.3 en `docs/openapi.yaml` (34 rutas).
 
 ## 5. Modelo de datos
 
@@ -123,7 +152,8 @@ erDiagram
 
 Tablas principales: `subjects`, `grades`, `missing_persons`, `teachers`,
 `teacher_reviews`, `lost_found_items`, `calendar_events`, `workshops`,
-`workshop_enrollments`, `announcements`, `tasks`, `task_completions`.
+`workshop_enrollments`, `announcements`, `tasks`, `task_completions` y
+`contact_messages` (bandeja privada de soporte, sin listado público).
 
 Reglas de integridad:
 

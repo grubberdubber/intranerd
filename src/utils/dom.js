@@ -158,6 +158,30 @@ export function setFieldError(input, message) {
   input.setAttribute('aria-describedby', [...describedBy].join(' '));
 }
 
+/**
+ * Retira el error de un único campo, por ejemplo mientras la persona escribe.
+ */
+export function clearFieldError(input) {
+  if (!input) return;
+  input.removeAttribute('aria-invalid');
+  const field = input.closest('.field') || input.parentElement;
+  if (!field) return;
+
+  const error = field.querySelector('.field__error');
+  if (!error) return;
+  const errorId = error.id;
+  error.remove();
+  if (!errorId) return;
+
+  qsa('[aria-describedby]', field).forEach((node) => {
+    const tokens = (node.getAttribute('aria-describedby') || '')
+      .split(/\s+/)
+      .filter((token) => token && token !== errorId);
+    if (tokens.length) node.setAttribute('aria-describedby', tokens.join(' '));
+    else node.removeAttribute('aria-describedby');
+  });
+}
+
 export function clearFieldErrors(root) {
   qsa('[aria-invalid="true"]', root).forEach((input) => input.removeAttribute('aria-invalid'));
 
@@ -173,6 +197,22 @@ export function clearFieldErrors(root) {
       else node.removeAttribute('aria-describedby');
     });
   });
+}
+
+/**
+ * Limpia el error del campo en cuanto la persona lo corrige.
+ * Devuelve una función para retirar los listeners si hiciera falta.
+ */
+export function bindFieldErrorClearing(root) {
+  const handler = (event) => {
+    if (event.target instanceof HTMLElement) clearFieldError(event.target);
+  };
+  root.addEventListener('input', handler);
+  root.addEventListener('change', handler);
+  return () => {
+    root.removeEventListener('input', handler);
+    root.removeEventListener('change', handler);
+  };
 }
 
 export function onEscape(handler) {

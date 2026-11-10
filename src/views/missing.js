@@ -1,6 +1,6 @@
 import { EXAMPLE_PEOPLE } from '../data/constants.js';
 import { missingRepo } from '../services/resources.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { prepareUpload } from '../utils/files.js';
 import { formatDateTime, relativeTime } from '../utils/format.js';
 import { filterMissingReports } from '../utils/reports.js';
@@ -36,11 +36,37 @@ function statCard({ iconName, label, value, hint, tone = '' }) {
   );
 }
 
+/** Devuelve la tarjeta visible de un reporte para restaurar el foco tras re-renderizar. */
+function cardById(id) {
+  return qs('#missing-list')
+    ? Array.from(qs('#missing-list').querySelectorAll('.report-card')).find(
+        (card) => card.dataset.id === id,
+      )
+    : null;
+}
+
+function focusCardAction(id, action = 'toggle') {
+  const target = cardById(id)?.querySelector(`[data-action="${action}"]`);
+  target?.focus();
+  return Boolean(target);
+}
+
+function focusFirstCardAction() {
+  const first = qs('#missing-list .report-card');
+  const target = first?.querySelector('[data-action="toggle"]');
+  if (target) {
+    target.focus();
+    return;
+  }
+  qs('#missing-search')?.focus();
+}
+
 function reportCard(report) {
   const photo = report.photo || report.exampleImg || EXAMPLE_PEOPLE[0];
   const isFound = Boolean(report.found);
   const foundLabel = isFound ? 'Marcar activo' : 'Marcar encontrado';
   const foundIcon = isFound ? 'refresh' : 'checkCircle';
+  const titleId = `missing-title-${report.id}`;
 
   return el(
     'article',
@@ -48,7 +74,12 @@ function reportCard(report) {
     el(
       'div',
       { class: 'report-card__thumb' },
-      el('img', { src: photo, alt: `Fotografía de ${report.name}`, loading: 'lazy' }),
+      el('img', {
+        src: photo,
+        // Una imagen de ejemplo no debe presentarse como fotografía real.
+        alt: report.photo ? `Fotografía adjunta de ${report.name}` : 'Imagen de referencia del reporte',
+        loading: 'lazy',
+      }),
     ),
     el(
       'div',
@@ -56,7 +87,7 @@ function reportCard(report) {
       el(
         'div',
         { class: 'report-card__top' },
-        el('h2', { class: 'report-card__name', text: report.name }),
+        el('h2', { class: 'report-card__name', id: titleId, text: report.name }),
         el('span', {
           class: `badge ${isFound ? 'badge--solid-success' : 'badge--solid-danger'}`,
           text: isFound ? 'ENCONTRADO' : 'ACTIVO',
@@ -89,6 +120,7 @@ function reportCard(report) {
             target: '_blank',
             rel: 'noopener',
             text: 'Ver foto o evidencia adjunta',
+            attrs: { 'aria-describedby': titleId },
           })
         : null,
     ),
@@ -98,12 +130,15 @@ function reportCard(report) {
       el('button', {
         class: `btn btn--sm ${isFound ? 'btn--ghost' : 'btn--success-soft'}`,
         type: 'button',
+        dataset: { action: 'toggle' },
+        attrs: { 'aria-describedby': titleId },
         html: `${icon(foundIcon, { size: 14 })}<span>${foundLabel}</span>`,
         on: { click: () => toggleFound(report) },
       }),
       el('button', {
         class: 'btn btn--danger-soft btn--sm',
         type: 'button',
+        attrs: { 'aria-describedby': titleId },
         html: `${icon('trash', { size: 14 })}<span>Eliminar</span>`,
         on: { click: () => deleteReport(report) },
       }),
@@ -188,6 +223,7 @@ async function toggleFound(report) {
     });
     reports = reports.map((item) => (item.id === report.id ? { ...item, ...updated } : item));
     renderAll();
+    focusCardAction(report.id);
     toast.success(
       !report.found
         ? `${report.name} marcado/a como encontrado/a.`
@@ -212,6 +248,7 @@ async function deleteReport(report) {
     await missingRepo.remove(report.id);
     reports = reports.filter((item) => item.id !== report.id);
     renderAll();
+    focusFirstCardAction();
     toast.success('Reporte eliminado.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar el reporte.', error);
@@ -224,7 +261,9 @@ function resetFilters() {
   const search = qs('#missing-search');
   if (search) search.value = '';
   document.querySelectorAll('#missing-filters .filter-pill').forEach((pill) => {
-    pill.classList.toggle('is-active', pill.dataset.status === 'all');
+    const active = pill.dataset.status === 'all';
+    pill.classList.toggle('is-active', active);
+    pill.setAttribute('aria-pressed', String(active));
   });
   renderList();
 }
@@ -274,7 +313,7 @@ function openReportModal() {
 
   const form = el(
     'form',
-    { class: 'form', id: 'missing-form' },
+    { class: 'form', id: 'missing-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -360,6 +399,8 @@ function openReportModal() {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = nameInput.value.trim();
@@ -368,8 +409,25 @@ function openReportModal() {
     const desc = descInput.value.trim();
     const age = ageInput.value.trim();
 
-    if (!name || !place || !contact || !desc) {
-      toast.warning('Completa nombre, descripción, último lugar y contacto.');
+    const ageNumber = age ? Number(age) : null;
+    const errors = [
+      [!name, nameInput, 'Escribe el nombre de la persona.'],
+      [
+        Boolean(age) && (!Number.isFinite(ageNumber) || ageNumber < 0 || ageNumber > 120),
+        ageInput,
+        'La edad debe ser un número entre 0 y 120.',
+      ],
+      [!desc, descInput, 'Describe a la persona y su vestimenta.'],
+      [!place, placeInput, 'Indica el último lugar donde fue vista.'],
+      [!contact, contactInput, 'Agrega un nombre, teléfono o correo de contacto.'],
+    ];
+
+    const firstInvalid = errors.find(([invalid]) => invalid);
+    if (firstInvalid) {
+      errors.forEach(([invalid, input, message]) => {
+        if (invalid) setFieldError(input, message);
+      });
+      firstInvalid[1].focus();
       return;
     }
 
@@ -396,6 +454,7 @@ function openReportModal() {
       reports = [created, ...reports];
       modal.close();
       renderAll();
+      focusCardAction(created.id);
       toast.success('Reporte publicado. La comunidad podrá verlo de inmediato.');
     } catch (error) {
       console.error('[IntraNerd] No se pudo crear el reporte.', error);
@@ -420,7 +479,11 @@ function bindFilters() {
   pills.forEach((pill) => {
     pill.addEventListener('click', () => {
       filters.status = pill.dataset.status;
-      pills.forEach((item) => item.classList.toggle('is-active', item === pill));
+      pills.forEach((item) => {
+        const active = item === pill;
+        item.classList.toggle('is-active', active);
+        item.setAttribute('aria-pressed', String(active));
+      });
       renderList();
     });
   });
@@ -458,23 +521,29 @@ export async function mount(container) {
         }),
         el(
           'div',
-          { class: 'filter-pills' },
+          {
+            class: 'filter-pills',
+            attrs: { role: 'group', 'aria-label': 'Filtrar reportes por estado' },
+          },
           el('button', {
             class: 'filter-pill is-active',
             type: 'button',
             dataset: { status: 'all' },
+            attrs: { 'aria-pressed': 'true' },
             text: 'Todos',
           }),
           el('button', {
             class: 'filter-pill',
             type: 'button',
             dataset: { status: 'active' },
+            attrs: { 'aria-pressed': 'false' },
             text: 'Activos',
           }),
           el('button', {
             class: 'filter-pill',
             type: 'button',
             dataset: { status: 'found' },
+            attrs: { 'aria-pressed': 'false' },
             text: 'Encontrados',
           }),
         ),

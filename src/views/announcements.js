@@ -1,7 +1,7 @@
 import { ANNOUNCEMENT_CATEGORIES, AUTHOR_ROLES } from '../data/constants.js';
 import { announcementsRepo } from '../services/resources.js';
 import { getProfile } from '../services/session.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { formatDateTime, initials, relativeTime } from '../utils/format.js';
 import { icon } from '../components/icon.js';
 import { confirmDialog, openModal } from '../components/modal.js';
@@ -62,9 +62,30 @@ function statCard({ iconName, label, value, hint, tone = '' }) {
   );
 }
 
+function cardById(id) {
+  const feed = qs('#announcements-feed');
+  if (!feed) return null;
+  return Array.from(feed.querySelectorAll('.announcement-card')).find(
+    (card) => card.dataset.id === id,
+  );
+}
+
+function focusCardAction(id, action = 'pin') {
+  const target = cardById(id)?.querySelector(`[data-action="${action}"]`);
+  target?.focus();
+  return Boolean(target);
+}
+
+function focusFirstCardAction() {
+  const target = qs('#announcements-feed .announcement-card [data-action="pin"]');
+  if (target) target.focus();
+  else qs('#announcements-search')?.focus();
+}
+
 function announcementCard(post) {
   const category = categoryOf(post);
   const pinned = Boolean(post.pinned);
+  const titleId = `announcement-post-${post.id}`;
 
   return el(
     'article',
@@ -100,7 +121,7 @@ function announcementCard(post) {
         el('span', { class: `badge badge--${category.tone}`, text: category.label }),
       ),
     ),
-    el('h2', { class: 'announcement-card__title', text: post.title }),
+    el('h2', { class: 'announcement-card__title', id: titleId, text: post.title }),
     el('p', { class: 'announcement-card__body', text: post.body }),
     el(
       'div',
@@ -115,12 +136,15 @@ function announcementCard(post) {
         el('button', {
           class: 'btn btn--ghost btn--sm',
           type: 'button',
+          dataset: { action: 'pin' },
+          attrs: { 'aria-describedby': titleId },
           html: `${icon('pin', { size: 13 })}<span>${pinned ? 'Quitar fijado' : 'Fijar'}</span>`,
           on: { click: () => togglePinned(post) },
         }),
         el('button', {
           class: 'btn btn--danger-soft btn--sm',
           type: 'button',
+          attrs: { 'aria-describedby': titleId },
           html: `${icon('trash', { size: 13 })}<span>Eliminar</span>`,
           on: { click: () => deletePost(post) },
         }),
@@ -216,6 +240,7 @@ async function togglePinned(post) {
     const updated = await announcementsRepo.update(post.id, { pinned: !post.pinned });
     posts = posts.map((item) => (item.id === post.id ? { ...item, ...updated } : item));
     renderAll();
+    focusCardAction(post.id);
     toast.success(!post.pinned ? 'Comunicado fijado en el tablón.' : 'Comunicado desfijado.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo actualizar el comunicado.', error);
@@ -236,6 +261,7 @@ async function deletePost(post) {
     await announcementsRepo.remove(post.id);
     posts = posts.filter((item) => item.id !== post.id);
     renderAll();
+    focusFirstCardAction();
     toast.success('Comunicado eliminado.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar el comunicado.', error);
@@ -295,7 +321,7 @@ function openComposerModal() {
 
   const form = el(
     'form',
-    { class: 'form announcement-composer', id: 'announcement-form' },
+    { class: 'form announcement-composer', id: 'announcement-form', noValidate: true },
     el(
       'div',
       { class: 'announcement-composer__row' },
@@ -390,6 +416,8 @@ function openComposerModal() {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const title = titleInput.value.trim();
@@ -397,10 +425,12 @@ function openComposerModal() {
     const body = bodyInput.value.trim();
 
     if (!title || !author || !body) {
-      toast.warning('Completa el título, el autor y el contenido del comunicado.');
-      if (!title) titleInput.setAttribute('aria-invalid', 'true');
-      if (!author) authorInput.setAttribute('aria-invalid', 'true');
-      if (!body) bodyInput.setAttribute('aria-invalid', 'true');
+      if (!title) setFieldError(titleInput, 'Escribe un título para el comunicado.');
+      if (!author) setFieldError(authorInput, 'Indica quién publica el comunicado.');
+      if (!body) setFieldError(bodyInput, 'Escribe el contenido del comunicado.');
+      if (!title) titleInput.focus();
+      else if (!author) authorInput.focus();
+      else bodyInput.focus();
       return;
     }
 
@@ -420,6 +450,7 @@ function openComposerModal() {
       posts = [created, ...posts];
       modal.close();
       renderAll();
+      focusCardAction(created.id);
       toast.success('Comunicado publicado en el tablón.');
     } catch (error) {
       console.error('[IntraNerd] No se pudo publicar el comunicado.', error);

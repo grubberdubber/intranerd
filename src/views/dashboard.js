@@ -11,6 +11,7 @@ import { getProfile } from '../services/session.js';
 import { el } from '../utils/dom.js';
 import { daysUntil, formatDate, formatNumber, relativeTime, toISODate } from '../utils/format.js';
 import { generalAverage } from '../utils/grades.js';
+import { buildStudyPlan } from '../utils/studyPlan.js';
 import { icon } from '../components/icon.js';
 import { pageHeader } from '../components/pageHeader.js';
 import { emptyState, skeletonRows } from '../components/states.js';
@@ -86,6 +87,126 @@ function announcementRow(post) {
   );
 }
 
+function studyItemRow(item) {
+  const iconName = item.type === 'assessment' ? 'calendar' : 'clipboard';
+  return el(
+    'li',
+    { class: `study-item study-item--${item.type}` },
+    el('span', {
+      class: 'study-item__icon',
+      html: icon(iconName, { size: 14 }),
+      attrs: { 'aria-hidden': 'true' },
+    }),
+    el(
+      'div',
+      { class: 'study-item__body' },
+      el('span', { class: 'study-item__title', text: item.title }),
+      el('span', {
+        class: 'study-item__meta',
+        text: `${item.subject} · ${item.reason}`,
+      }),
+    ),
+    el('span', { class: 'study-item__minutes', text: `${item.minutes} min` }),
+  );
+}
+
+function studyDayCard(day) {
+  return el(
+    'article',
+    { class: `study-day${day.index === 0 ? ' is-today' : ''}` },
+    el(
+      'header',
+      { class: 'study-day__header' },
+      el(
+        'div',
+        {},
+        el('h3', { class: 'study-day__title', text: day.label }),
+        el('span', { class: 'study-day__date', text: day.dateLabel }),
+      ),
+      el('span', {
+        class: 'study-day__minutes',
+        text: day.totalMinutes ? `${day.totalMinutes} min` : 'Libre',
+      }),
+    ),
+    day.items.length
+      ? el('ul', { class: 'study-day__list' }, ...day.items.map(studyItemRow))
+      : el('p', { class: 'study-day__empty', text: 'Sin bloques. Repasa o descansa.' }),
+    day.extra
+      ? el('a', {
+          class: 'study-day__extra',
+          href: '#/tareas',
+          text: `+${day.extra} más en Tareas`,
+        })
+      : null,
+  );
+}
+
+function studyPlanSection(plan) {
+  return el(
+    'section',
+    { class: 'study-plan', attrs: { 'aria-labelledby': 'study-plan-title' } },
+    el(
+      'div',
+      { class: 'study-plan__header' },
+      el(
+        'div',
+        { class: 'study-plan__heading' },
+        el(
+          'span',
+          { class: 'study-plan__eyebrow' },
+          el('span', { html: icon('sparkles', { size: 13 }) }),
+          'Plan sugerido',
+        ),
+        el('h2', {
+          class: 'study-plan__title',
+          id: 'study-plan-title',
+          text: 'Tu semana de estudio',
+        }),
+        el('p', {
+          class: 'study-plan__description',
+          text:
+            'Organizamos tus tareas y evaluaciones en bloques cortos. ' +
+            'Tú decides el ritmo y puedes ajustarlo desde cada módulo.',
+        }),
+      ),
+      el(
+        'div',
+        { class: 'study-plan__aside' },
+        el('span', {
+          class: 'badge badge--brand',
+          text: `${plan.totalItems} ${plan.totalItems === 1 ? 'bloque' : 'bloques'} · ${plan.totalMinutes} min`,
+        }),
+        el(
+          'div',
+          { class: 'btn-row' },
+          el('a', { class: 'btn btn--ghost btn--sm', href: '#/tareas', text: 'Ver tareas' }),
+          el('a', {
+            class: 'btn btn--ghost btn--sm',
+            href: '#/calendario',
+            text: 'Ver calendario',
+          }),
+        ),
+      ),
+    ),
+    plan.totalItems
+      ? el('div', { class: 'study-plan__grid' }, ...plan.days.map(studyDayCard))
+      : el(
+          'div',
+          { class: 'study-plan__empty' },
+          el('span', { html: icon('checkCircle', { size: 20 }), attrs: { 'aria-hidden': 'true' } }),
+          el('span', {
+            text: 'No hay entregas ni pruebas próximas. Aprovecha para repasar o descansar.',
+          }),
+        ),
+    el(
+      'div',
+      { class: 'study-plan__tip' },
+      el('span', { html: icon('info', { size: 15 }), attrs: { 'aria-hidden': 'true' } }),
+      el('p', { text: plan.tip }),
+    ),
+  );
+}
+
 function quickLink(item) {
   return el(
     'a',
@@ -150,6 +271,7 @@ export async function mount(container) {
     const availableWorkshops = workshops.filter(
       (workshop) => (workshop.enrollments?.length || 0) < workshop.capacity,
     ).length;
+    const plan = buildStudyPlan({ tasks, events });
     const completed = tasks.length - pendingTasks.length;
     const completion = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
 
@@ -444,6 +566,7 @@ export async function mount(container) {
       }),
       hero,
       stats,
+      studyPlanSection(plan),
       quick,
       columns,
     );

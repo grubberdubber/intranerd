@@ -6,9 +6,9 @@ Documento de estrategia y trazabilidad de la suite de QA. Complementa
 
 ## 1. Objetivo y alcance
 
-Verificar que los ocho módulos de IntraNerd funcionan de extremo a extremo y
+Verificar que los nueve módulos de IntraNerd funcionan de extremo a extremo y
 que las reglas de negocio críticas (escala de notas, cupos, promedios,
-seguridad escolar y persistencia) se mantienen correctas ante cambios.
+seguridad escolar, soporte y persistencia) se mantienen correctas ante cambios.
 
 **En alcance**
 
@@ -53,6 +53,7 @@ suite.
 | Calendario: fechas, feriados, eventos por rol  | `calendar.holidays`, `calendar.validator`           | `calendar.api`                          | `calendar.spec.js`                |
 | Comunicados y fijado                           | `seeds`                                             | `announcements.api`                     | `modules.spec.js`                 |
 | Tareas y checklist                             | `seeds`                                             | `tasks.api`                             | `modules.spec.js`                 |
+| Contacto: validación, folio y respaldo local   | `constants`, `resources`                            | `contact.api`                           | `contact.spec.js`                 |
 | Persistencia `localStorage`                    | `storage`, `api.resource`, `session`                | —                                       | `grades`, `lostfound`, `calendar` |
 | Envoltura de errores y códigos HTTP            | `http`                                              | `health-and-errors` y todos los `*.api` | —                                 |
 | Responsive / navegación                        | —                                                   | —                                       | `navigation.mobile.spec.js`       |
@@ -100,7 +101,10 @@ suite.
 3. **Calendario:** rol profesor + nombre → abrir 12 de marzo → programar prueba
    → título visible en la cuadrícula → persistencia → cambiar a rol alumno →
    abrir el mismo día → título, descripción y autoría visibles.
-4. **Responsive:** abrir menú hamburguesa → navegar a notas → sin desborde
+4. **Contacto:** enviar el formulario vacío → error asociado y foco en el primer
+   campo inválido → completar nombre, correo, rol, tema, asunto y mensaje →
+   confirmación con folio → persistencia en `localStorage` tras recargar.
+5. **Responsive:** abrir menú hamburguesa → navegar a notas → sin desborde
    horizontal en Pixel 7.
 
 ## 5. Datos de prueba
@@ -119,14 +123,14 @@ suite.
 **Entrada**
 
 - Dependencias instaladas y esquema del backend inicializable.
-- `npm run lint` sin errores.
+- `pnpm lint` sin errores.
 - Chromium disponible para E2E.
 
 **Salida**
 
 - 100 % de tests unitarios e integración en verde.
-- E2E de los tres flujos críticos y del humo de módulos en verde en Chromium
-  de escritorio.
+- E2E de los cuatro flujos críticos (notas, objetos perdidos, calendario y
+  contacto) y del humo de módulos en verde en Chromium de escritorio.
 - Smoke test móvil en verde.
 - Cobertura ≥ umbrales: statements 80 %, branches 75 %, functions 80 %,
   lines 80 %.

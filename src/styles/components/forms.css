@@ -58,7 +58,8 @@
   width: 100%;
   min-height: 40px;
   padding: 9px 12px;
-  border: 1px solid var(--border-strong);
+  /* 3:1 contra el fondo para identificar el límite del control (WCAG 1.4.11). */
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: var(--text);
@@ -71,13 +72,14 @@
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--slate-400);
+  /* Slate 500 conserva 4.76:1 sobre blanco; slate 400 no alcanzaba AA. */
+  color: var(--slate-500);
 }
 
 .input:hover,
 .select:hover,
 .textarea:hover {
-  border-color: var(--slate-300);
+  border-color: var(--slate-600);
 }
 
 .input:focus,
@@ -156,10 +158,11 @@
 }
 
 .checkbox input {
-  width: 17px;
-  height: 17px;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
   margin-top: 2px;
-  accent-color: var(--brand-600);
+  accent-color: var(--brand-700);
 }
 
 .form-actions {
@@ -195,7 +198,7 @@
   place-items: center;
   gap: var(--space-2);
   padding: var(--space-5);
-  border: 1.5px dashed var(--border-strong);
+  border: 1.5px dashed var(--border-control);
   border-radius: var(--radius-md);
   background: var(--slate-50);
   color: var(--text-muted);
@@ -203,12 +206,21 @@
   cursor: pointer;
   transition:
     border-color var(--duration) var(--ease),
-    background var(--duration) var(--ease);
+    background var(--duration) var(--ease),
+    outline-color var(--duration) var(--ease);
 }
 
 .file-drop:hover,
 .file-drop.is-dragging {
-  border-color: var(--brand-400, var(--brand-500));
+  border-color: var(--brand-500);
+  background: var(--brand-50);
+}
+
+/* El input real está visualmente oculto: el foco debe verse en el contenedor. */
+.file-drop:focus-within {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-color: var(--brand-700);
   background: var(--brand-50);
 }
 

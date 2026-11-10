@@ -43,7 +43,7 @@
 
 .badge--info {
   background: var(--info-50);
-  color: var(--info-600);
+  color: var(--info-700);
 }
 
 .badge--solid {
@@ -52,7 +52,7 @@
 }
 
 .badge--solid-success {
-  background: var(--success-600);
+  background: var(--success-700);
   color: var(--white);
 }
 
@@ -194,7 +194,7 @@
 }
 
 .text-success {
-  color: var(--success-600);
+  color: var(--success-700);
 }
 
 .text-brand {

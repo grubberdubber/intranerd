@@ -51,6 +51,22 @@ function unlockBody() {
   }
 }
 
+/**
+ * Solo el modal superior debe recibir foco y teclado. Los inferiores quedan
+ * inertes para que Tab y los lectores de pantalla no salten entre capas.
+ */
+function syncModalStack() {
+  openModals.forEach((modal, index) => {
+    const isTop = index === openModals.length - 1;
+    modal.element.inert = !isTop;
+    if (isTop) {
+      modal.element.removeAttribute('aria-hidden');
+    } else {
+      modal.element.setAttribute('aria-hidden', 'true');
+    }
+  });
+}
+
 function focusableElements(container) {
   const selector = [
     'a[href]',
@@ -89,9 +105,15 @@ export function openModal(options = {}) {
     if (index === -1) return;
     openModals.splice(index, 1);
     backdrop.remove();
+    syncModalStack();
     unlockBody();
     document.removeEventListener('keydown', onKeyDown);
-    if (previousFocus instanceof HTMLElement) previousFocus.focus();
+    if (previousFocus instanceof HTMLElement && previousFocus.isConnected) {
+      previousFocus.focus();
+    } else {
+      // Si la vista re-renderizó el disparador, evita que el foco caiga en body.
+      document.getElementById('main-content')?.focus({ preventScroll: true });
+    }
     if (typeof onClose === 'function') onClose(reason);
   };
 
@@ -162,6 +184,9 @@ export function openModal(options = {}) {
   );
 
   const onKeyDown = (event) => {
+    // Solo la capa superior responde; si no, Escape cerraría varios modales.
+    if (openModals[openModals.length - 1]?.element !== backdrop) return;
+
     if (event.key === 'Escape') {
       event.preventDefault();
       close('escape');
@@ -188,6 +213,7 @@ export function openModal(options = {}) {
 
   root.appendChild(backdrop);
   openModals.push({ element: backdrop, close });
+  syncModalStack();
   lockBody();
   document.addEventListener('keydown', onKeyDown);
 
@@ -224,18 +250,21 @@ export function confirmDialog({
       modal.close(value ? 'confirm' : 'cancel');
     };
 
+    // El mensaje se declara como descripción del diálogo para que el lector de
+    // pantalla lo anuncie al abrirlo, sin duplicarlo en el cuerpo.
     const body = el(
       'div',
       { class: 'confirm' },
       el('span', {
         class: `confirm__icon${tone === 'danger' ? '' : ' confirm__icon--soft'}`,
         html: icon(tone === 'danger' ? 'alert' : 'info', { size: 22 }),
+        attrs: { 'aria-hidden': 'true' },
       }),
-      el('p', { class: 'confirm__text', text: message }),
     );
 
     const modal = openModal({
       title,
+      description: message,
       body,
       size: 'sm',
       onClose: () => {

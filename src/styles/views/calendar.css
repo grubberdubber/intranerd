@@ -17,8 +17,19 @@
 
 .calendar-year {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+}
+
+/* El input de año no debe ocupar el 100 % del ancho: comparte la fila con
+   los botones de navegación y el acceso rápido a "Hoy". */
+.calendar-year .input {
+  flex: 0 0 auto;
+  width: 88px;
+  min-height: 34px;
+  padding-block: 5px;
+  font-size: var(--text-xs);
 }
 
 .calendar-year__value {
@@ -43,11 +54,26 @@
   font-size: var(--text-xs);
 }
 
+.calendar-identity__field {
+  display: block;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Evita que el ancho intrínseco del input empuje la fila fuera de la tarjeta. */
+.calendar-identity__field .input {
+  min-width: 0;
+}
+
 .calendar-identity .input {
   width: 170px;
   min-height: 34px;
   padding-block: 5px;
   font-size: var(--text-xs);
+}
+
+.calendar-identity__field .input {
+  width: 100%;
 }
 
 .calendar-legend {
@@ -121,9 +147,9 @@
 
 .month-card__weekday {
   text-align: center;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-soft);
   text-transform: uppercase;
 }
 
@@ -137,13 +163,15 @@
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
-  min-height: 54px;
+  min-height: 62px;
   padding: 3px;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--radius-xs);
   background: transparent;
   text-align: left;
-  transition: background var(--duration) var(--ease);
+  transition:
+    background var(--duration) var(--ease),
+    border-color var(--duration) var(--ease);
 }
 
 .day-cell:hover {
@@ -174,10 +202,24 @@
 
 .day-cell--holiday {
   background: var(--danger-50);
+  border-color: #fecaca;
 }
 
 .day-cell--holiday .day-cell__number {
   color: var(--danger-700);
+}
+
+/* El feriado no depende solo del color: lleva una etiqueta textual visible. */
+.day-cell__holiday {
+  display: block;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: var(--danger-600);
+  color: var(--white);
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .day-cell__events {
@@ -193,7 +235,7 @@
   border-radius: 3px;
   background: var(--warning-50);
   color: var(--warning-700);
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 650;
   line-height: 1.35;
   overflow: hidden;
@@ -202,8 +244,8 @@
 }
 
 .day-cell__more {
-  font-size: 0.56rem;
-  color: var(--text-muted);
+  font-size: 0.66rem;
+  color: var(--text-soft);
   padding-left: 2px;
 }
 
@@ -280,7 +322,8 @@
 
   .calendar-identity .input {
     flex: 1;
-    width: auto;
+    width: 100%;
+    min-width: 0;
   }
 
   .month-card__days {

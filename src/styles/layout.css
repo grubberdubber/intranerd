@@ -76,7 +76,7 @@
 
 .sidebar__tagline {
   font-size: 0.7rem;
-  color: rgba(226, 232, 240, 0.66);
+  color: #cbd5e1;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -87,7 +87,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(226, 232, 240, 0.72);
+  color: #cbd5e1;
 }
 
 .sidebar__nav {
@@ -201,7 +201,7 @@
 
 .sidebar__legal {
   font-size: 0.7rem;
-  color: rgba(226, 232, 240, 0.7);
+  color: #cbd5e1;
   padding: 0 var(--space-1);
 }
 

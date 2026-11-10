@@ -1,9 +1,10 @@
 import { LOSTFOUND_CATEGORIES } from '../data/constants.js';
 import { foundRepo, lostRepo } from '../services/resources.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { prepareUpload } from '../utils/files.js';
 import { formatDate, relativeTime } from '../utils/format.js';
 import { filterLostFoundItems } from '../utils/reports.js';
+import { findLostFoundMatches } from '../utils/lostFoundMatches.js';
 import { icon } from '../components/icon.js';
 import { createFilePicker } from '../components/filePicker.js';
 import { confirmDialog, openModal } from '../components/modal.js';
@@ -42,6 +43,29 @@ function statCard({ iconName, label, value, hint, tone = '' }) {
   );
 }
 
+/** Localiza una tarjeta visible para devolver el foco después de re-renderizar. */
+function cardById(type, id) {
+  const list = qs(type === 'found' ? '#found-list' : '#lost-list');
+  if (!list) return null;
+  return Array.from(list.querySelectorAll('.item-card')).find((card) => card.dataset.id === id);
+}
+
+function focusCardAction(type, id, action = 'toggle') {
+  const target = cardById(type, id)?.querySelector(`[data-action="${action}"]`);
+  target?.focus();
+  return Boolean(target);
+}
+
+function focusFirstCardAction(type) {
+  const list = qs(type === 'found' ? '#found-list' : '#lost-list');
+  const target = list?.querySelector('.item-card [data-action="toggle"]');
+  if (target) {
+    target.focus();
+    return;
+  }
+  qs('#lostfound-search')?.focus();
+}
+
 function itemCard(item, type) {
   const category = categoryOf(item);
   const resolved = Boolean(item.resolved);
@@ -49,6 +73,7 @@ function itemCard(item, type) {
   const actionLabel = resolved ? 'Reabrir' : type === 'found' ? 'Entregado' : 'Resuelto';
   const actionIcon = resolved ? 'refresh' : 'check';
   const typeLabel = type === 'found' ? 'Encontrado por' : 'Aviso de';
+  const titleId = `lostfound-title-${type}-${item.id}`;
 
   return el(
     'article',
@@ -56,7 +81,13 @@ function itemCard(item, type) {
     el(
       'div',
       { class: 'item-card__media' },
-      el('img', { src: image, alt: item.desc, loading: 'lazy' }),
+      el('img', {
+        src: image,
+        alt: item.photo
+          ? 'Fotografía del objeto publicado'
+          : `Imagen de referencia de ${category.label.toLowerCase()}`,
+        loading: 'lazy',
+      }),
       el('span', { class: 'item-card__badge badge badge--solid', text: category.label }),
     ),
     el(
@@ -65,7 +96,7 @@ function itemCard(item, type) {
       el(
         'div',
         { class: 'cluster' },
-        el('h2', { class: 'item-card__title', text: item.desc }),
+        el('h2', { class: 'item-card__title', id: titleId, text: item.desc }),
         resolved
           ? el('span', {
               class: 'badge badge--success',
@@ -102,18 +133,21 @@ function itemCard(item, type) {
                 target: '_blank',
                 rel: 'noopener',
                 text: 'Ver foto',
+                attrs: { 'aria-describedby': titleId },
               })
             : null,
           el('button', {
             class: `btn btn--sm ${resolved ? 'btn--ghost' : 'btn--success-soft'}`,
             type: 'button',
+            dataset: { action: 'toggle' },
+            attrs: { 'aria-describedby': titleId },
             html: `${icon(actionIcon, { size: 13 })}<span>${actionLabel}</span>`,
             on: { click: () => toggleResolved(item, type) },
           }),
           el('button', {
             class: 'icon-btn icon-btn--danger',
             type: 'button',
-            attrs: { 'aria-label': 'Eliminar publicación' },
+            attrs: { 'aria-label': 'Eliminar publicación', 'aria-describedby': titleId },
             html: icon('trash', { size: 15 }),
             on: { click: () => deleteItem(item, type) },
           }),
@@ -204,9 +238,175 @@ function renderLists() {
   );
 }
 
+function matchSide(item, type) {
+  const category = categoryOf(item);
+  const image = item.photo || item.image || category.image;
+  return el(
+    'div',
+    { class: 'match-card__item' },
+    el('img', {
+      class: 'match-card__thumb',
+      src: image,
+      alt: item.photo
+        ? 'Fotografía del objeto publicado'
+        : `Imagen de referencia de ${category.label.toLowerCase()}`,
+      loading: 'lazy',
+    }),
+    el(
+      'div',
+      { class: 'match-card__content' },
+      el('span', {
+        class: 'match-card__kind',
+        text: type === 'found' ? 'Encontrado' : 'Aviso de perdido',
+      }),
+      el('strong', { class: 'match-card__title', text: item.desc }),
+      el('span', {
+        class: 'match-card__meta',
+        text: `${item.place || 'Sin lugar'} · ${item.by}`,
+      }),
+    ),
+  );
+}
+
+function matchCard(match) {
+  return el(
+    'article',
+    { class: 'match-card' },
+    matchSide(match.found, 'found'),
+    el(
+      'div',
+      { class: 'match-card__score' },
+      el('strong', { text: `${match.score}%` }),
+      el('span', { text: 'coincidencia' }),
+    ),
+    matchSide(match.lost, 'lost'),
+    el(
+      'ul',
+      { class: 'match-card__reasons' },
+      ...match.reasons.map((reason) => el('li', { text: reason })),
+    ),
+    el(
+      'div',
+      { class: 'match-card__actions' },
+      el('button', {
+        class: 'btn btn--ghost btn--sm',
+        type: 'button',
+        text: 'Ver encontrado',
+        on: { click: () => revealItem('found', match.found.id) },
+      }),
+      el('button', {
+        class: 'btn btn--ghost btn--sm',
+        type: 'button',
+        text: 'Ver aviso',
+        on: { click: () => revealItem('lost', match.lost.id) },
+      }),
+    ),
+  );
+}
+
+function renderMatches() {
+  const container = qs('#lostfound-matches');
+  if (!container) return;
+
+  const openFound = foundItems.filter((item) => !item.resolved);
+  const openLost = lostItems.filter((item) => !item.resolved);
+  if (!openFound.length || !openLost.length) {
+    container.replaceChildren();
+    return;
+  }
+
+  const matches = findLostFoundMatches(foundItems, lostItems);
+  if (!matches.length) {
+    container.replaceChildren(
+      el(
+        'section',
+        { class: 'card match-panel match-panel--empty' },
+        el(
+          'div',
+          { class: 'card__body match-empty' },
+          el('span', {
+            class: 'match-empty__icon',
+            html: icon('sparkles', { size: 20 }),
+            attrs: { 'aria-hidden': 'true' },
+          }),
+          el(
+            'div',
+            {},
+            el('h2', { class: 'match-empty__title', text: 'Coincidencias inteligentes' }),
+            el('p', {
+              class: 'match-empty__text',
+              text:
+                'Todavía no hay pistas suficientes para sugerir un cruce. ' +
+                'Añade color, marcas y el lugar donde se perdió o encontró cada objeto.',
+            }),
+          ),
+        ),
+      ),
+    );
+    return;
+  }
+
+  container.replaceChildren(
+    el(
+      'section',
+      { class: 'card match-panel' },
+      el(
+        'header',
+        { class: 'card__header' },
+        el(
+          'div',
+          {},
+          el(
+            'h2',
+            { class: 'card__title' },
+            el('span', { html: icon('sparkles', { size: 18 }) }),
+            'Coincidencias sugeridas',
+          ),
+          el('p', {
+            class: 'card__subtitle',
+            text: 'Comparamos categoría, palabras, lugar y fechas. Confirma los detalles antes de entregar un objeto.',
+          }),
+        ),
+        el('span', {
+          class: 'badge badge--brand',
+          text: `${matches.length} ${matches.length === 1 ? 'sugerencia' : 'sugerencias'}`,
+        }),
+      ),
+      el(
+        'div',
+        { class: 'card__body' },
+        el('div', { class: 'match-list' }, ...matches.map(matchCard)),
+      ),
+    ),
+  );
+}
+
+function revealItem(type, id) {
+  let card = cardById(type, id);
+  if (!card) {
+    filters = { query: '', category: 'all' };
+    const search = qs('#lostfound-search');
+    const category = qs('#lostfound-category');
+    if (search) search.value = '';
+    if (category) category.value = 'all';
+    renderLists();
+    card = cardById(type, id);
+  }
+  if (!card) return;
+
+  const reduceMotion =
+    document.documentElement.dataset.motion === 'reduced' ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  card.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+  card.classList.add('is-highlighted');
+  card.querySelector('[data-action="toggle"]')?.focus({ preventScroll: true });
+  window.setTimeout(() => card.classList.remove('is-highlighted'), 2600);
+}
+
 function renderAll() {
   renderSummary();
   renderLists();
+  renderMatches();
 }
 
 async function toggleResolved(item, type) {
@@ -221,6 +421,7 @@ async function toggleResolved(item, type) {
       foundItems = foundItems.map((entry) => (entry.id === item.id ? next : entry));
     else lostItems = lostItems.map((entry) => (entry.id === item.id ? next : entry));
     renderAll();
+    focusCardAction(type, item.id);
     toast.success(next.resolved ? 'Publicación marcada como resuelta.' : 'Publicación reabierta.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo actualizar la publicación.', error);
@@ -243,6 +444,7 @@ async function deleteItem(item, type) {
     if (type === 'found') foundItems = foundItems.filter((entry) => entry.id !== item.id);
     else lostItems = lostItems.filter((entry) => entry.id !== item.id);
     renderAll();
+    focusFirstCardAction(type);
     toast.success('Publicación eliminada.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar la publicación.', error);
@@ -297,7 +499,7 @@ function openItemModal(type) {
 
   const form = el(
     'form',
-    { class: 'form', id: 'item-form' },
+    { class: 'form', id: 'item-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -377,6 +579,8 @@ function openItemModal(type) {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const by = byInput.value.trim();
@@ -385,12 +589,19 @@ function openItemModal(type) {
     const place = placeInput.value.trim();
     const category = categorySelect.value;
 
-    if (!by || !contact || !desc || (isFound && !place)) {
-      toast.warning(
-        isFound
-          ? 'Completa tu nombre, contacto, descripción y lugar.'
-          : 'Completa tu nombre, contacto y descripción.',
-      );
+    const errors = [
+      [!by, byInput, 'Escribe tu nombre.'],
+      [!contact, contactInput, 'Agrega un teléfono, correo o curso de contacto.'],
+      [!desc, descInput, 'Describe el objeto con el mayor detalle posible.'],
+      [isFound && !place, placeInput, 'Indica dónde encontraste el objeto.'],
+    ];
+
+    const firstInvalid = errors.find(([invalid]) => invalid);
+    if (firstInvalid) {
+      errors.forEach(([invalid, input, message]) => {
+        if (invalid) setFieldError(input, message);
+      });
+      firstInvalid[1].focus();
       return;
     }
 
@@ -423,6 +634,7 @@ function openItemModal(type) {
 
       modal.close();
       renderAll();
+      focusCardAction(type, created.id);
       toast.success(
         isFound ? 'Objeto encontrado publicado.' : 'Aviso de objeto perdido publicado.',
       );
@@ -477,6 +689,7 @@ export async function mount(container) {
       'div',
       { class: 'stack' },
       el('div', { id: 'lostfound-summary', class: 'grid-3' }, skeletonRows(1)),
+      el('div', { id: 'lostfound-matches' }),
       el(
         'div',
         { class: 'toolbar' },

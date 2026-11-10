@@ -29,6 +29,7 @@
   --white: #ffffff;
 
   /* Semánticos */
+  --success-800: #065f46;
   --success-700: #047857;
   --success-600: #059669;
   --success-500: #10b981;
@@ -36,11 +37,13 @@
   --warning-700: #b45309;
   --warning-600: #d97706;
   --warning-500: #f59e0b;
+  --warning-400: #fbbf24;
   --warning-50: #fffbeb;
   --danger-700: #b91c1c;
   --danger-600: #dc2626;
   --danger-500: #ef4444;
   --danger-50: #fef2f2;
+  --info-700: #0369a1;
   --info-600: #0284c7;
   --info-50: #f0f9ff;
   --gold-400: #fbbf24;
@@ -54,6 +57,7 @@
   --surface-muted: var(--slate-100);
   --border: #e6ecf4;
   --border-strong: var(--slate-200);
+  --border-control: var(--slate-500);
 
   /* Texto */
   --text: var(--slate-900);

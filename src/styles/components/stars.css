@@ -18,7 +18,8 @@
   border: 0;
   border-radius: var(--radius-xs);
   background: transparent;
-  color: var(--slate-300);
+  /* El contorno vacío también debe distinguirse del fondo (3:1). */
+  color: var(--slate-500);
   font-size: 20px;
   line-height: 1;
   transition:
@@ -34,7 +35,8 @@
 }
 
 .stars__star.is-filled {
-  color: var(--gold-400);
+  /* Dorado oscuro: conserva el aspecto de estrella y supera 4.5:1. */
+  color: var(--warning-700);
 }
 
 /* Las estrellas activas se rellenan en dorado; las vacías quedan como
@@ -55,7 +57,7 @@
 
 .stars--interactive .stars__star:hover,
 .stars--interactive .stars__star.is-preview {
-  color: var(--gold-500);
+  color: var(--warning-600);
   transform: scale(1.12);
 }
 

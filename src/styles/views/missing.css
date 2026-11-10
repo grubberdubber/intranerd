@@ -40,6 +40,7 @@
 
 .report-card__body {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-2);
   flex: 1;
   min-width: 0;
@@ -50,6 +51,21 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  /* Como hijo de grid, su min-content puede superar la tarjeta si una
+     insignia larga no puede partirse. */
+  min-width: 0;
+}
+
+.report-card__desc,
+.report-card__meta {
+  min-width: 0;
+}
+
+/* La fecha de "encontrado" puede ser larga: se permite partirla en móvil en
+   lugar de empujar la tarjeta fuera de la pantalla. */
+.report-card__top .badge {
+  max-width: 100%;
+  white-space: normal;
 }
 
 .report-card__name {

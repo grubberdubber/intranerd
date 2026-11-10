@@ -89,8 +89,9 @@
 }
 
 .btn--success {
-  --btn-bg: var(--success-600);
-  --btn-bg-hover: var(--success-700);
+  /* El blanco sobre success-600 no alcanzaba 4.5:1; success-700 sí. */
+  --btn-bg: var(--success-700);
+  --btn-bg-hover: var(--success-800);
 }
 
 .btn--success-soft {

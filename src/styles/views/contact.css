@@ -118,7 +118,7 @@
 }
 
 .contact-success:focus-visible {
-  outline: 3px solid var(--success-600);
+  outline: 3px solid var(--success-700);
   outline-offset: 2px;
 }
 

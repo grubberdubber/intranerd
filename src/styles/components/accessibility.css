@@ -1,0 +1,250 @@
+/* ==========================================================================
+   Accesibilidad · preferencias de lectura y presentación
+   Los atributos se aplican sobre <html> desde services/preferences.js.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Tamaño del texto
+   -------------------------------------------------------------------------- */
+
+html[data-text-size='large'] {
+  font-size: 112.5%;
+}
+
+html[data-text-size='xlarge'] {
+  font-size: 125%;
+}
+
+/* --------------------------------------------------------------------------
+   Alto contraste
+   Refuerza textos, bordes y superficies sin perder la identidad azul.
+   -------------------------------------------------------------------------- */
+
+html[data-contrast='high'] {
+  --bg-app: #ffffff;
+  --bg-subtle: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-muted: #f1f5f9;
+  --border: #64748b;
+  --border-strong: #334155;
+  --border-control: #111827;
+  --text: #000000;
+  --text-soft: #1f2937;
+  --text-muted: #374151;
+  --text-inverse: #ffffff;
+  --brand-50: #dbeafe;
+  --brand-100: #bfdbfe;
+  --brand-600: #1e3a8a;
+  --brand-700: #172554;
+  --brand-800: #172554;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-300: #94a3b8;
+  --slate-400: #64748b;
+  --slate-500: #334155;
+  --slate-600: #1f2937;
+  --slate-700: #111827;
+  --success-50: #ecfdf5;
+  --success-500: #047857;
+  --success-600: #047857;
+  --success-700: #065f46;
+  --warning-50: #fffbeb;
+  --warning-500: #b45309;
+  --warning-600: #b45309;
+  --warning-700: #92400e;
+  --danger-50: #fef2f2;
+  --danger-500: #b91c1c;
+  --danger-600: #991b1b;
+  --danger-700: #7f1d1d;
+  --info-50: #eff6ff;
+  --info-600: #1e40af;
+  --info-700: #1e3a8a;
+  --focus-ring: #000000;
+}
+
+html[data-contrast='high'] .app-shell {
+  background: #ffffff;
+}
+
+html[data-contrast='high'] .topbar {
+  background: #ffffff;
+  border-bottom-color: #64748b;
+}
+
+html[data-contrast='high'] .sidebar {
+  background: #172554;
+}
+
+html[data-contrast='high'] .btn--ghost,
+html[data-contrast='high'] .icon-btn,
+html[data-contrast='high'] .user-chip,
+html[data-contrast='high'] .topbar__date {
+  border-color: #64748b;
+}
+
+html[data-contrast='high'] .badge,
+html[data-contrast='high'] .chip {
+  border: 1px solid #64748b;
+}
+
+/* --------------------------------------------------------------------------
+   Movimiento reducido elegido desde la app
+   -------------------------------------------------------------------------- */
+
+html[data-motion='reduced'] {
+  scroll-behavior: auto;
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Respeta también la preferencia del sistema, aunque no se guarde en la app. */
+@media (prefers-contrast: more) {
+  :root {
+    --border: #64748b;
+    --border-strong: #334155;
+    --text-muted: #334155;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Panel de preferencias
+   -------------------------------------------------------------------------- */
+
+.a11y-panel {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.a11y-panel__intro {
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.a11y-form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.a11y-group {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.a11y-group__legend {
+  padding: 0 6px;
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.a11y-group__hint {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.a11y-group__options {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.a11y-choice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    border-color var(--duration) var(--ease),
+    background var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+
+.a11y-choice:hover {
+  border-color: var(--border-strong);
+  background: var(--slate-50);
+}
+
+.a11y-choice:has(.a11y-choice__input:checked) {
+  border-color: var(--brand-600);
+  background: var(--brand-50);
+  box-shadow: inset 0 0 0 1px var(--brand-600);
+}
+
+.a11y-choice:has(.a11y-choice__input:focus-visible) {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.a11y-choice__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.a11y-choice__label {
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 650;
+}
+
+.a11y-choice__hint {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+}
+
+.a11y-choice__input {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--brand-700);
+}
+
+.a11y-panel__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--brand-100);
+  border-radius: var(--radius-sm);
+  background: var(--brand-50);
+  color: var(--brand-800);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+
+.a11y-panel__note-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  padding-top: 1px;
+}
+
+@media (max-width: 600px) {
+  .a11y-group {
+    padding: var(--space-3);
+  }
+
+  .a11y-choice {
+    padding: 10px;
+  }
+}

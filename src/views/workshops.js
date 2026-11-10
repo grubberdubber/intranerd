@@ -1,6 +1,6 @@
 import { WORKSHOP_CATEGORIES } from '../data/constants.js';
 import { workshopsRepo } from '../services/resources.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { icon } from '../components/icon.js';
 import { confirmDialog, openModal } from '../components/modal.js';
 import { pageHeader } from '../components/pageHeader.js';
@@ -69,6 +69,18 @@ function statCard({ iconName, label, value, hint, tone = '' }) {
   );
 }
 
+function workshopCardById(id) {
+  return Array.from(qs('#workshops-list')?.querySelectorAll('.workshop-card') || []).find(
+    (card) => card.dataset.id === id,
+  );
+}
+
+function focusWorkshopAction(id, action = 'detail') {
+  const target = workshopCardById(id)?.querySelector(`[data-action="${action}"]`);
+  target?.focus();
+  return Boolean(target);
+}
+
 function workshopCard(workshop) {
   const category = categoryOf(workshop);
   const count = enrollmentCount(workshop);
@@ -76,6 +88,7 @@ function workshopCard(workshop) {
   const spots = availableSpots(workshop);
   const full = spots <= 0;
   const percentage = capacity ? Math.min(100, Math.round((count / capacity) * 100)) : 0;
+  const titleId = `workshop-title-${workshop.id}`;
 
   return el(
     'article',
@@ -97,7 +110,7 @@ function workshopCard(workshop) {
     el(
       'div',
       { class: 'workshop-card__body' },
-      el('h2', { class: 'workshop-card__title', text: workshop.name }),
+      el('h2', { class: 'workshop-card__title', id: titleId, text: workshop.name }),
       el('p', { class: 'workshop-card__desc', text: workshop.description }),
       el(
         'div',
@@ -140,12 +153,16 @@ function workshopCard(workshop) {
         el('button', {
           class: 'btn btn--ghost btn--sm',
           type: 'button',
+          dataset: { action: 'detail' },
+          attrs: { 'aria-describedby': titleId },
           text: 'Ver inscritos',
           on: { click: () => openWorkshopDetail(workshop) },
         }),
         el('button', {
           class: `btn btn--sm ${full ? 'btn--ghost' : 'btn--primary'}`,
           type: 'button',
+          dataset: { action: 'enroll' },
+          attrs: { 'aria-describedby': titleId },
           text: full ? 'Cupo lleno' : 'Inscribirme',
           disabled: full,
           on: { click: () => openEnrollModal(workshop) },
@@ -249,7 +266,7 @@ function openEnrollModal(workshop) {
 
   const form = el(
     'form',
-    { class: 'form', id: 'enroll-form' },
+    { class: 'form', id: 'enroll-form', noValidate: true },
     el(
       'div',
       { class: 'lostfound-note' },
@@ -300,20 +317,26 @@ function openEnrollModal(workshop) {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = nameInput.value.trim();
     const course = courseInput.value.trim();
     if (!name || !course) {
-      toast.warning('Completa el nombre y el curso.');
+      if (!name) setFieldError(nameInput, 'Escribe el nombre del alumno/a.');
+      if (!course) setFieldError(courseInput, 'Indica el curso del alumno/a.');
+      if (!name) nameInput.focus();
+      else courseInput.focus();
       return;
     }
 
     const fresh = workshops.find((item) => item.id === current.id) || current;
     if (availableSpots(fresh) <= 0) {
-      toast.error('El taller se llenó mientras completabas el formulario.');
       modal.close();
       renderAll();
+      focusWorkshopAction(fresh.id, 'detail');
+      toast.error('El taller se llenó mientras completabas el formulario.');
       return;
     }
 
@@ -323,7 +346,8 @@ function openEnrollModal(workshop) {
         enrollment.course.toLowerCase() === course.toLowerCase(),
     );
     if (duplicate) {
-      toast.warning('Ese alumno ya está inscrito en este taller.');
+      setFieldError(nameInput, 'Ese alumno ya está inscrito en este taller.');
+      nameInput.focus();
       return;
     }
 
@@ -342,6 +366,7 @@ function openEnrollModal(workshop) {
         { successMessage: `${name} quedó inscrito/a en ${fresh.name}.` },
       );
       modal.close();
+      focusWorkshopAction(fresh.id, 'detail');
     } catch (error) {
       console.error('[IntraNerd] No se pudo completar la inscripción.', error);
       toast.error(error.message || 'No se pudo completar la inscripción.');
@@ -370,6 +395,7 @@ async function removeEnrollment(workshop, enrollment, modal) {
       { successMessage: 'Inscripción eliminada.' },
     );
     modal.close();
+    focusWorkshopAction(fresh.id, 'detail');
   } catch (error) {
     console.error('[IntraNerd] No se pudo quitar la inscripción.', error);
     toast.error(error.message || 'No se pudo quitar la inscripción.');
@@ -533,7 +559,7 @@ function openCreateModal() {
 
   const form = el(
     'form',
-    { class: 'form', id: 'workshop-form' },
+    { class: 'form', id: 'workshop-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -636,6 +662,8 @@ function openCreateModal() {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const name = nameInput.value.trim();
@@ -645,16 +673,24 @@ function openCreateModal() {
     const description = descriptionInput.value.trim();
     const capacity = Number(capacityInput.value);
 
-    if (
-      !name ||
-      !teacher ||
-      !schedule ||
-      !location ||
-      !description ||
-      !Number.isFinite(capacity) ||
-      capacity < 1
-    ) {
-      toast.warning('Completa todos los campos y define una capacidad válida.');
+    const errors = [
+      [!name, nameInput, 'Escribe el nombre del taller.'],
+      [!teacher, teacherInput, 'Indica el profesor/a a cargo.'],
+      [
+        !Number.isFinite(capacity) || capacity < 1 || capacity > 200,
+        capacityInput,
+        'Define una capacidad entre 1 y 200 cupos.',
+      ],
+      [!schedule, scheduleInput, 'Indica el horario del taller.'],
+      [!location, locationInput, 'Indica el lugar donde se realizará.'],
+      [!description, descriptionInput, 'Describe el taller y a quién está dirigido.'],
+    ];
+    const firstInvalid = errors.find(([invalid]) => invalid);
+    if (firstInvalid) {
+      errors.forEach(([invalid, input, message]) => {
+        if (invalid) setFieldError(input, message);
+      });
+      firstInvalid[1].focus();
       return;
     }
 
@@ -672,6 +708,7 @@ function openCreateModal() {
       workshops = [created, ...workshops];
       modal.close();
       renderAll();
+      focusWorkshopAction(created.id, 'detail');
       toast.success(`Taller "${name}" creado.`);
     } catch (error) {
       console.error('[IntraNerd] No se pudo crear el taller.', error);

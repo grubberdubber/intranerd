@@ -23,8 +23,15 @@
   border-radius: var(--radius-md);
   background: var(--surface);
   box-shadow: var(--shadow-lg);
-  pointer-events: auto;
+  /* El aviso no debe bloquear clics del contenido que queda debajo (por
+     ejemplo, el pie de un modal abierto); solo sus controles son interactivos. */
+  pointer-events: none;
   animation: toast-in 240ms var(--ease) both;
+}
+
+.toast__close,
+.toast .btn {
+  pointer-events: auto;
 }
 
 .toast.is-leaving {

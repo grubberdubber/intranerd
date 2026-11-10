@@ -11,6 +11,8 @@ import {
   ROLE_LABELS,
 } from '../services/session.js';
 import { icon } from './icon.js';
+import { openAccessibilityPreferences } from './accessibility.js';
+import { createFooter } from './footer.js';
 import { openModal } from './modal.js';
 import { toast } from './toast.js';
 
@@ -103,11 +105,24 @@ export function createLayout(root) {
     on: { click: () => toggleNav() },
   });
 
-  const topbarTitle = el('h2', { class: 'topbar__title', text: 'Panel general' });
+  // No es un encabezado: la página ya tiene su propio h1 y el topbar se repite.
+  const topbarTitle = el('span', { class: 'topbar__title', text: 'Panel general' });
   const userChip = el('button', {
     class: 'user-chip',
     type: 'button',
     attrs: { 'aria-label': 'Editar perfil' },
+  });
+
+  const accessibilityButton = el('button', {
+    class: 'icon-btn topbar__a11y',
+    type: 'button',
+    attrs: {
+      'aria-label': 'Abrir preferencias de accesibilidad',
+      'aria-haspopup': 'dialog',
+      title: 'Accesibilidad: texto, contraste y movimiento',
+    },
+    html: icon('accessibility', { size: 18 }),
+    on: { click: () => openAccessibilityPreferences() },
   });
 
   const topbar = el(
@@ -129,6 +144,7 @@ export function createLayout(root) {
         el('span', { html: icon('calendar', { size: 14 }) }),
         el('span', { text: today }),
       ),
+      accessibilityButton,
       userChip,
     ),
   );
@@ -150,7 +166,7 @@ export function createLayout(root) {
     { class: 'app-layout' },
     overlay,
     sidebar,
-    el('div', { class: 'app-main' }, topbar, main),
+    el('div', { class: 'app-main' }, topbar, main, createFooter()),
     routeAnnouncer,
   );
 
@@ -209,6 +225,10 @@ export function createLayout(root) {
     const label = isApi ? 'API conectada' : enabled ? 'Almacenamiento local' : 'Modo local';
     const detail = isApi ? 'Sincronización REST activa' : 'Datos guardados en este navegador';
     storageChip.dataset.mode = isApi ? 'api' : 'local';
+    storageChip.setAttribute(
+      'aria-label',
+      `Estado: ${label}. ${detail}. Haz clic para reintentar la conexión con la API.`,
+    );
     storageChip.replaceChildren(
       el('span', { class: 'storage-chip__dot', attrs: { 'aria-hidden': 'true' } }),
       el(
@@ -348,6 +368,11 @@ export function createLayout(root) {
         const active = link.dataset.route === routeId;
         link.classList.toggle('is-active', active);
         if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+      // El footer también marca el módulo activo para lectores de pantalla.
+      qsa('[data-footer-route]').forEach((link) => {
+        if (link.dataset.footerRoute === routeId) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
       });
       closeNav();

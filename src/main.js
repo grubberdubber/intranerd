@@ -1,6 +1,8 @@
 import { APP_NAME } from './config.js';
 import { createLayout } from './components/layout.js';
+import { initCookieConsent } from './components/cookieConsent.js';
 import { createRouter } from './router.js';
+import { initPreferences } from './services/preferences.js';
 import { applyDataFixes, migrateLegacyData } from './services/migrate.js';
 import { toast } from './components/toast.js';
 import { el } from './utils/dom.js';
@@ -20,12 +22,17 @@ function boot() {
     throw new Error('No se encontró el contenedor #app.');
   }
 
+  // Aplica tamaño, contraste y movimiento antes de pintar el layout.
+  initPreferences();
   migrateLegacyData();
   applyDataFixes();
 
   const layout = createLayout(root);
   const router = createRouter(layout);
   router.start();
+
+  // El aviso de privacidad se muestra solo si aún no hay una decisión guardada.
+  initCookieConsent();
 
   root.dataset.ready = 'true';
   document.documentElement.dataset.app = 'ready';

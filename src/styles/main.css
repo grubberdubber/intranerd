@@ -19,6 +19,10 @@
 @import url('./components/toast.css');
 @import url('./components/skeleton.css');
 @import url('./components/stars.css');
+@import url('./components/footer.css');
+@import url('./components/legal.css');
+@import url('./components/cookie-consent.css');
+@import url('./components/accessibility.css');
 
 /* Vistas */
 @import url('./views/dashboard.css');

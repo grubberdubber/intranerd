@@ -139,7 +139,7 @@ describe('data/seeds · objetos perdidos y encontrados', () => {
     const lost = seedLost();
 
     expect(found).toHaveLength(3);
-    expect(lost).toHaveLength(2);
+    expect(lost).toHaveLength(3);
     assertUniqueIds(found);
     assertUniqueIds(lost);
 

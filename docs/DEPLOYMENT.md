@@ -136,7 +136,7 @@ docker compose ps
 - Limita el acceso SSH y mantén Docker y las imágenes actualizadas.
 - No ejecutes `docker compose down -v` en producción.
 - Los contenedores usan `no-new-privileges`; la API corre como usuario no-root.
-- Revisa dependencias con `npm audit` y reconstruye imágenes periódicamente.
+- Revisa dependencias con `pnpm audit` y reconstruye imágenes periódicamente.
 - El CSP de Nginx permite solo recursos propios y data URLs para imágenes.
 - Si expones la API, añade autenticación y autorización antes de hacerlo.
 

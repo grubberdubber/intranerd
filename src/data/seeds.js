@@ -224,6 +224,20 @@ export function seedLost() {
   return [
     {
       id: uid('lost'),
+      category: 'mochila',
+      desc:
+        'Mochila azul con stickers de astronautas y una etiqueta con las iniciales J.P. ' +
+        'La dejé cerca del patio central.',
+      by: 'Javiera Paredes',
+      contact: 'j.paredes@colegio.cl',
+      place: 'Patio central',
+      photo: null,
+      image: 'assets/items/backpack.svg',
+      resolved: false,
+      createdAt: hoursAgo(4),
+    },
+    {
+      id: uid('lost'),
       category: 'tecnologia',
       desc: 'Audífonos inalámbricos blancos dentro de un estuche azul. Tienen una marca en la bisagra.',
       by: 'Javier González',

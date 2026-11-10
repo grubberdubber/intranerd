@@ -1,7 +1,7 @@
 import { PRIORITIES, SUBJECTS } from '../data/constants.js';
 import { tasksRepo } from '../services/resources.js';
 import { getProfile } from '../services/session.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, setFieldError } from '../utils/dom.js';
 import { daysUntil, formatDate, toISODate } from '../utils/format.js';
 import { icon } from '../components/icon.js';
 import { confirmDialog, openModal } from '../components/modal.js';
@@ -250,7 +250,7 @@ function renderList() {
       el(
         'header',
         { class: 'task-subject-group__header' },
-        el('span', { text: subject }),
+        el('h2', { class: 'task-subject-group__title', text: subject }),
         el('span', {
           class: 'badge',
           text: `${groupTasks.filter((task) => !task.completed).length} pendientes`,
@@ -261,6 +261,29 @@ function renderList() {
   });
 
   list.replaceChildren(...groupNodes);
+}
+
+function taskItemById(id) {
+  return Array.from(qs('#tasks-list')?.querySelectorAll('.task-item') || []).find(
+    (item) => item.dataset.id === id,
+  );
+}
+
+function focusTaskCheckbox(id) {
+  const checkbox = taskItemById(id)?.querySelector('input[type="checkbox"]');
+  checkbox?.focus();
+  return Boolean(checkbox);
+}
+
+function focusFirstTaskOrSearch() {
+  const checkbox = qs('#tasks-list .task-item input[type="checkbox"]');
+  if (checkbox) {
+    checkbox.focus();
+    return;
+  }
+  const emptyAction = qs('#tasks-list .empty-state .btn--primary');
+  if (emptyAction) emptyAction.focus();
+  else qs('#tasks-search')?.focus();
 }
 
 function renderAll() {
@@ -304,6 +327,7 @@ async function toggleTask(task, checkbox) {
     });
     tasks = tasks.map((item) => (item.id === task.id ? { ...item, ...updated } : item));
     renderAll();
+    if (!focusTaskCheckbox(task.id)) focusFirstTaskOrSearch();
     toast.success(
       nextCompleted
         ? `"${task.title}" marcada como completada.`
@@ -329,6 +353,7 @@ async function deleteTask(task) {
     await tasksRepo.remove(task.id);
     tasks = tasks.filter((item) => item.id !== task.id);
     renderAll();
+    focusFirstTaskOrSearch();
     toast.success('Tarea eliminada.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar la tarea.', error);
@@ -391,7 +416,7 @@ function openTaskModal() {
 
   const form = el(
     'form',
-    { class: 'form', id: 'task-form' },
+    { class: 'form', id: 'task-form', noValidate: true },
     el(
       'div',
       { class: 'form-grid' },
@@ -481,6 +506,8 @@ function openTaskModal() {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const title = titleInput.value.trim();
@@ -489,8 +516,19 @@ function openTaskModal() {
     const author = authorInput.value.trim();
     const description = descriptionInput.value.trim();
 
-    if (!title || !subject || !dueDate || !author || !description) {
-      toast.warning('Completa el título, la asignatura, la fecha, el autor y la descripción.');
+    const errors = [
+      [!title, titleInput, 'Escribe el título de la tarea.'],
+      [!subject, subjectInput, 'Indica la asignatura.'],
+      [!dueDate, dueInput, 'Selecciona la fecha de entrega.'],
+      [!author, authorInput, 'Indica qué profesor/a asigna la tarea.'],
+      [!description, descriptionInput, 'Describe las instrucciones de la tarea.'],
+    ];
+    const firstInvalid = errors.find(([invalid]) => invalid);
+    if (firstInvalid) {
+      errors.forEach(([invalid, input, message]) => {
+        if (invalid) setFieldError(input, message);
+      });
+      firstInvalid[1].focus();
       return;
     }
 
@@ -513,6 +551,7 @@ function openTaskModal() {
       modal.close();
       renderSubjectFilter();
       renderAll();
+      if (!focusTaskCheckbox(created.id)) focusFirstTaskOrSearch();
       toast.success('Tarea publicada.');
     } catch (error) {
       console.error('[IntraNerd] No se pudo publicar la tarea.', error);

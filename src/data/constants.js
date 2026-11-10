@@ -210,4 +210,5 @@ export const STORAGE_KEYS = {
   tasks: 'tasks.items',
   profile: 'session.profile',
   contact: 'contact.messages',
+  preferences: 'ui.preferences',
 };

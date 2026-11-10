@@ -1,7 +1,7 @@
 import { HOLIDAYS, SUBJECTS } from '../data/constants.js';
 import { calendarRepo } from '../services/resources.js';
 import { getProfile, saveProfile } from '../services/session.js';
-import { el, qs } from '../utils/dom.js';
+import { bindFieldErrorClearing, el, qs, qsa, setFieldError } from '../utils/dom.js';
 import {
   MONTHS,
   WEEKDAYS,
@@ -18,8 +18,13 @@ import { pageHeader } from '../components/pageHeader.js';
 import { emptyState, skeletonCards } from '../components/states.js';
 import { toast } from '../components/toast.js';
 
+const MIN_YEAR = 1900;
+const MAX_YEAR = 2100;
+
 let events = [];
 let currentYear = new Date().getFullYear();
+// Fecha que conserva el único tab stop de la cuadrícula (roving tabindex).
+let focusDate = toISODate(new Date());
 let profile = getProfile();
 
 function isHoliday(date) {
@@ -39,12 +44,61 @@ function eventAuthorText(event) {
   return `${subject}Publicado por ${role}: ${event.author}`;
 }
 
+/** Fecha que debe tener el tabindex="0"; siempre dentro del año visible. */
+function tabStopDate() {
+  return focusDate.startsWith(`${currentYear}-`) ? focusDate : `${currentYear}-01-01`;
+}
+
+function focusDay(dateISO) {
+  const grid = qs('#calendar-grid');
+  if (!grid) return false;
+  const target = qs(`[data-date="${dateISO}"]`, grid);
+  if (!target) return false;
+  qsa('.day-cell[data-date]', grid).forEach((cell) => {
+    cell.tabIndex = cell === target ? 0 : -1;
+  });
+  target.focus();
+  return true;
+}
+
+function announce(message) {
+  const live = qs('#calendar-live');
+  if (!live) return;
+  live.textContent = '';
+  requestAnimationFrame(() => {
+    live.textContent = message;
+  });
+}
+
+function addDays(dateISO, amount) {
+  const date = toDate(dateISO);
+  date.setDate(date.getDate() + amount);
+  return date;
+}
+
+function addMonths(dateISO, amount) {
+  const date = toDate(dateISO);
+  const day = date.getDate();
+  date.setDate(1);
+  date.setMonth(date.getMonth() + amount);
+  date.setDate(Math.min(day, daysInMonth(date.getFullYear(), date.getMonth())));
+  return date;
+}
+
 function monthCard(year, monthIndex) {
-  const card = el('article', { class: 'month-card' });
-  const title = el('h3', { class: 'month-card__title', text: `${MONTHS[monthIndex]} ${year}` });
+  const monthId = `calendar-month-${year}-${monthIndex + 1}`;
+  const card = el('article', {
+    class: 'month-card',
+    attrs: { 'aria-labelledby': monthId },
+  });
+  const title = el('h2', {
+    class: 'month-card__title',
+    id: monthId,
+    text: `${MONTHS[monthIndex]} ${year}`,
+  });
   const weekdays = el(
     'div',
-    { class: 'month-card__weekdays' },
+    { class: 'month-card__weekdays', attrs: { 'aria-hidden': 'true' } },
     ...WEEKDAYS.map((day) => el('span', { class: 'month-card__weekday', text: day })),
   );
   const days = el('div', { class: 'month-card__days' });
@@ -58,6 +112,7 @@ function monthCard(year, monthIndex) {
 
   const totalDays = daysInMonth(year, monthIndex);
   const today = new Date();
+  const activeTabStop = tabStopDate();
 
   for (let day = 1; day <= totalDays; day += 1) {
     const date = new Date(year, monthIndex, day);
@@ -73,10 +128,17 @@ function monthCard(year, monthIndex) {
       .filter(Boolean)
       .join(' ');
 
-    const eventWord = dayEvents.length === 1 ? 'prueba' : 'pruebas';
-    const dayLabel =
-      `${formatLongDate(date)}${holiday ? ', feriado' : ''}. ` +
-      `${dayEvents.length} ${eventWord}.`;
+    const eventSummary = dayEvents.length
+      ? `${dayEvents.length} ${dayEvents.length === 1 ? 'prueba' : 'pruebas'}: ` +
+        dayEvents.map((event) => event.title).join('; ')
+      : 'Sin pruebas';
+    const dayLabel = [
+      isToday ? `Hoy, ${formatLongDate(date)}` : formatLongDate(date),
+      holiday ? 'Feriado' : '',
+      eventSummary,
+    ]
+      .filter(Boolean)
+      .join('. ');
 
     const cell = el(
       'button',
@@ -84,14 +146,34 @@ function monthCard(year, monthIndex) {
         class: classNames,
         type: 'button',
         dataset: { date: dateISO },
-        attrs: { 'aria-label': dayLabel },
-        on: { click: () => openDayModal(dateISO) },
+        attrs: {
+          'aria-label': `${dayLabel}.`,
+          ...(isToday ? { 'aria-current': 'date' } : {}),
+        },
+        tabIndex: dateISO === activeTabStop ? 0 : -1,
+        on: {
+          click: () => {
+            focusDate = dateISO;
+            openDayModal(dateISO);
+          },
+        },
       },
-      el('span', { class: 'day-cell__number', text: String(day) }),
+      el('span', {
+        class: 'day-cell__number',
+        text: String(day),
+        attrs: { 'aria-hidden': 'true' },
+      }),
+      holiday
+        ? el('span', {
+            class: 'day-cell__holiday',
+            text: 'Feriado',
+            attrs: { 'aria-hidden': 'true' },
+          })
+        : null,
       dayEvents.length
         ? el(
             'span',
-            { class: 'day-cell__events' },
+            { class: 'day-cell__events', attrs: { 'aria-hidden': 'true' } },
             ...dayEvents
               .slice(0, 2)
               .map((event) => el('span', { class: 'day-event', text: event.title })),
@@ -116,6 +198,7 @@ function renderCalendar() {
   const cards = [];
   for (let month = 0; month < 12; month += 1) cards.push(monthCard(currentYear, month));
   grid.replaceChildren(...cards);
+  grid.setAttribute('aria-label', `Calendario escolar del año ${currentYear}`);
 
   const yearLabel = qs('#calendar-year-value');
   if (yearLabel) yearLabel.textContent = String(currentYear);
@@ -123,9 +206,73 @@ function renderCalendar() {
   if (yearInput) yearInput.value = String(currentYear);
 }
 
-function setYear(nextYear) {
-  currentYear = Math.min(2100, Math.max(1900, Number(nextYear) || new Date().getFullYear()));
+function setYear(nextYear, { moveFocus = false, message = '' } = {}) {
+  const previousYear = currentYear;
+  currentYear = Math.min(MAX_YEAR, Math.max(MIN_YEAR, Number(nextYear) || currentYear));
+
+  if (!focusDate.startsWith(`${currentYear}-`)) {
+    const today = new Date();
+    focusDate = today.getFullYear() === currentYear ? toISODate(today) : `${currentYear}-01-01`;
+  }
+
   renderCalendar();
+
+  if (moveFocus) focusDay(focusDate);
+  if (message) announce(message);
+  else if (previousYear !== currentYear) announce(`Año ${currentYear}`);
+}
+
+/** Navegación por teclado con un único tab stop (patrón roving tabindex). */
+function handleGridKeydown(event) {
+  const cell = event.target.closest?.('.day-cell[data-date]');
+  if (!cell) return;
+
+  const dateISO = cell.dataset.date;
+  let target = null;
+
+  switch (event.key) {
+    case 'ArrowLeft':
+      target = addDays(dateISO, -1);
+      break;
+    case 'ArrowRight':
+      target = addDays(dateISO, 1);
+      break;
+    case 'ArrowUp':
+      target = addDays(dateISO, -7);
+      break;
+    case 'ArrowDown':
+      target = addDays(dateISO, 7);
+      break;
+    case 'Home': {
+      const date = toDate(dateISO);
+      target = addDays(dateISO, -weekdayIndexMonday(date));
+      break;
+    }
+    case 'End': {
+      const date = toDate(dateISO);
+      target = addDays(dateISO, 6 - weekdayIndexMonday(date));
+      break;
+    }
+    case 'PageUp':
+      target = addMonths(dateISO, event.shiftKey ? -12 : -1);
+      break;
+    case 'PageDown':
+      target = addMonths(dateISO, event.shiftKey ? 12 : 1);
+      break;
+    default:
+      return;
+  }
+
+  const targetYear = target.getFullYear();
+  if (targetYear < MIN_YEAR || targetYear > MAX_YEAR) return;
+
+  event.preventDefault();
+  focusDate = toISODate(target);
+  if (targetYear !== currentYear) {
+    setYear(targetYear, { moveFocus: true, message: `Año ${targetYear}` });
+  } else {
+    focusDay(focusDate);
+  }
 }
 
 function openDayModal(dateISO) {
@@ -156,9 +303,11 @@ function openDayModal(dateISO) {
             el('button', {
               class: 'icon-btn icon-btn--danger day-event-item__delete',
               type: 'button',
-              attrs: { 'aria-label': `Eliminar ${event.title}` },
+              attrs: {
+                'aria-label': `Eliminar ${event.title} del ${formatLongDate(dateISO)}`,
+              },
               html: icon('trash', { size: 15 }),
-              on: { click: () => deleteEvent(event, modal) },
+              on: { click: () => deleteEvent(event, modal, dateISO) },
             }),
           ),
         ),
@@ -173,6 +322,7 @@ function openDayModal(dateISO) {
     id: 'event-title',
     placeholder: 'Ej: Prueba de Matemáticas',
     required: true,
+    attrs: { 'aria-describedby': 'event-title-help' },
   });
   const subjectInput = el('input', {
     class: 'input',
@@ -206,6 +356,11 @@ function openDayModal(dateISO) {
           attrs: { for: 'event-title' },
         }),
         titleInput,
+        el('span', {
+          class: 'field__hint',
+          id: 'event-title-help',
+          text: 'Obligatorio. Se mostrará en la cuadrícula del día.',
+        }),
       ),
       el(
         'div',
@@ -249,7 +404,7 @@ function openDayModal(dateISO) {
       ? el(
           'div',
           { class: 'lostfound-note' },
-          el('span', { html: icon('calendar', { size: 15 }) }),
+          el('span', { html: icon('calendar', { size: 15 }), attrs: { 'aria-hidden': 'true' } }),
           el('span', {
             text:
               'Este día está marcado como feriado. Puedes programar una actividad, ' +
@@ -257,6 +412,7 @@ function openDayModal(dateISO) {
           }),
         )
       : null,
+    el('h3', { class: 'section__title', text: 'Pruebas de este día' }),
     eventList,
     el('hr', { class: 'divider' }),
     el('h3', { class: 'section__title', text: 'Agregar una prueba' }),
@@ -281,21 +437,26 @@ function openDayModal(dateISO) {
     ],
   });
 
+  bindFieldErrorClearing(form);
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const title = titleInput.value.trim();
     const author = profile.name?.trim();
 
     if (!author || author === 'Visitante') {
-      toast.warning('Escribe tu nombre en la barra del calendario antes de programar una prueba.');
       modal.close();
-      qs('#calendar-name')?.focus();
+      const nameInput = qs('#calendar-name');
+      setFieldError(
+        nameInput,
+        'Escribe tu nombre en la barra del calendario antes de programar una prueba.',
+      );
+      nameInput?.focus();
       return;
     }
     if (!title) {
-      titleInput.setAttribute('aria-invalid', 'true');
+      setFieldError(titleInput, 'Escribe un título para la prueba.');
       titleInput.focus();
-      toast.warning('Escribe un título para la prueba.');
       return;
     }
 
@@ -314,7 +475,9 @@ function openDayModal(dateISO) {
       });
       events = [...events, created];
       modal.close();
+      focusDate = dateISO;
       renderCalendar();
+      focusDay(dateISO);
       toast.success('Prueba programada en el calendario.');
     } catch (error) {
       console.error('[IntraNerd] No se pudo programar la prueba.', error);
@@ -327,7 +490,7 @@ function openDayModal(dateISO) {
   requestAnimationFrame(() => titleInput.focus());
 }
 
-async function deleteEvent(event, modal = null) {
+async function deleteEvent(event, modal = null, dateISO = event.date) {
   const confirmed = await confirmDialog({
     title: 'Eliminar prueba',
     message: `Se eliminará "${event.title}" del calendario.`,
@@ -340,7 +503,9 @@ async function deleteEvent(event, modal = null) {
     await calendarRepo.remove(event.id);
     events = events.filter((item) => item.id !== event.id);
     modal?.close();
+    focusDate = dateISO;
     renderCalendar();
+    focusDay(dateISO);
     toast.success('Prueba eliminada del calendario.');
   } catch (error) {
     console.error('[IntraNerd] No se pudo eliminar la prueba.', error);
@@ -373,6 +538,12 @@ function syncProfileFromToolbar() {
   });
   nameInput.addEventListener('change', persist);
   nameInput.addEventListener('blur', persist);
+}
+
+function goToToday() {
+  const today = new Date();
+  focusDate = toISODate(today);
+  setYear(today.getFullYear(), { moveFocus: true, message: `Hoy, ${formatLongDate(today)}` });
 }
 
 export async function mount(container) {
@@ -415,16 +586,24 @@ export async function mount(container) {
             class: 'input',
             id: 'calendar-year-input',
             type: 'number',
-            min: '1900',
-            max: '2100',
+            min: String(MIN_YEAR),
+            max: String(MAX_YEAR),
             value: String(currentYear),
-            attrs: { 'aria-label': 'Escribir año' },
+            attrs: {
+              'aria-label': 'Escribir año',
+              'aria-describedby': 'calendar-year-help',
+            },
+          }),
+          el('span', {
+            class: 'sr-only',
+            id: 'calendar-year-help',
+            text: `Entre ${MIN_YEAR} y ${MAX_YEAR}. Presiona Enter para aplicar el año.`,
           }),
           el('button', {
             class: 'btn btn--ghost btn--sm',
             type: 'button',
             text: 'Hoy',
-            on: { click: () => setYear(new Date().getFullYear()) },
+            on: { click: goToToday },
           }),
         ),
         el(
@@ -436,22 +615,62 @@ export async function mount(container) {
             el('option', { value: 'alumno', text: 'Alumno/a' }),
             el('option', { value: 'profesor', text: 'Profesor/a' }),
           ),
-          el('input', {
-            class: 'input',
-            id: 'calendar-name',
-            placeholder: 'Tu nombre',
-            attrs: { 'aria-label': 'Nombre del usuario' },
+          el(
+            'div',
+            { class: 'field calendar-identity__field' },
+            el('label', {
+              class: 'sr-only',
+              text: 'Nombre del usuario',
+              attrs: { for: 'calendar-name' },
+            }),
+            el('input', {
+              class: 'input',
+              id: 'calendar-name',
+              placeholder: 'Tu nombre',
+            }),
+          ),
+        ),
+      ),
+      el('span', {
+        class: 'sr-only',
+        id: 'calendar-live',
+        attrs: { role: 'status', 'aria-live': 'polite', 'aria-atomic': 'true' },
+      }),
+      el(
+        'div',
+        { class: 'calendar-legend' },
+        el(
+          'span',
+          {},
+          el('span', { class: 'legend-dot legend-dot--today', attrs: { 'aria-hidden': 'true' } }),
+          'Hoy',
+        ),
+        el(
+          'span',
+          {},
+          el('span', {
+            class: 'legend-dot legend-dot--holiday',
+            attrs: { 'aria-hidden': 'true' },
           }),
+          'Feriado',
+        ),
+        el(
+          'span',
+          {},
+          el('span', { class: 'legend-dot legend-dot--event', attrs: { 'aria-hidden': 'true' } }),
+          'Con evaluaciones',
         ),
       ),
       el(
         'div',
-        { class: 'calendar-legend' },
-        el('span', {}, el('span', { class: 'legend-dot legend-dot--today' }), 'Hoy'),
-        el('span', {}, el('span', { class: 'legend-dot legend-dot--holiday' }), 'Feriado'),
-        el('span', {}, el('span', { class: 'legend-dot legend-dot--event' }), 'Con evaluaciones'),
+        {
+          id: 'calendar-grid',
+          class: 'calendar-grid',
+          attrs: { role: 'group', 'aria-label': `Calendario escolar del año ${currentYear}` },
+          on: { keydown: handleGridKeydown },
+        },
+        skeletonCards(6),
       ),
-      el('div', { id: 'calendar-grid', class: 'calendar-grid' }, skeletonCards(6)),
     ),
   );
 

@@ -5,11 +5,16 @@ import { icon } from './icon.js';
  * Estrellas estáticas y selector interactivo accesible.
  */
 
-export function staticStars(value = 0, { size = 15, className = '' } = {}) {
+export function staticStars(value = 0, { size = 15, className = '', decorative = false } = {}) {
   const rounded = Math.round(Number(value) || 0);
   const wrapper = el('span', {
     class: `stars stars--sm ${className}`.trim(),
-    attrs: { 'aria-label': `${Number(value).toFixed(1)} de 5 estrellas` },
+    attrs: decorative
+      ? { 'aria-hidden': 'true' }
+      : {
+          role: 'img',
+          'aria-label': `${Number(value).toFixed(1)} de 5 estrellas`,
+        },
   });
 
   for (let index = 1; index <= 5; index += 1) {
@@ -27,12 +32,26 @@ export function staticStars(value = 0, { size = 15, className = '' } = {}) {
 export function ratingSummary(value = 0, count = 0) {
   return el(
     'span',
-    { class: 'rating-summary' },
-    staticStars(value, { size: 14 }),
-    el('span', { class: 'rating-summary__value', text: Number(value || 0).toFixed(1) }),
+    {
+      class: 'rating-summary',
+      attrs: {
+        role: 'img',
+        'aria-label': `${Number(value || 0).toFixed(1)} de 5 estrellas, ${count} ${
+          count === 1 ? 'calificación' : 'calificaciones'
+        }`,
+      },
+    },
+    // El resumen ya tiene un nombre accesible completo; las estrellas son decorativas.
+    staticStars(value, { size: 14, decorative: true }),
+    el('span', {
+      class: 'rating-summary__value',
+      text: Number(value || 0).toFixed(1),
+      attrs: { 'aria-hidden': 'true' },
+    }),
     el('span', {
       class: 'rating-summary__count',
       text: `(${count} ${count === 1 ? 'calificación' : 'calificaciones'})`,
+      attrs: { 'aria-hidden': 'true' },
     }),
   );
 }
@@ -44,7 +63,11 @@ export function createStarRating({ value = 0, onChange = null, label = 'Califica
   let current = Number(value) || 0;
   const wrapper = el('div', {
     class: 'stars stars--interactive stars--lg',
-    attrs: { role: 'radiogroup', 'aria-label': label },
+    attrs: {
+      role: 'radiogroup',
+      'aria-label': label,
+      'aria-orientation': 'horizontal',
+    },
   });
 
   const buttons = [];
