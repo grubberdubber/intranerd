@@ -21,6 +21,8 @@ const PATHS = {
     '<path d="M12 3a3 3 0 0 0-3 3c0 1.2.7 2.3 1.8 2.8A6.5 6.5 0 0 0 5 15v5h14v-5a6.5 6.5 0 0 0-5.8-6.2A3 3 0 0 0 15 6a3 3 0 0 0-3-3Z"/><path d="M9 20v-3a3 3 0 0 1 6 0v3"/>',
   announcements: '<path d="m3 11 18-5v12L3 14v-3Z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
   tasks: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m8 12 2.5 2.5L16 9"/>',
+  chat: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V6a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/><path d="M8 9h8M8 13h5"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   trash:

@@ -16,6 +16,13 @@ test.describe('Navegación móvil', () => {
     await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
     await expect(menuButton).toHaveAttribute('aria-label', 'Cerrar menú de navegación');
 
+    // El mismo botón debe cerrar el panel superpuesto en móvil.
+    await menuButton.click();
+    await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
+    await expect(menuButton).toHaveAttribute('aria-label', 'Abrir menú de navegación');
+    await expect(page.locator('#app')).not.toHaveClass(/is-nav-open/);
+
+    await menuButton.click();
     const gradesLink = page.locator('a.nav-link[data-route="grades"]');
     await expect(gradesLink).toBeVisible();
     await gradesLink.click();

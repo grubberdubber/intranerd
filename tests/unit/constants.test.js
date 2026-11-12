@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import {
   ANNOUNCEMENT_CATEGORIES,
   AUTHOR_ROLES,
+  CHAT_ROLES,
   GRADE_SCALE,
   HOLIDAYS,
   LOSTFOUND_CATEGORIES,
+  MENU_COMMENT_TYPES,
   NAV_ITEMS,
   PRIORITIES,
   STORAGE_KEYS,
@@ -14,8 +16,8 @@ import {
 import { daysInMonth } from '../../src/utils/format.js';
 
 describe('data/constants · navegación', () => {
-  it('define los 10 módulos de la plataforma', () => {
-    expect(NAV_ITEMS).toHaveLength(10);
+  it('define los 12 módulos de la plataforma', () => {
+    expect(NAV_ITEMS).toHaveLength(12);
     expect(NAV_ITEMS.map((item) => item.id)).toEqual([
       'dashboard',
       'grades',
@@ -26,6 +28,8 @@ describe('data/constants · navegación', () => {
       'workshops',
       'announcements',
       'tasks',
+      'chat',
+      'menu',
       'contact',
     ]);
   });
@@ -61,12 +65,21 @@ describe('data/constants · escala y catálogos', () => {
     expect(ANNOUNCEMENT_CATEGORIES.map((category) => category.id)).toContain('urgente');
     expect(AUTHOR_ROLES.map((role) => role.id)).toContain('direccion');
     expect(PRIORITIES.map((priority) => priority.id)).toEqual(['alta', 'media', 'baja']);
+    expect(CHAT_ROLES.map((role) => role.id)).toEqual([
+      'profesor',
+      'alumno',
+      'inspector',
+      'direccion',
+      'apoderado',
+      'otro',
+    ]);
+    expect(MENU_COMMENT_TYPES.map((type) => type.id)).toEqual(['comentario', 'sugerencia']);
   });
 
   it('define claves de almacenamiento únicas y con espacio de nombres', () => {
     const keys = Object.values(STORAGE_KEYS);
     expect(new Set(keys).size).toBe(keys.length);
-    keys.forEach((key) => expect(key).toMatch(/^[a-z]+\.[a-z]+$/));
+    keys.forEach((key) => expect(key).toMatch(/^[a-z]+\.[a-zA-Z]+$/));
   });
 });
 

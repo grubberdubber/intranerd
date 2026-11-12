@@ -176,48 +176,81 @@ export function createLayout(root) {
   const mobileQuery = window.matchMedia('(max-width: 900px)');
 
   /**
-   * En móvil el sidebar está fuera de pantalla: `inert` evita que sus enlaces
-   * reciban foco cuando el menú está cerrado. En escritorio siempre es visible.
+   * El panel se oculta de dos formas: en móvil sale de pantalla y se abre como
+   * capa; en escritorio se pliega con el mismo botón. `inert` evita que el
+   * teclado y los lectores de pantalla entren en un panel cerrado.
    */
   function syncSidebarInert() {
-    const hidden = mobileQuery.matches && !root.classList.contains('is-nav-open');
+    const hidden = mobileQuery.matches
+      ? !root.classList.contains('is-nav-open')
+      : root.classList.contains('is-sidebar-collapsed');
     sidebar.inert = hidden;
     if (hidden) sidebar.setAttribute('aria-hidden', 'true');
     else sidebar.removeAttribute('aria-hidden');
   }
 
+  function syncMenuButton() {
+    const mobileOpen = mobileQuery.matches && root.classList.contains('is-nav-open');
+    const collapsed = !mobileQuery.matches && root.classList.contains('is-sidebar-collapsed');
+    menuButton.setAttribute('aria-expanded', String(mobileQuery.matches ? mobileOpen : !collapsed));
+    menuButton.setAttribute(
+      'aria-label',
+      mobileQuery.matches
+        ? mobileOpen
+          ? 'Cerrar menú de navegación'
+          : 'Abrir menú de navegación'
+        : collapsed
+          ? 'Mostrar menú lateral'
+          : 'Ocultar menú lateral',
+    );
+    menuButton.innerHTML = icon(mobileOpen ? 'x' : 'menu', { size: 19 });
+  }
+
   function closeNav({ restoreFocus = false } = {}) {
+    if (!mobileQuery.matches) return;
     const hadFocus = sidebar.contains(document.activeElement);
     root.classList.remove('is-nav-open');
-    menuButton.setAttribute('aria-expanded', 'false');
-    menuButton.setAttribute('aria-label', 'Abrir menú de navegación');
-    if (restoreFocus || (hadFocus && mobileQuery.matches)) {
+    syncMenuButton();
+    if (restoreFocus || hadFocus) {
       menuButton.focus({ preventScroll: true });
     }
     syncSidebarInert();
   }
 
   function toggleNav() {
-    const open = !root.classList.contains('is-nav-open');
-    root.classList.toggle('is-nav-open', open);
-    menuButton.setAttribute('aria-expanded', String(open));
-    menuButton.setAttribute(
-      'aria-label',
-      open ? 'Cerrar menú de navegación' : 'Abrir menú de navegación',
-    );
+    if (mobileQuery.matches) {
+      const open = !root.classList.contains('is-nav-open');
+      root.classList.toggle('is-nav-open', open);
+      syncMenuButton();
+      syncSidebarInert();
+      if (open) {
+        requestAnimationFrame(() => qs('.nav-link', sidebar)?.focus());
+      }
+      return;
+    }
+
+    const collapsed = root.classList.toggle('is-sidebar-collapsed');
+    syncMenuButton();
     syncSidebarInert();
-    if (open) {
+    if (collapsed) {
+      // Si el foco estaba dentro del panel, devuélvelo al botón que lo cerró.
+      if (sidebar.contains(document.activeElement)) menuButton.focus({ preventScroll: true });
+    } else {
       requestAnimationFrame(() => qs('.nav-link', sidebar)?.focus());
     }
   }
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && root.classList.contains('is-nav-open')) {
+    if (event.key === 'Escape' && mobileQuery.matches && root.classList.contains('is-nav-open')) {
       closeNav({ restoreFocus: true });
     }
   });
 
-  mobileQuery.addEventListener('change', syncSidebarInert);
+  mobileQuery.addEventListener('change', () => {
+    syncMenuButton();
+    syncSidebarInert();
+  });
+  syncMenuButton();
   syncSidebarInert();
 
   function renderConnection({ mode, enabled }) {

@@ -6,9 +6,10 @@ Documento de estrategia y trazabilidad de la suite de QA. Complementa
 
 ## 1. Objetivo y alcance
 
-Verificar que los nueve módulos de IntraNerd funcionan de extremo a extremo y
-que las reglas de negocio críticas (escala de notas, cupos, promedios,
-seguridad escolar, soporte y persistencia) se mantienen correctas ante cambios.
+Verificar que los módulos de IntraNerd funcionan de extremo a extremo y que las
+reglas de negocio críticas (escala de notas, cupos, promedios, seguridad
+escolar, mensajería, menú, soporte y persistencia) se mantienen correctas ante
+cambios.
 
 **En alcance**
 
@@ -77,6 +78,9 @@ suite.
 - Reportes: normalización de búsqueda, coincidencia por nombre/lugar/contacto/
   descripción, orden activos→encontrados y por fecha, filtros por estado y
   categoría, y no mutación de los arreglos originales.
+- Chat: filtros por rol, orden por no leídos, vista previa y validación.
+- Menú: semana ISO, días hábiles, rotación, filtros y validación de comentarios.
+- Legales: documentos, versión y cobertura de las páginas del footer.
 - Seeds: integridad referencial, conteos, promedios esperados de profesores.
 
 ### 4.2 Integración (API)
@@ -104,8 +108,12 @@ suite.
 4. **Contacto:** enviar el formulario vacío → error asociado y foco en el primer
    campo inválido → completar nombre, correo, rol, tema, asunto y mensaje →
    confirmación con folio → persistencia en `localStorage` tras recargar.
-5. **Responsive:** abrir menú hamburguesa → navegar a notas → sin desborde
-   horizontal en Pixel 7.
+5. **Responsive:** abrir menú hamburguesa → navegar a notas → cerrar el panel
+   con el mismo botón → sin desborde horizontal en Pixel 7.
+6. **Mensajes:** agregar un contacto → enviar un mensaje → persistencia tras
+   recargar. Abrir el aviso legal y la política de seguridad desde el footer.
+7. **Menú:** consultar la semana actual → publicar una sugerencia → persistencia
+   → cambiar de semana → plegar y expandir la barra lateral en escritorio.
 
 ## 5. Datos de prueba
 
@@ -129,8 +137,8 @@ suite.
 **Salida**
 
 - 100 % de tests unitarios e integración en verde.
-- E2E de los cuatro flujos críticos (notas, objetos perdidos, calendario y
-  contacto) y del humo de módulos en verde en Chromium de escritorio.
+- E2E de los flujos críticos (notas, objetos perdidos, calendario, contacto,
+  mensajes y menú) y del humo de módulos en verde en Chromium de escritorio.
 - Smoke test móvil en verde.
 - Cobertura ≥ umbrales: statements 80 %, branches 75 %, functions 80 %,
   lines 80 %.

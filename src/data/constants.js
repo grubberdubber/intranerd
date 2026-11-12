@@ -76,6 +76,22 @@ export const NAV_ITEMS = [
     description: 'Deberes por asignatura y checklist personal de avance.',
   },
   {
+    id: 'chat',
+    path: '/mensajes',
+    label: 'Mensajes internos',
+    shortLabel: 'Mensajes',
+    icon: 'chat',
+    description: 'Conversa con profesores, alumnos, inspectoría y dirección.',
+  },
+  {
+    id: 'menu',
+    path: '/menu',
+    label: 'Menú semanal',
+    shortLabel: 'Menú',
+    icon: 'coffee',
+    description: 'Revisa el menú de la semana y sugiere mejoras para la cafetería.',
+  },
+  {
     id: 'contact',
     path: '/contacto',
     label: 'Contacto y soporte',
@@ -136,6 +152,20 @@ export const CONTACT_ROLES = [
   { id: 'teacher', label: 'Profesor/a' },
   { id: 'direction', label: 'Dirección / administración' },
   { id: 'other', label: 'Otro' },
+];
+
+export const MENU_COMMENT_TYPES = [
+  { id: 'comentario', label: 'Comentario', icon: 'chat' },
+  { id: 'sugerencia', label: 'Sugerencia', icon: 'sparkles' },
+];
+
+export const CHAT_ROLES = [
+  { id: 'profesor', label: 'Profesor/a', icon: 'teachers', tone: 'brand' },
+  { id: 'alumno', label: 'Alumno/a', icon: 'user', tone: 'info' },
+  { id: 'inspector', label: 'Inspector/a', icon: 'shield', tone: 'warning' },
+  { id: 'direccion', label: 'Dirección', icon: 'announcements', tone: 'success' },
+  { id: 'apoderado', label: 'Apoderado/a', icon: 'users', tone: '' },
+  { id: 'otro', label: 'Otro contacto', icon: 'users', tone: '' },
 ];
 
 export const CONTACT_TOPICS = [
@@ -210,5 +240,8 @@ export const STORAGE_KEYS = {
   tasks: 'tasks.items',
   profile: 'session.profile',
   contact: 'contact.messages',
+  chatContacts: 'chat.contacts',
+  chatThreads: 'chat.threads',
+  menuComments: 'menu.comments',
   preferences: 'ui.preferences',
 };

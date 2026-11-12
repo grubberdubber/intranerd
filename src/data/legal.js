@@ -12,9 +12,9 @@ import { config } from '../config.js';
  * con asesoría legal.
  */
 
-export const LEGAL_VERSION = '1.0';
-export const LEGAL_UPDATED = '10 de noviembre de 2026';
-export const LEGAL_UPDATED_ISO = '2026-11-10';
+export const LEGAL_VERSION = '1.1';
+export const LEGAL_UPDATED = '12 de noviembre de 2026';
+export const LEGAL_UPDATED_ISO = '2026-11-12';
 
 export const COOKIE_CONSENT_KEY = 'legal.cookieConsent';
 export const COOKIE_CONSENT_VERSION = 1;
@@ -55,6 +55,8 @@ export const LEGAL_DOCUMENTS = {
           'Reportar personas extraviadas, objetos perdidos y necesidades de seguridad.',
           'Opinar sobre asignaturas y docentes de forma respetuosa y fundamentada.',
           'Leer comunicados oficiales y contactar al equipo de soporte.',
+          'Conversar por mensajería interna con los contactos que agregues al directorio.',
+          'Revisar el menú semanal y enviar comentarios o sugerencias a la cafetería.',
         ],
       },
       {
@@ -89,7 +91,19 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '7. Emergencias y personas extraviadas',
+        heading: '7. Mensajería interna',
+        paragraphs: [
+          'El módulo de Mensajes permite crear contactos y conversaciones con integrantes de ' +
+            'la comunidad. En esta versión los mensajes se guardan en el navegador y no se ' +
+            'entregan a la persona destinataria; no uses este canal para comunicar una ' +
+            'emergencia ni información urgente. Para casos reales, acude a inspectoría, ' +
+            'dirección o a los canales oficiales del colegio.',
+          'No publiques datos sensibles, contraseñas, información médica ni antecedentes de ' +
+            'terceros. La mensajería debe usarse con respeto y para fines escolares.',
+        ],
+      },
+      {
+        heading: '8. Emergencias y personas extraviadas',
         paragraphs: [
           'El módulo de personas extraviadas es una herramienta de apoyo interna. No ' +
             'reemplaza a los servicios de emergencia. Ante un extravío real, avisa de ' +
@@ -98,7 +112,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '8. Propiedad intelectual',
+        heading: '9. Propiedad intelectual',
         paragraphs: [
           'La marca, los textos y el código de IntraNerd pertenecen a sus autores y al ' +
             'equipo del proyecto. El código se distribuye bajo licencia MIT y la tipografía ' +
@@ -106,7 +120,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '9. Disponibilidad y datos',
+        heading: '10. Disponibilidad y datos',
         paragraphs: [
           'La plataforma puede suspenderse por mantenimiento, fallas técnicas o decisiones ' +
             'del colegio. Como los datos se guardan en el navegador, borrar los datos del ' +
@@ -115,7 +129,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '10. Privacidad y cookies',
+        heading: '11. Privacidad y cookies',
         paragraphs: [
           'El tratamiento de datos se explica en la Política de Privacidad. El uso de ' +
             'almacenamiento local y las opciones de consentimiento se detallan en la ' +
@@ -123,7 +137,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '11. Cambios en los términos',
+        heading: '12. Cambios en los términos',
         paragraphs: [
           'Podemos actualizar estos términos cuando cambien los módulos o las normas del ' +
             'colegio. La versión vigente y su fecha aparecen siempre al inicio del documento. ' +
@@ -131,7 +145,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '12. Contacto',
+        heading: '13. Contacto',
         paragraphs: [
           `Para consultas sobre estos términos escribe a ${config.contact.email} o usa el ` +
             'módulo de Contacto y soporte. Horario de atención: ' +
@@ -139,7 +153,7 @@ export const LEGAL_DOCUMENTS = {
         ],
       },
       {
-        heading: '13. Legislación aplicable',
+        heading: '14. Legislación aplicable',
         paragraphs: [
           'Estos términos se interpretan conforme a las normas de la República de Chile, ' +
             'en especial la Ley 19.628 sobre protección de la vida privada y la Ley 21.719 ' +
@@ -151,6 +165,191 @@ export const LEGAL_DOCUMENTS = {
       'Documento de ejemplo redactado por el equipo de la escuela. No constituye asesoría ' +
       'legal: antes de publicar la plataforma fuera del establecimiento, solicita revisión a ' +
       'la dirección y a un profesional del área.',
+  },
+
+  aviso: {
+    id: 'aviso',
+    eyebrow: 'Información del sitio',
+    title: 'Aviso legal',
+    description:
+      'Quién está detrás de IntraNerd, con qué finalidad se publica y cómo se identifican sus responsables.',
+    intro:
+      'Este aviso identifica el proyecto y las condiciones generales de publicación de ' +
+      'IntraNerd. Es un documento informativo del equipo escolar y complementa los términos, ' +
+      'la privacidad y las cookies.',
+    sections: [
+      {
+        heading: '1. Titularidad del proyecto',
+        paragraphs: [
+          `IntraNerd es una plataforma interna del ${config.app.school}, desarrollada por el ` +
+            'equipo tecnológico del establecimiento con fines educativos y de gestión escolar. ' +
+            'No es un producto comercial independiente ni una red social abierta al público.',
+        ],
+      },
+      {
+        heading: '2. Finalidad y ámbito de uso',
+        paragraphs: [
+          'La plataforma centraliza información académica, comunitaria y de seguridad para ' +
+            'alumnado, profesorado, apoderados, inspectoría y dirección. Su uso está limitado ' +
+            'a la comunidad del colegio y a las tareas propias del año escolar.',
+        ],
+      },
+      {
+        heading: '3. Responsable y contacto',
+        paragraphs: [
+          `El responsable editorial es el equipo IntraNerd del ${config.app.school}. ` +
+            `Para consultas sobre el sitio, escribe a ${config.contact.email}. ` +
+            `Horario de atención: ${config.contact.hours}.`,
+        ],
+      },
+      {
+        heading: '4. Alojamiento y funcionamiento',
+        paragraphs: [
+          'La versión offline-first funciona con archivos estáticos y almacenamiento local del ' +
+            'navegador. Si el colegio publica la plataforma en un servidor, el establecimiento ' +
+            'define el proveedor de alojamiento, el dominio y las medidas de seguridad de la ' +
+            'infraestructura. Esta versión no incluye pagos, publicidad ni servicios de ' +
+            'seguimiento de terceros.',
+        ],
+      },
+      {
+        heading: '5. Propiedad intelectual y licencias',
+        paragraphs: [
+          'La marca, los textos propios y el código de IntraNerd pertenecen a sus autores y al ' +
+            'equipo del proyecto. El código se distribuye bajo licencia MIT y la tipografía ' +
+            'Inter bajo licencia OFL. Las imágenes, íconos y recursos de ejemplo se usan con ' +
+            'fines educativos; conserva sus archivos de licencia al reutilizarlos.',
+        ],
+      },
+      {
+        heading: '6. Enlaces a sitios externos',
+        paragraphs: [
+          'La plataforma puede enlazar documentación técnica, la especificación de la API u ' +
+            'otros recursos. IntraNerd no controla esos sitios ni sus políticas; revise sus ' +
+            'condiciones antes de usarlos.',
+        ],
+      },
+      {
+        heading: '7. Limitación de responsabilidad',
+        paragraphs: [
+          'La información se ofrece como apoyo a la gestión escolar y puede contener errores ' +
+            'o quedar desactualizada. El colegio debe validar los datos oficiales por sus ' +
+            'canales habituales. IntraNerd no reemplaza los servicios de emergencia, los ' +
+            'registros académicos oficiales ni la comunicación formal de la dirección.',
+        ],
+      },
+      {
+        heading: '8. Legislación aplicable',
+        paragraphs: [
+          'Este aviso se interpreta conforme a las normas de la República de Chile, en ' +
+            'particular la Ley 19.628 sobre protección de la vida privada y la Ley 21.719 ' +
+            'sobre protección de datos personales, en lo que resulten aplicables.',
+        ],
+      },
+      {
+        heading: '9. Actualizaciones',
+        paragraphs: [
+          'El aviso puede actualizarse cuando cambien los responsables, los módulos o las ' +
+            'condiciones de publicación. La versión y la fecha vigentes aparecen al inicio de ' +
+            'este documento.',
+        ],
+      },
+    ],
+    footerNote:
+      'Aviso legal de ejemplo del proyecto escolar. La dirección debe revisarlo antes de ' +
+      'publicar la plataforma fuera del establecimiento.',
+  },
+
+  security: {
+    id: 'security',
+    eyebrow: 'Protección y confianza',
+    title: 'Política de seguridad',
+    description:
+      'Cómo cuidamos la información, qué límites tiene esta versión y cómo reportar un problema de seguridad.',
+    intro:
+      'La seguridad de una plataforma escolar se construye entre el equipo, el colegio y ' +
+      'quienes la usan. Esta política resume las medidas actuales, sus límites y el canal ' +
+      'para reportar una vulnerabilidad de forma responsable.',
+    sections: [
+      {
+        heading: '1. Alcance',
+        paragraphs: [
+          'Esta política cubre la SPA, la API REST y los datos almacenados por IntraNerd. ' +
+            'No cubre los equipos personales, las redes del colegio ni los servicios de ' +
+            'terceros que se enlacen desde la plataforma.',
+        ],
+      },
+      {
+        heading: '2. Medidas implementadas',
+        bullets: [
+          'Validación de datos en la interfaz y en el servidor; los errores de negocio no se ocultan.',
+          'Consultas parametrizadas en la API para reducir el riesgo de inyección SQL.',
+          'Límites de tamaño y tipo para fotos y evidencias; no se aceptan contraseñas.',
+          'Degradación controlada a localStorage si la API no está disponible.',
+          'Escapado de texto en la interfaz para evitar inyección de HTML en contenidos de usuario.',
+          'Dependencias revisadas y pruebas automatizadas de los flujos críticos.',
+          'Recomendación de HTTPS para cualquier publicación fuera de localhost.',
+        ],
+      },
+      {
+        heading: '3. Límites de esta versión',
+        paragraphs: [
+          'IntraNerd no incluye autenticación ni permisos por rol. El perfil es local y ' +
+            'cualquier persona con acceso al navegador puede ver los datos guardados. Por eso ' +
+            'no debe publicarse en Internet como si fuera un sistema con cuentas reales. La ' +
+            'mensajería interna es local: no entrega mensajes a otras personas ni sincroniza ' +
+            'dispositivos.',
+        ],
+      },
+      {
+        heading: '4. Datos y copias de respaldo',
+        paragraphs: [
+          'Los datos de la SPA viven en el navegador y pueden perderse al borrar los datos del ' +
+            'sitio, cambiar de equipo o usar una ventana privada. Si se usa la API, el ' +
+            'establecimiento debe definir copias de respaldo, retención y acceso restringido a ' +
+            'la base de datos.',
+        ],
+      },
+      {
+        heading: '5. Reporte responsable de vulnerabilidades',
+        paragraphs: [
+          `Si encuentras una falla de seguridad, no publiques datos de otras personas ni ` +
+            `pruebes técnicas invasivas. Escribe a ${config.contact.email} con el asunto ` +
+            '“Seguridad IntraNerd”, indicando la página, los pasos para reproducir el ' +
+            'problema y el impacto que observaste. El equipo confirmará la recepción y ' +
+            'coordinará una revisión con la dirección del colegio.',
+        ],
+      },
+      {
+        heading: '6. Incidentes y comunicación',
+        paragraphs: [
+          'Si se detecta un incidente que afecte datos personales, el colegio activará su ' +
+            'protocolo interno, limitará el acceso afectado y comunicará lo necesario a las ' +
+            'personas involucradas y a las autoridades cuando corresponda. IntraNerd no ' +
+            'sustituye ese protocolo.',
+        ],
+      },
+      {
+        heading: '7. Recomendaciones para la comunidad',
+        bullets: [
+          'Usa equipos personales o de confianza y cierra la sesión del navegador al terminar.',
+          'No subas fotos de menores sin autorización de su apoderado.',
+          'No compartas capturas con datos privados de otras personas.',
+          'Reporta enlaces sospechosos, suplantaciones o mensajes ofensivos al colegio.',
+          'Mantén actualizado el navegador y el sistema operativo del equipo.',
+        ],
+      },
+      {
+        heading: '8. Contacto',
+        paragraphs: [
+          `Canal de seguridad: ${config.contact.email}. Horario de atención: ` +
+            `${config.contact.hours}. ${config.contact.responseTime}`,
+        ],
+      },
+    ],
+    footerNote:
+      'Política de ejemplo del proyecto escolar. Antes de exponer la plataforma a Internet, ' +
+      'la dirección debe revisar la autenticación, el alojamiento y el protocolo de incidentes.',
   },
 
   privacy: {
@@ -180,6 +379,8 @@ export const LEGAL_DOCUMENTS = {
           'Objetos perdidos: descripciones, ubicación, datos de contacto y miniaturas.',
           'Calendario y tareas: pruebas, evaluaciones y marcas de tareas completadas.',
           'Comunicados: publicaciones y autoría visible dentro de la comunidad.',
+          'Mensajes internos: contactos que agregas, notas de contacto y conversaciones.',
+          'Menú: comentarios y sugerencias asociados a una semana y un día.',
           'Contacto: nombre, correo, rol, motivo y mensaje que envías a soporte.',
         ],
       },
@@ -298,6 +499,10 @@ export const LEGAL_DOCUMENTS = {
             'hasta que los elimines.',
           'intranerd.v2:legal.cookieConsent — Tu decisión sobre el almacenamiento y su fecha. ' +
             'Duración: hasta que la retires.',
+          'intranerd.v2:chat.contacts y chat.threads — Contactos, notas y mensajes del chat. ' +
+            'Duración: hasta que los elimines o borres los datos del sitio.',
+          'intranerd.v2:menu.comments — Comentarios y sugerencias del menú semanal. ' +
+            'Duración: hasta que los elimines o borres los datos del sitio.',
           'intranerd.v2:* — Resto de módulos (talleres, objetos, calendario, comunicados, ' +
             'tareas y contacto). Duración: hasta que los elimines.',
         ],

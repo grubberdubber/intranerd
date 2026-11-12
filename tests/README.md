@@ -1,23 +1,23 @@
 # Pruebas de IntraNerd
 
 Suite de pruebas de la plataforma escolar IntraNerd, organizada en tres niveles.
-Estado actual: **351 pruebas Vitest** (178 unitarias + 173 de integración),
-**11 E2E** y **11 pruebas del backend**.
+Estado actual: **395 pruebas Vitest** (222 unitarias + 173 de integración),
+**15 E2E** y **11 pruebas del backend**.
 
-| Nivel       | Carpeta             | Herramienta        | Qué prueba                                                                                |
-| ----------- | ------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
-| Unitario    | `tests/unit`        | Vitest             | Lógica pura: notas, formato, fechas, feriados, storage, HTTP, seeds y dominio del backend |
-| Integración | `tests/integration` | Vitest + Supertest | API REST real (`/api/v1`) con una base SQLite temporal aislada por archivo                |
-| E2E         | `tests/e2e`         | Playwright         | Flujos completos en la SPA real, en Chromium de escritorio y móvil                        |
+| Nivel       | Carpeta             | Herramienta        | Qué prueba                                                                                            |
+| ----------- | ------------------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| Unitario    | `tests/unit`        | Vitest             | Lógica pura: notas, formato, fechas, feriados, chat, menú, storage, HTTP, seeds y dominio del backend |
+| Integración | `tests/integration` | Vitest + Supertest | API REST real (`/api/v1`) con una base SQLite temporal aislada por archivo                            |
+| E2E         | `tests/e2e`         | Playwright         | Flujos completos en la SPA real, en Chromium de escritorio y móvil                                    |
 
 ## Comandos
 
 ```bash
 pnpm test                  # Unitarias + integración + reporte de cobertura
-pnpm test:unit             # Solo unitarias (178)
+pnpm test:unit             # Solo unitarias (222)
 pnpm test:integration      # Solo integración (173, no requiere backend levantado)
 pnpm test:coverage         # Igual que pnpm test (cobertura explícita)
-pnpm test:e2e              # Playwright (11); levanta la SPA en el puerto 8080
+pnpm test:e2e              # Playwright (15); levanta la SPA en el puerto 8080
 pnpm test:e2e:ui           # Playwright en modo interactivo
 pnpm test:all              # Cobertura + E2E
 pnpm test:e2e:install      # Instala Chromium y dependencias del sistema

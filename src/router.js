@@ -12,6 +12,8 @@ import { mount as mountCalendar } from './views/calendar.js';
 import { mount as mountWorkshops } from './views/workshops.js';
 import { mount as mountAnnouncements } from './views/announcements.js';
 import { mount as mountTasks } from './views/tasks.js';
+import { mount as mountChat } from './views/chat.js';
+import { mount as mountMenu } from './views/menu.js';
 import { mount as mountContact } from './views/contact.js';
 
 /**
@@ -28,6 +30,8 @@ const VIEWS = {
   workshops: mountWorkshops,
   announcements: mountAnnouncements,
   tasks: mountTasks,
+  chat: mountChat,
+  menu: mountMenu,
   contact: mountContact,
 };
 

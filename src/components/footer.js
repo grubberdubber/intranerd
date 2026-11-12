@@ -14,7 +14,7 @@ import { openLegalModal } from './legal.js';
  * que no sacan a la persona de la aplicación.
  */
 
-const PLATFORM_LINKS = ['dashboard', 'grades', 'calendar', 'announcements', 'tasks'];
+const PLATFORM_LINKS = ['dashboard', 'grades', 'calendar', 'announcements', 'tasks', 'menu', 'chat'];
 
 const RESOURCE_LINKS = [
   {
@@ -189,9 +189,11 @@ export function createFooter() {
         el(
           'ul',
           { class: 'footer__list' },
+          legalButton({ label: 'Aviso legal', documentId: 'aviso' }),
           legalButton({ label: 'Términos y condiciones', documentId: 'terms' }),
           legalButton({ label: 'Política de privacidad', documentId: 'privacy' }),
           legalButton({ label: 'Política de cookies', documentId: 'cookies' }),
+          legalButton({ label: 'Política de seguridad', documentId: 'security' }),
           legalButton({ label: 'Declaración de accesibilidad', documentId: 'accessibility' }),
           legalButton({
             label: 'Preferencias de cookies',

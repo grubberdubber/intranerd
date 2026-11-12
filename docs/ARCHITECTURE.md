@@ -45,7 +45,7 @@ compartida para integraciones y pruebas de contrato.
 | SQLite embebido                   | Cero servicios externos, backups por archivo, ideal para un colegio | Un solo escritor; suficiente para el volumen esperado               |
 | Imágenes como data URL / archivos | Funciona offline y no requiere object storage                       | Payload mayor; límites de 2.5–4 MB en la SPA y 10 MB en la API      |
 | Express 5                         | Manejo nativo de promesas y router maduro                           | Requiere Node.js 24+                                                |
-| Sin autenticación                 | La entrega prioriza los 9 módulos y el modo offline                 | No exponer la API a Internet sin añadir sesiones y roles            |
+| Sin autenticación                 | La entrega prioriza los módulos escolares y el modo offline         | No exponer la API a Internet sin añadir sesiones y roles            |
 
 ## 3. Frontend
 
@@ -61,10 +61,13 @@ compartida para integraciones y pruebas de contrato.
   - `http.js`: timeout, errores tipados y `AbortController`.
   - `api.js`: fábrica de repositorios con doble adaptador REST/localStorage.
   - `session.js`: perfil y rol local para autoría de contenido.
+  - `chat.js`: contactos y conversaciones locales del módulo Mensajes.
+  - `menu.js`: comentarios y sugerencias del menú semanal.
   - `migrate.js`: importa datos de los prototipos antiguos en `legacy/`.
-- `src/data/`: catálogos, feriados y seeds de demostración.
-- `src/utils/`: formato, cálculos de notas, filtros y reglas de sugerencias
-  (`gradeGoals.js`, `lostFoundMatches.js`, `studyPlan.js`).
+- `src/data/`: catálogos, feriados, rotaciones del menú y seeds de demostración.
+- `src/utils/`: formato, cálculos de notas, semanas ISO, filtros y reglas de
+  sugerencias (`gradeGoals.js`, `lostFoundMatches.js`, `studyPlan.js`,
+  `chat.js`, `menu.js`).
 - `src/styles/`: tokens, layout y CSS por vista.
 
 ### Cálculos y sugerencias locales
@@ -84,12 +87,23 @@ externos:
 Son reglas deterministas y testeables; no hay IA generativa ni envío de datos a
 terceros en estas funciones.
 
+### Mensajería y menú local
+
+- **Mensajes:** el directorio y las conversaciones se guardan en
+  `intranerd.v2:chat.contacts` y `intranerd.v2:chat.threads`. No hay envío real
+  ni respuestas automáticas: es una bandeja local para preparar la integración
+  con un backend y un canal en tiempo real.
+- **Menú semanal:** `data/menu.js` define rotaciones que se alternan según la
+  semana ISO. Los comentarios viven en `intranerd.v2:menu.comments`, separados
+  por semana y día para no mezclar opiniones entre menús distintos.
+
 ### Persistencia
 
 1. La SPA hidrata cada repositorio desde `localStorage` con namespace
    `intranerd.v2:*`. La decisión de privacidad se guarda en
    `intranerd.v2:legal.cookieConsent` y las preferencias de accesibilidad en
-   `intranerd.v2:ui.preferences`; ambas se gestionan desde el footer.
+   `intranerd.v2:ui.preferences`; ambas se gestionan desde el footer. El chat y
+   el menú usan sus propias claves (`chat.*` y `menu.comments`).
 2. Si la API está habilitada (`config.api.enabled`), cada repositorio intenta
    la operación remota mediante los adaptadores de `services/resources.js`.
 3. Los errores de red/5xx degradan a almacenamiento local y se emite el evento

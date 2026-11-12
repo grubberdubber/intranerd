@@ -7,9 +7,10 @@
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-3.0-85ea2d)](docs/openapi.yaml)
 
 IntraNerd es el núcleo de gestión de una comunidad escolar. Reúne en una sola
-plataforma los nueve módulos del establecimiento: notas semestrales, talleres,
+plataforma los módulos del establecimiento: notas semestrales, talleres,
 personas extraviadas, valoración de profesores, objetos perdidos, calendario de
-evaluaciones, comunicados, tareas y contacto/soporte.
+evaluaciones, comunicados, tareas, mensajes internos, menú semanal y
+contacto/soporte.
 
 La aplicación es una **SPA offline-first**: toda la información se guarda en
 `localStorage`, por lo que funciona sin conexión y sin depender de un servidor.
@@ -30,11 +31,17 @@ suite de pruebas y una especificación OpenAPI.
 | 6   | **Calendario escolar**        | Navegación anual, feriados chilenos, selector de rol, eventos por día con autor                                 |
 | 7   | **Comunicados**               | Feed oficial, fijado de anuncios, categorías y autoría                                                          |
 | 8   | **Tareas**                    | Publicación por asignatura, fechas de entrega y checklist personal por alumno                                   |
-| 9   | **Contacto y soporte**        | Formulario accesible, API + respaldo local, canales directos y enlace a la solución tecnológica (OpenAPI)       |
+| 9   | **Mensajes internos**         | Directorio de contactos, alta de profesores/alumnos/inspectores y conversaciones locales                        |
+| 10  | **Menú semanal**              | Rotación automática por semana, detalle por día, alérgenos, comentarios y sugerencias                           |
+| 11  | **Contacto y soporte**        | Formulario accesible, API + respaldo local, canales directos y enlace a la solución tecnológica (OpenAPI)       |
 
 El **panel general** añade un plan semanal que combina tareas y evaluaciones
 para proponer bloques de estudio. Las coincidencias de objetos y el simulador
 de notas son reglas locales y explicables: no envían datos a servicios de IA.
+
+El **footer institucional** reúne la navegación secundaria, el centro de
+accesibilidad, los canales de contacto y los documentos legales: aviso legal,
+términos, privacidad, cookies, seguridad y accesibilidad.
 
 ---
 
@@ -178,6 +185,10 @@ pnpm dev:api
 pnpm dev
 ```
 
+Para una demostración temporal solo necesitas el paso 1 y `pnpm dev`: si la API
+no está levantada, la SPA usa `localStorage` después del timeout de conexión.
+Abre <http://localhost:5173>. Si el puerto está ocupado, usa `PORT=5174 pnpm dev`.
+
 La SPA también puede abrirse como sitio estático: al no depender de un bundler,
 basta servir la raíz del repositorio (`python3 -m http.server 8080`).
 
@@ -255,10 +266,10 @@ Códigos: `200/201` éxito, `400` petición mal formada, `404` recurso,
 ## Pruebas
 
 ```bash
-pnpm test                  # 375 pruebas Vitest (202 unitarias + 173 de integración) con cobertura
-pnpm test:unit             # 202 pruebas unitarias
+pnpm test                  # 395 pruebas Vitest (222 unitarias + 173 de integración) con cobertura
+pnpm test:unit             # 222 pruebas unitarias
 pnpm test:integration      # 173 pruebas de API (SQLite temporal)
-pnpm test:e2e              # 11 flujos Playwright (Chromium de escritorio + móvil)
+pnpm test:e2e              # 15 flujos Playwright (Chromium de escritorio + móvil)
 pnpm test:backend          # 11 pruebas del backend con node:test
 ```
 

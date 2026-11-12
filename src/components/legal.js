@@ -51,7 +51,7 @@ export function renderLegalDocument(document) {
 
 /**
  * Abre un documento legal en un modal accesible.
- * @param {'terms'|'privacy'|'cookies'} documentId
+ * @param {'terms'|'aviso'|'security'|'privacy'|'cookies'|'accessibility'} documentId
  */
 export function openLegalModal(documentId) {
   const document = LEGAL_DOCUMENTS[documentId];
