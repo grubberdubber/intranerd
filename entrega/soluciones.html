@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1e40af" />
+    <meta
+      name="description"
+      content="Portafolio de soluciones tecnológicas de IntraNerd: gestión escolar, logística, reservas y tableros de datos."
+    />
+    <title>Soluciones | IntraNerd</title>
+    <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Sora:wght@500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/soluciones.css" />
+    <script src="js/main.js" defer></script>
+  </head>
+  <body class="font-body">
+    <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html" aria-label="IntraNerd, ir al inicio">
+          <img src="img/intranerd-mark.svg" alt="" width="44" height="44" />
+          <span class="brand-text">
+            <span class="brand-name">IntraNerd</span>
+            <span class="brand-tagline">Soluciones tecnológicas</span>
+          </span>
+        </a>
+
+        <nav class="nav" id="primary-nav" data-nav aria-label="Navegación principal">
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="soluciones.html" aria-current="page">Soluciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </nav>
+
+        <a class="btn btn--small header-cta" href="contacto.html">Hablemos</a>
+
+        <button
+          class="nav-toggle"
+          type="button"
+          data-nav-toggle
+          aria-controls="primary-nav"
+          aria-expanded="false"
+          aria-label="Abrir menú de navegación"
+        >
+          <span class="nav-toggle__lines" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="page-hero solutions-hero" aria-labelledby="soluciones-title">
+        <div class="container page-hero__content solutions-hero__content">
+          <p class="eyebrow">Portafolio IntraNerd</p>
+          <h1 class="font-heading" id="soluciones-title">
+            Ideas que se convierten en herramientas
+          </h1>
+          <p>
+            Cuatro formas de resolver problemas reales con tecnología: una plataforma escolar, un
+            portal logístico, un sistema de reservas y un tablero de decisiones.
+          </p>
+        </div>
+      </section>
+
+      <section class="section" id="destaca" aria-labelledby="destaca-title">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Qué nos destaca</p>
+            <h2 class="font-heading" id="destaca-title">No solo escribimos código</h2>
+            <p class="lead">
+              Cada proyecto combina método, diseño y acompañamiento. Estos son los cuatro
+              diferenciadores que sostienen nuestro trabajo.
+            </p>
+          </div>
+
+          <div class="differentiators-grid">
+            <article class="differentiator">
+              <span class="differentiator__number" aria-hidden="true">01</span>
+              <h3>Diagnóstico antes de construir</h3>
+              <p>
+                Investigamos el proceso, las personas y los datos antes de proponer una pantalla o
+                una automatización.
+              </p>
+            </article>
+            <article class="differentiator">
+              <span class="differentiator__number" aria-hidden="true">02</span>
+              <h3>Entregas por etapas</h3>
+              <p>
+                Mostramos avances cada pocas semanas para validar decisiones y evitar sorpresas al
+                final del proyecto.
+              </p>
+            </article>
+            <article class="differentiator">
+              <span class="differentiator__number" aria-hidden="true">03</span>
+              <h3>Diseño para personas reales</h3>
+              <p>
+                Priorizamos claridad, accesibilidad y rapidez. La herramienta debe entenderse sin
+                manuales interminables.
+              </p>
+            </article>
+            <article class="differentiator" id="acompanamiento">
+              <span class="differentiator__number" aria-hidden="true">04</span>
+              <h3>Acompañamiento después del lanzamiento</h3>
+              <p>
+                Capacitamos, documentamos y monitoreamos. El lanzamiento es el comienzo del uso
+                real, no el final.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--tint" id="proyectos" aria-labelledby="proyectos-title">
+        <div class="container">
+          <div class="section-heading">
+            <p class="eyebrow">Proyectos ficticios</p>
+            <h2 class="font-heading" id="proyectos-title">Soluciones que nos gustaría construir</h2>
+            <p class="lead">
+              Ejemplos de portafolio con contexto, alcance, tiempo estimado y presupuesto
+              aproximado. Cada tarjeta se puede desplegar para ver más detalles.
+            </p>
+          </div>
+
+          <div class="solutions-grid">
+            <article class="solution-card" id="aula-viva">
+              <div class="solution-card__media">
+                <img
+                  src="img/solucion-aula-viva.svg"
+                  alt="Interfaz ficticia de Aula Viva con panel escolar, cursos y tareas"
+                  width="800"
+                  height="500"
+                  loading="lazy"
+                />
+                <span class="solution-card__tag">Educación</span>
+              </div>
+              <div class="solution-card__body">
+                <h3 class="font-heading">Aula Viva</h3>
+                <p>
+                  Plataforma escolar integral para centralizar calificaciones, tareas, talleres y
+                  comunicados en una experiencia simple para alumnos, docentes y familias.
+                </p>
+                <div class="solution-card__meta" aria-label="Tiempo y presupuesto del proyecto">
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    10 semanas
+                  </span>
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="14" rx="3" />
+                      <path d="M3 10h18M7 15h4" stroke-linecap="round" />
+                    </svg>
+                    USD 12.000–18.000
+                  </span>
+                </div>
+                <button
+                  class="accordion-toggle"
+                  type="button"
+                  data-accordion
+                  aria-expanded="false"
+                  aria-controls="detalle-aula-viva"
+                >
+                  Ver detalle del proyecto
+                  <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+                </button>
+                <div class="accordion-panel" id="detalle-aula-viva" hidden>
+                  <ul>
+                    <li>Panel por rol con notas, asistencia y calendario de evaluaciones.</li>
+                    <li>Módulo de talleres con cupos, horarios y lista de espera.</li>
+                    <li>Mensajería interna y comunicados con confirmación de lectura.</li>
+                    <li>Migración acompañada desde planillas y capacitación al equipo docente.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="solution-card" id="ruta-clara">
+              <div class="solution-card__media">
+                <img
+                  src="img/solucion-ruta-clara.svg"
+                  alt="Mapa ficticio de Ruta Clara con seguimiento de entregas y estados"
+                  width="800"
+                  height="500"
+                  loading="lazy"
+                />
+                <span class="solution-card__tag">Logística</span>
+              </div>
+              <div class="solution-card__body">
+                <h3 class="font-heading">Ruta Clara</h3>
+                <p>
+                  Portal de seguimiento de despachos para pymes que necesitan visibilidad en tiempo
+                  real, avisos automáticos y una experiencia clara para sus clientes.
+                </p>
+                <div class="solution-card__meta" aria-label="Tiempo y presupuesto del proyecto">
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    8 semanas
+                  </span>
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="14" rx="3" />
+                      <path d="M3 10h18M7 15h4" stroke-linecap="round" />
+                    </svg>
+                    USD 8.000–12.000
+                  </span>
+                </div>
+                <button
+                  class="accordion-toggle"
+                  type="button"
+                  data-accordion
+                  aria-expanded="false"
+                  aria-controls="detalle-ruta-clara"
+                >
+                  Ver detalle del proyecto
+                  <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+                </button>
+                <div class="accordion-panel" id="detalle-ruta-clara" hidden>
+                  <ul>
+                    <li>Mapa de rutas con estados de preparación, tránsito y entrega.</li>
+                    <li>Notificaciones automáticas por correo y enlace de seguimiento.</li>
+                    <li>Panel operativo para conductores y coordinadores.</li>
+                    <li>Integración con el sistema de inventario existente.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="solution-card" id="turno-facil">
+              <div class="solution-card__media">
+                <img
+                  src="img/solucion-turno-facil.svg"
+                  alt="Interfaz ficticia de Turno Fácil con calendario y selección de horarios"
+                  width="800"
+                  height="500"
+                  loading="lazy"
+                />
+                <span class="solution-card__tag">Servicios</span>
+              </div>
+              <div class="solution-card__body">
+                <h3 class="font-heading">Turno Fácil</h3>
+                <p>
+                  Sistema de reservas para clínicas y centros de atención que reduce llamadas,
+                  ordena la agenda y confirma las horas automáticamente.
+                </p>
+                <div class="solution-card__meta" aria-label="Tiempo y presupuesto del proyecto">
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    6 semanas
+                  </span>
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="14" rx="3" />
+                      <path d="M3 10h18M7 15h4" stroke-linecap="round" />
+                    </svg>
+                    USD 6.000–9.000
+                  </span>
+                </div>
+                <button
+                  class="accordion-toggle"
+                  type="button"
+                  data-accordion
+                  aria-expanded="false"
+                  aria-controls="detalle-turno-facil"
+                >
+                  Ver detalle del proyecto
+                  <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+                </button>
+                <div class="accordion-panel" id="detalle-turno-facil" hidden>
+                  <ul>
+                    <li>Agenda por profesional, sede y tipo de atención.</li>
+                    <li>Reserva web y confirmación automática por correo o WhatsApp.</li>
+                    <li>Recordatorios para reducir inasistencias.</li>
+                    <li>Reportes de ocupación y tiempos de espera.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+
+            <article class="solution-card" id="datos-al-dia">
+              <div class="solution-card__media">
+                <img
+                  src="img/solucion-datos-al-dia.svg"
+                  alt="Tablero ficticio de Datos al Día con indicadores, área y distribución"
+                  width="800"
+                  height="500"
+                  loading="lazy"
+                />
+                <span class="solution-card__tag">Datos</span>
+              </div>
+              <div class="solution-card__body">
+                <h3 class="font-heading">Datos al Día</h3>
+                <p>
+                  Tablero de indicadores para fundaciones y equipos directivos que necesitan
+                  entender su impacto sin revisar diez planillas distintas.
+                </p>
+                <div class="solution-card__meta" aria-label="Tiempo y presupuesto del proyecto">
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    7 semanas
+                  </span>
+                  <span class="meta-pill">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="5" width="18" height="14" rx="3" />
+                      <path d="M3 10h18M7 15h4" stroke-linecap="round" />
+                    </svg>
+                    USD 7.000–10.000
+                  </span>
+                </div>
+                <button
+                  class="accordion-toggle"
+                  type="button"
+                  data-accordion
+                  aria-expanded="false"
+                  aria-controls="detalle-datos-al-dia"
+                >
+                  Ver detalle del proyecto
+                  <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+                </button>
+                <div class="accordion-panel" id="detalle-datos-al-dia" hidden>
+                  <ul>
+                    <li>Integración de fuentes dispersas en un modelo de datos común.</li>
+                    <li>Indicadores por programa, territorio y período.</li>
+                    <li>Alertas cuando un resultado se aleja de la meta.</li>
+                    <li>Exportación de reportes para consejos y financiamiento.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="preguntas" aria-labelledby="preguntas-title">
+        <div class="container faq-layout">
+          <div class="faq-intro">
+            <p class="eyebrow">Preguntas y respuestas</p>
+            <h2 class="font-heading" id="preguntas-title">Antes de empezar</h2>
+            <p class="lead">
+              Resolvemos las dudas que aparecen cuando una organización decide dar el paso hacia una
+              solución digital.
+            </p>
+            <p class="faq-note">
+              <span aria-hidden="true">💡</span>
+              <span
+                ><strong>¿No ves tu caso?</strong> Escríbenos y lo conversamos sin compromiso.</span
+              >
+            </p>
+          </div>
+
+          <div class="accordion">
+            <div class="accordion-item">
+              <button
+                class="accordion-toggle"
+                type="button"
+                data-accordion
+                aria-expanded="false"
+                aria-controls="faq-sol-1"
+              >
+                ¿Qué puede hacer IntraNerd por mi organización?
+                <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+              </button>
+              <div class="accordion-panel" id="faq-sol-1" hidden>
+                <p>
+                  Podemos diagnosticar un proceso, diseñar una plataforma, automatizar tareas,
+                  integrar sistemas existentes o construir un portal para tus usuarios. También
+                  ofrecemos soporte, capacitación y mejora continua después del lanzamiento.
+                </p>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button
+                class="accordion-toggle"
+                type="button"
+                data-accordion
+                aria-expanded="false"
+                aria-controls="faq-sol-2"
+              >
+                ¿Cómo abordan un proyecto desde el inicio?
+                <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+              </button>
+              <div class="accordion-panel" id="faq-sol-2" hidden>
+                <p>
+                  Partimos con una etapa de descubrimiento para entender el problema, los usuarios y
+                  las restricciones. Luego prototipamos, validamos y planificamos entregas cortas.
+                  Cada etapa termina con algo que puedes ver y probar.
+                </p>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button
+                class="accordion-toggle"
+                type="button"
+                data-accordion
+                aria-expanded="false"
+                aria-controls="faq-sol-3"
+              >
+                ¿Trabajan con pymes o solo con grandes empresas?
+                <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+              </button>
+              <div class="accordion-panel" id="faq-sol-3" hidden>
+                <p>
+                  Trabajamos con organizaciones de distintos tamaños. Adaptamos el alcance y la
+                  inversión al problema real, priorizando una primera versión útil antes de sumar
+                  funcionalidades.
+                </p>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <button
+                class="accordion-toggle"
+                type="button"
+                data-accordion
+                aria-expanded="false"
+                aria-controls="faq-sol-4"
+              >
+                ¿Cómo cuidan la seguridad y los datos?
+                <span class="accordion-icon" data-accordion-icon aria-hidden="true">+</span>
+              </button>
+              <div class="accordion-panel" id="faq-sol-4" hidden>
+                <p>
+                  Aplicamos permisos por rol, cifrado en tránsito, respaldos y registro de cambios.
+                  Antes de construir definimos qué datos son necesarios y evitamos almacenar
+                  información que no aporta al servicio.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="nerdi-sol-title">
+        <div class="container">
+          <div class="mascot-band">
+            <div class="mascot-band__image">
+              <img
+                src="img/nerdi.webp"
+                alt="Nerdi, mascota de IntraNerd, señalando una idea"
+                width="470"
+                height="520"
+                loading="lazy"
+              />
+            </div>
+            <div class="mascot-band__content">
+              <p class="eyebrow">Nerdi aprueba</p>
+              <h2 class="font-heading" id="nerdi-sol-title">
+                Toda buena solución parte con una buena pregunta
+              </h2>
+              <p>
+                Nuestro copiloto de ideas nos ayuda a no enamorarnos de la primera respuesta.
+                Prototipamos, preguntamos y ajustamos hasta que la herramienta se sienta natural.
+              </p>
+              <a class="btn btn--small" href="contacto.html">Cuéntanos tu desafío</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="cta-sol-title">
+        <div class="container">
+          <div class="solutions-cta">
+            <div>
+              <h2 class="font-heading" id="cta-sol-title">
+                ¿Construimos juntos la próxima solución?
+              </h2>
+              <p>
+                Cuéntanos qué necesitas resolver y te ayudaremos a convertirlo en un proyecto claro,
+                medible y posible.
+              </p>
+            </div>
+            <a class="btn btn--accent" href="contacto.html"
+              >Hablemos <span class="btn__arrow" aria-hidden="true">→</span></a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html">
+            <img src="img/intranerd-mark.svg" alt="" width="44" height="44" />
+            <span class="brand-text">
+              <span class="brand-name">IntraNerd</span>
+              <span class="brand-tagline">Soluciones tecnológicas</span>
+            </span>
+          </a>
+          <p>
+            Diseñamos tecnología que conecta personas, ordena procesos y deja más espacio para lo
+            importante.
+          </p>
+          <span class="footer-badge">Hecho con cuidado en Chile</span>
+        </div>
+
+        <div class="footer-column">
+          <h2>Explora</h2>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="nosotros.html">Nosotros</a></li>
+            <li><a href="soluciones.html">Soluciones</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h2>Soluciones</h2>
+          <ul>
+            <li><a href="soluciones.html#aula-viva">Aula Viva</a></li>
+            <li><a href="soluciones.html#ruta-clara">Ruta Clara</a></li>
+            <li><a href="soluciones.html#turno-facil">Turno Fácil</a></li>
+            <li><a href="soluciones.html#datos-al-dia">Datos al Día</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-column">
+          <h2>Contacto</h2>
+          <ul>
+            <li><a href="mailto:hola@intranerd.cl">hola@intranerd.cl</a></li>
+            <li><a href="tel:+56223456789">+56 2 2345 6789</a></li>
+            <li><address>Av. Providencia 1234, Santiago</address></li>
+            <li><a href="contacto.html#formulario">Enviar un mensaje</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <p>© <span data-year>2026</span> IntraNerd. Todos los derechos reservados.</p>
+        <p>Proyecto académico · Sitio institucional multipágina</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 640" role="img" aria-label="Retrato ilustrado de Rodrigo Martínez">
+  <defs>
+    <linearGradient id="bg-r" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dbeafe"/>
+      <stop offset="1" stop-color="#eff6ff"/>
+    </linearGradient>
+    <linearGradient id="shirt-r" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1e40af"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="520" height="640" fill="url(#bg-r)"/>
+  <circle cx="410" cy="105" r="130" fill="#bfdbfe" opacity=".7"/>
+  <circle cx="90" cy="545" r="150" fill="#93c5fd" opacity=".28"/>
+  <path d="M0 530c96-46 190-52 272-16s174 39 248-5v131H0Z" fill="#ffffff" opacity=".35"/>
+  <circle cx="260" cy="205" r="108" fill="#e8b18c"/>
+  <path d="M160 188c4-79 46-122 101-122 57 0 99 45 102 122-40-33-72-46-102-46-31 0-63 14-101 46Z" fill="#1f2937"/>
+  <path d="M170 214c-4 58 2 92 18 112" fill="none" stroke="#1f2937" stroke-width="20" stroke-linecap="round"/>
+  <path d="M350 214c4 50-1 82-16 102" fill="none" stroke="#1f2937" stroke-width="18" stroke-linecap="round"/>
+  <g fill="none" stroke="#0f172a" stroke-width="7">
+    <circle cx="222" cy="203" r="30" fill="#ffffff" fill-opacity=".2"/>
+    <circle cx="298" cy="203" r="30" fill="#ffffff" fill-opacity=".2"/>
+    <path d="M252 201h16"/>
+    <path d="M192 201h-22M328 201h20"/>
+  </g>
+  <circle cx="222" cy="203" r="7" fill="#0f172a"/>
+  <circle cx="298" cy="203" r="7" fill="#0f172a"/>
+  <path d="M242 252c12 10 24 10 35 0" fill="none" stroke="#7c2d12" stroke-width="7" stroke-linecap="round"/>
+  <path d="M260 224c-2 12-5 22-9 30 7 5 14 5 20 0" fill="#d99a72"/>
+  <path d="M260 318c-82 0-139 38-151 101l-22 221h346l-22-221c-12-63-69-101-151-101Z" fill="url(#shirt-r)"/>
+  <path d="M223 310h74l13 47h-100Z" fill="#e8b18c"/>
+  <path d="M260 357v-18l-38-19 8-20 30 17 30-17 8 20-38 19Z" fill="#dbeafe" opacity=".92"/>
+  <circle cx="408" cy="460" r="48" fill="#ffffff" opacity=".38"/>
+  <path d="M390 460l13 13 25-29" fill="none" stroke="#1e40af" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

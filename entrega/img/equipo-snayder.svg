@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 640" role="img" aria-label="Retrato ilustrado de Snayder Martínez">
+  <defs>
+    <linearGradient id="bg-s" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ccfbf1"/>
+      <stop offset="1" stop-color="#eff6ff"/>
+    </linearGradient>
+    <linearGradient id="shirt-s" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#0f766e"/>
+      <stop offset="1" stop-color="#14b8a6"/>
+    </linearGradient>
+  </defs>
+  <rect width="520" height="640" fill="url(#bg-s)"/>
+  <circle cx="88" cy="100" r="136" fill="#99f6e4" opacity=".6"/>
+  <circle cx="438" cy="548" r="160" fill="#5eead4" opacity=".25"/>
+  <path d="M0 552c102-52 199-55 284-14s166 36 236-10v112H0Z" fill="#ffffff" opacity=".42"/>
+  <circle cx="260" cy="208" r="108" fill="#8d5524"/>
+  <g fill="#111827">
+    <circle cx="182" cy="142" r="38"/>
+    <circle cx="224" cy="118" r="42"/>
+    <circle cx="272" cy="110" r="44"/>
+    <circle cx="320" cy="126" r="42"/>
+    <circle cx="348" cy="164" r="38"/>
+    <circle cx="166" cy="184" r="32"/>
+    <circle cx="356" cy="202" r="30"/>
+    <path d="M154 198c0-64 44-106 106-106 60 0 104 44 106 106-42-34-73-48-106-48-34 0-65 14-106 48Z"/>
+  </g>
+  <circle cx="222" cy="206" r="7" fill="#0f172a"/>
+  <circle cx="298" cy="206" r="7" fill="#0f172a"/>
+  <path d="M242 255c12 10 24 10 35 0" fill="none" stroke="#3f1d0b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M260 228c-2 12-5 22-9 30 7 5 14 5 20 0" fill="#6f3b1c"/>
+  <path d="M260 320c-84 0-142 38-154 102l-21 218h350l-21-218c-12-64-70-102-154-102Z" fill="url(#shirt-s)"/>
+  <path d="M222 312h76l14 48h-104Z" fill="#8d5524"/>
+  <path d="M260 360v-19l-40-20 9-20 31 17 31-17 9 20-40 20Z" fill="#f0fdfa" opacity=".95"/>
+  <g fill="#ffffff" opacity=".5">
+    <circle cx="422" cy="425" r="42"/>
+    <circle cx="422" cy="425" r="26"/>
+  </g>
+  <path d="M407 425h30M422 410v30" stroke="#0f766e" stroke-width="6" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Interfaz ficticia de Turno Fácil con calendario y reserva de horas">
+  <defs>
+    <linearGradient id="t-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#3b0764"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="t-screen" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f5f3ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#t-bg)"/>
+  <circle cx="670" cy="90" r="170" fill="#c4b5fd" opacity=".22"/>
+  <circle cx="120" cy="450" r="170" fill="#a78bfa" opacity=".18"/>
+  <rect x="70" y="54" width="660" height="392" rx="26" fill="#0f172a" opacity=".35"/>
+  <rect x="88" y="44" width="624" height="368" rx="18" fill="url(#t-screen)"/>
+  <rect x="112" y="72" width="576" height="54" rx="12" fill="#f5f3ff"/>
+  <circle cx="144" cy="99" r="16" fill="#7c3aed"/>
+  <path d="M137 99l5 5 10-11" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="172" y="88" width="102" height="9" rx="4.5" fill="#5b21b6"/>
+  <rect x="172" y="104" width="64" height="6" rx="3" fill="#8b5cf6" opacity=".45"/>
+  <rect x="570" y="84" width="94" height="30" rx="15" fill="#7c3aed"/>
+  <rect x="590" y="96" width="54" height="6" rx="3" fill="#ffffff" opacity=".85"/>
+
+  <!-- Calendario -->
+  <rect x="112" y="148" width="304" height="232" rx="14" fill="#ffffff" stroke="#ede9fe"/>
+  <rect x="132" y="168" width="80" height="8" rx="4" fill="#6d28d9"/>
+  <g fill="#ede9fe">
+    <rect x="132" y="194" width="34" height="30" rx="7"/>
+    <rect x="178" y="194" width="34" height="30" rx="7"/>
+    <rect x="224" y="194" width="34" height="30" rx="7"/>
+    <rect x="270" y="194" width="34" height="30" rx="7"/>
+    <rect x="316" y="194" width="34" height="30" rx="7"/>
+    <rect x="362" y="194" width="34" height="30" rx="7"/>
+    <rect x="132" y="236" width="34" height="30" rx="7"/>
+    <rect x="224" y="236" width="34" height="30" rx="7"/>
+    <rect x="316" y="236" width="34" height="30" rx="7"/>
+    <rect x="362" y="236" width="34" height="30" rx="7"/>
+    <rect x="178" y="278" width="34" height="30" rx="7"/>
+    <rect x="270" y="278" width="34" height="30" rx="7"/>
+    <rect x="362" y="278" width="34" height="30" rx="7"/>
+  </g>
+  <rect x="178" y="236" width="34" height="30" rx="7" fill="#7c3aed"/>
+  <rect x="270" y="236" width="34" height="30" rx="7" fill="#ddd6fe"/>
+  <rect x="316" y="278" width="34" height="30" rx="7" fill="#ddd6fe"/>
+  <path d="M184 251h22M191 244v14" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Horas -->
+  <rect x="440" y="148" width="248" height="232" rx="14" fill="#ffffff" stroke="#ede9fe"/>
+  <rect x="462" y="170" width="92" height="8" rx="4" fill="#6d28d9"/>
+  <g>
+    <rect x="462" y="196" width="204" height="32" rx="8" fill="#f5f3ff"/>
+    <rect x="462" y="238" width="204" height="32" rx="8" fill="#7c3aed"/>
+    <rect x="462" y="280" width="204" height="32" rx="8" fill="#f5f3ff"/>
+    <rect x="476" y="207" width="62" height="7" rx="3.5" fill="#6d28d9" opacity=".65"/>
+    <rect x="476" y="249" width="62" height="7" rx="3.5" fill="#ffffff" opacity=".85"/>
+    <rect x="476" y="291" width="62" height="7" rx="3.5" fill="#6d28d9" opacity=".65"/>
+    <circle cx="642" cy="212" r="7" fill="#c4b5fd"/>
+    <circle cx="642" cy="254" r="7" fill="#ffffff"/>
+    <circle cx="642" cy="296" r="7" fill="#c4b5fd"/>
+  </g>
+  <rect x="462" y="326" width="204" height="34" rx="17" fill="#5b21b6"/>
+  <rect x="524" y="339" width="80" height="7" rx="3.5" fill="#ffffff" opacity=".85"/>
+  <circle cx="696" cy="90" r="24" fill="#fbbf24"/>
+  <path d="M687 90h18M696 81v18" stroke="#78350f" stroke-width="3" stroke-linecap="round"/>
+</svg>

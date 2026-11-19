@@ -53,6 +53,7 @@ términos, privacidad, cookies, seguridad y accesibilidad.
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Desarrollo                           | Capas, decisiones, modelo de datos, flujos y pruebas                            |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)     | Infraestructura                      | Despliegue, variables, respaldos y operación                                    |
 | [`docs/openapi.yaml`](docs/openapi.yaml)       | Integraciones                        | Contrato REST completo de la plataforma                                         |
+| [`entrega/README.md`](entrega/README.md)       | Evaluación académica                 | Sitio institucional multipágina y checklist de las rúbricas                     |
 
 La guía del equipo está escrita para quienes nunca han usado HTML: explica
 cada concepto desde cero y termina con un tutorial para agregar un módulo nuevo

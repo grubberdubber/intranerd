@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Mapa ficticio de Ruta Clara con seguimiento de entregas">
+  <defs>
+    <linearGradient id="r-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#042f2e"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+    <pattern id="r-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M34 0H0v34" fill="none" stroke="#99f6e4" stroke-opacity=".14" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#r-bg)"/>
+  <rect width="800" height="500" fill="url(#r-grid)"/>
+  <path d="M-20 410c120-48 174-136 260-136 105 0 130 74 230 48 78-21 98-110 180-136 54-17 108-12 170 5" fill="none" stroke="#5eead4" stroke-opacity=".32" stroke-width="42" stroke-linecap="round"/>
+  <path d="M-20 410c120-48 174-136 260-136 105 0 130 74 230 48 78-21 98-110 180-136 54-17 108-12 170 5" fill="none" stroke="#ccfbf1" stroke-width="4" stroke-dasharray="10 18" stroke-linecap="round"/>
+  <g>
+    <circle cx="160" cy="342" r="22" fill="#fbbf24"/>
+    <circle cx="160" cy="342" r="9" fill="#0f766e"/>
+    <circle cx="392" cy="300" r="22" fill="#ffffff"/>
+    <circle cx="392" cy="300" r="9" fill="#0d9488"/>
+    <circle cx="626" cy="222" r="22" fill="#ffffff"/>
+    <circle cx="626" cy="222" r="9" fill="#0d9488"/>
+  </g>
+  <g transform="translate(250 190)">
+    <rect x="0" y="34" width="170" height="128" rx="16" fill="#ffffff"/>
+    <rect x="18" y="54" width="84" height="9" rx="4.5" fill="#0f766e"/>
+    <rect x="18" y="76" width="128" height="7" rx="3.5" fill="#94a3b8" opacity=".5"/>
+    <rect x="18" y="92" width="108" height="7" rx="3.5" fill="#94a3b8" opacity=".35"/>
+    <rect x="18" y="118" width="82" height="22" rx="11" fill="#ccfbf1"/>
+    <rect x="34" y="126" width="50" height="6" rx="3" fill="#0f766e" opacity=".8"/>
+    <path d="M136 34l22-24 22 24Z" fill="#fbbf24"/>
+  </g>
+  <g transform="translate(475 294)">
+    <rect x="0" y="0" width="192" height="92" rx="16" fill="#0f172a" opacity=".86"/>
+    <rect x="18" y="18" width="68" height="8" rx="4" fill="#5eead4"/>
+    <rect x="18" y="38" width="142" height="6" rx="3" fill="#ffffff" opacity=".25"/>
+    <rect x="18" y="58" width="128" height="10" rx="5" fill="#ffffff" opacity=".14"/>
+    <rect x="18" y="58" width="94" height="10" rx="5" fill="#2dd4bf"/>
+    <circle cx="160" cy="62" r="12" fill="#fbbf24"/>
+    <path d="M154 62l4 4 8-9" fill="none" stroke="#78350f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(585 120)">
+    <rect x="-44" y="-28" width="88" height="56" rx="14" fill="#ffffff"/>
+    <path d="M-18 0h36M0-18v36" stroke="#0d9488" stroke-width="6" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 640" role="img" aria-label="Retrato ilustrado de Yhostin Rivera">
+  <defs>
+    <linearGradient id="bg-y" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#ffedd5"/>
+      <stop offset="1" stop-color="#fff7ed"/>
+    </linearGradient>
+    <linearGradient id="shirt-y" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#c2410c"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+  </defs>
+  <rect width="520" height="640" fill="url(#bg-y)"/>
+  <circle cx="432" cy="122" r="134" fill="#fed7aa" opacity=".7"/>
+  <circle cx="94" cy="548" r="154" fill="#fdba74" opacity=".28"/>
+  <path d="M0 548c104-44 194-47 276-8s169 32 244-8v108H0Z" fill="#ffffff" opacity=".4"/>
+  <circle cx="260" cy="210" r="106" fill="#f7d0b1"/>
+  <path d="M154 220c-2-84 44-138 106-138 63 0 108 56 106 138-32-30-62-44-106-44-43 0-74 13-106 44Z" fill="#7c2d12"/>
+  <path d="M166 200c-22 46-16 104 6 144M354 200c18 44 15 98-4 136" fill="none" stroke="#7c2d12" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="222" cy="207" r="7" fill="#0f172a"/>
+  <circle cx="298" cy="207" r="7" fill="#0f172a"/>
+  <path d="M242 255c12 10 24 10 35 0" fill="none" stroke="#9a3412" stroke-width="7" stroke-linecap="round"/>
+  <path d="M260 228c-2 12-5 22-9 30 7 5 14 5 20 0" fill="#e8b18c"/>
+  <path d="M260 318c-82 0-139 38-151 101l-22 221h346l-22-221c-12-63-69-101-151-101Z" fill="url(#shirt-y)"/>
+  <path d="M222 310h76l14 48h-104Z" fill="#f7d0b1"/>
+  <path d="M260 359v-18l-38-19 8-20 30 17 30-17 8 20-38 19Z" fill="#fff7ed" opacity=".95"/>
+  <g transform="translate(408 420)" fill="none" stroke="#c2410c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="0" cy="0" r="44" fill="#ffffff" opacity=".5"/>
+    <path d="M-17 0h34M0-17v34"/>
+  </g>
+</svg>

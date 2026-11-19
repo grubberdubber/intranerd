@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 640" role="img" aria-label="Retrato ilustrado de Rogelio Peña">
+  <defs>
+    <linearGradient id="bg-ro" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#dcfce7"/>
+      <stop offset="1" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <linearGradient id="shirt-ro" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#166534"/>
+      <stop offset="1" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect width="520" height="640" fill="url(#bg-ro)"/>
+  <circle cx="108" cy="126" r="140" fill="#bbf7d0" opacity=".65"/>
+  <circle cx="430" cy="548" r="160" fill="#86efac" opacity=".25"/>
+  <path d="M0 548c94-38 186-43 272-8s174 34 248-4v104H0Z" fill="#ffffff" opacity=".4"/>
+  <circle cx="260" cy="208" r="107" fill="#c68642"/>
+  <path d="M157 190c5-74 45-116 103-116 59 0 99 43 103 116-38-29-70-42-103-42-34 0-66 14-103 42Z" fill="#292524"/>
+  <path d="M168 212c-3 42 1 68 12 87M352 210c3 40-1 66-12 85" fill="none" stroke="#292524" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="222" cy="205" r="7" fill="#0f172a"/>
+  <circle cx="298" cy="205" r="7" fill="#0f172a"/>
+  <path d="M242 253c12 10 24 10 35 0" fill="none" stroke="#3f1d0b" stroke-width="7" stroke-linecap="round"/>
+  <path d="M260 226c-2 12-5 22-9 30 7 5 14 5 20 0" fill="#a86b3c"/>
+  <path d="M208 285c14 30 36 46 52 46s38-16 52-46c-17 12-35 17-52 17s-35-5-52-17Z" fill="#292524"/>
+  <path d="M260 318c-82 0-139 38-151 101l-22 221h346l-22-221c-12-63-69-101-151-101Z" fill="url(#shirt-ro)"/>
+  <path d="M222 310h76l14 48h-104Z" fill="#c68642"/>
+  <path d="M260 359v-18l-38-19 8-20 30 17 30-17 8 20-38 19Z" fill="#f0fdf4" opacity=".95"/>
+  <g transform="translate(414 434)" fill="none" stroke="#166534" stroke-width="7" stroke-linecap="round">
+    <circle cx="0" cy="0" r="38" fill="#ffffff" opacity=".45"/>
+    <path d="M-16 0h32M0-16v32"/>
+  </g>
+</svg>
