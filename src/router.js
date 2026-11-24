@@ -9,6 +9,7 @@ import { mount as mountMissing } from './views/missing.js';
 import { mount as mountTeachers } from './views/teachers.js';
 import { mount as mountLostFound } from './views/lostfound.js';
 import { mount as mountCalendar } from './views/calendar.js';
+import { mount as mountSchedule } from './views/schedule.js';
 import { mount as mountWorkshops } from './views/workshops.js';
 import { mount as mountAnnouncements } from './views/announcements.js';
 import { mount as mountTasks } from './views/tasks.js';
@@ -27,6 +28,7 @@ const VIEWS = {
   teachers: mountTeachers,
   lostfound: mountLostFound,
   calendar: mountCalendar,
+  schedule: mountSchedule,
   workshops: mountWorkshops,
   announcements: mountAnnouncements,
   tasks: mountTasks,
