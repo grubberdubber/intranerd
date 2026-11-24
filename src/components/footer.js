@@ -14,7 +14,15 @@ import { openLegalModal } from './legal.js';
  * que no sacan a la persona de la aplicación.
  */
 
-const PLATFORM_LINKS = ['dashboard', 'grades', 'calendar', 'announcements', 'tasks', 'menu', 'chat'];
+const PLATFORM_LINKS = [
+  'dashboard',
+  'grades',
+  'calendar',
+  'announcements',
+  'tasks',
+  'menu',
+  'chat',
+];
 
 const RESOURCE_LINKS = [
   {
