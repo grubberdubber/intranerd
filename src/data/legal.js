@@ -503,6 +503,8 @@ export const LEGAL_DOCUMENTS = {
             'Duración: hasta que los elimines o borres los datos del sitio.',
           'intranerd.v2:menu.comments — Comentarios y sugerencias del menú semanal. ' +
             'Duración: hasta que los elimines o borres los datos del sitio.',
+          'intranerd.v2:schedule.blocks — Bloques de tu horario semanal, docentes y salas. ' +
+            'Duración: hasta que los elimines o borres los datos del sitio.',
           'intranerd.v2:* — Resto de módulos (talleres, objetos, calendario, comunicados, ' +
             'tareas y contacto). Duración: hasta que los elimines.',
         ],

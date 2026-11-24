@@ -63,11 +63,13 @@ compartida para integraciones y pruebas de contrato.
   - `session.js`: perfil y rol local para autoría de contenido.
   - `chat.js`: contactos y conversaciones locales del módulo Mensajes.
   - `menu.js`: comentarios y sugerencias del menú semanal.
+  - `schedule.js`: bloques del horario personal, validación de cruces y
+    persistencia local.
   - `migrate.js`: importa datos de los prototipos antiguos en `legacy/`.
 - `src/data/`: catálogos, feriados, rotaciones del menú y seeds de demostración.
 - `src/utils/`: formato, cálculos de notas, semanas ISO, filtros y reglas de
   sugerencias (`gradeGoals.js`, `lostFoundMatches.js`, `studyPlan.js`,
-  `chat.js`, `menu.js`).
+  `schedule.js`, `chat.js`, `menu.js`).
 - `src/styles/`: tokens, layout y CSS por vista.
 
 ### Cálculos y sugerencias locales
@@ -87,7 +89,7 @@ externos:
 Son reglas deterministas y testeables; no hay IA generativa ni envío de datos a
 terceros en estas funciones.
 
-### Mensajería y menú local
+### Mensajería, menú y horario local
 
 - **Mensajes:** el directorio y las conversaciones se guardan en
   `intranerd.v2:chat.contacts` y `intranerd.v2:chat.threads`. No hay envío real
@@ -96,6 +98,9 @@ terceros en estas funciones.
 - **Menú semanal:** `data/menu.js` define rotaciones que se alternan según la
   semana ISO. Los comentarios viven en `intranerd.v2:menu.comments`, separados
   por semana y día para no mezclar opiniones entre menús distintos.
+- **Horario semanal:** cada bloque se guarda en `intranerd.v2:schedule.blocks`.
+  Es información personal del navegador, no comunitaria, por lo que no se envía
+  a la API. La validación rechaza horas invertidas y cruces en el mismo día.
 
 ### Persistencia
 

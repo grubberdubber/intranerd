@@ -52,6 +52,14 @@ export const NAV_ITEMS = [
     description: 'Pruebas, evaluaciones y feriados del año escolar.',
   },
   {
+    id: 'schedule',
+    path: '/horario',
+    label: 'Horario semanal',
+    shortLabel: 'Horario',
+    icon: 'clock',
+    description: 'Tus clases de la semana, salas y docentes en un solo lugar.',
+  },
+  {
     id: 'workshops',
     path: '/talleres',
     label: 'Talleres y actividades',
@@ -222,6 +230,14 @@ export const HOLIDAYS = {
   12: [8, 25],
 };
 
+export const SCHEDULE_DAYS = [
+  { id: 1, label: 'Lunes', shortLabel: 'Lun' },
+  { id: 2, label: 'Martes', shortLabel: 'Mar' },
+  { id: 3, label: 'Miércoles', shortLabel: 'Mié' },
+  { id: 4, label: 'Jueves', shortLabel: 'Jue' },
+  { id: 5, label: 'Viernes', shortLabel: 'Vie' },
+];
+
 export const GRADE_SCALE = {
   min: 1,
   max: 7,
@@ -235,6 +251,7 @@ export const STORAGE_KEYS = {
   found: 'lostfound.found',
   lost: 'lostfound.lost',
   calendar: 'calendar.events',
+  schedule: 'schedule.blocks',
   workshops: 'workshops.items',
   announcements: 'announcements.posts',
   tasks: 'tasks.items',

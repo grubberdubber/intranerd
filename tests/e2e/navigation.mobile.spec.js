@@ -39,4 +39,25 @@ test.describe('Navegación móvil', () => {
     );
     expect(overflow).toBeLessThanOrEqual(1);
   });
+
+  test('el horario semanal se apila sin desbordes en móvil', async ({ page }) => {
+    await page.locator('.topbar__menu').click();
+    const scheduleLink = page.locator('a.nav-link[data-route="schedule"]');
+    await expect(scheduleLink).toBeVisible();
+    await scheduleLink.click();
+
+    await expect(page.locator('.view[data-route="schedule"]')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Horario semanal' })).toBeVisible();
+    await expect(page.locator('.schedule-day')).toHaveCount(5);
+
+    const gridColumns = await page
+      .locator('.schedule-grid')
+      .evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+    expect(gridColumns).toBe(1);
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    );
+    expect(overflow).toBeLessThanOrEqual(1);
+  });
 });

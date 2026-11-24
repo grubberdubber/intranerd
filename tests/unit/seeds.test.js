@@ -5,6 +5,7 @@ import {
   seedFound,
   seedLost,
   seedMissing,
+  seedSchedule,
   seedSubjects,
   seedTasks,
   seedTeachers,
@@ -159,6 +160,26 @@ describe('data/seeds · objetos perdidos y encontrados', () => {
   });
 });
 
+describe('data/seeds · horario', () => {
+  it('genera bloques de lunes a viernes con horas válidas', () => {
+    const blocks = seedSchedule();
+
+    expect(blocks).toHaveLength(20);
+    assertUniqueIds(blocks);
+    expect(new Set(blocks.map((block) => block.day))).toEqual(new Set([1, 2, 3, 4, 5]));
+
+    for (const block of blocks) {
+      expect(block.start).toMatch(/^\d{2}:\d{2}$/);
+      expect(block.end).toMatch(/^\d{2}:\d{2}$/);
+      expect(block.end > block.start).toBe(true);
+      expect(block.subject).toBeTruthy();
+      expect(block.teacher).toMatch(/^Prof\./);
+      expect(block.room).toBeTruthy();
+      expect(block.createdAt).toMatch(ISO_DATETIME);
+    }
+  });
+});
+
 describe('data/seeds · calendario', () => {
   it('genera evaluaciones en fechas ISO reales del año en curso', () => {
     const events = seedCalendar();
@@ -272,6 +293,7 @@ describe('data/seeds · unicidad entre módulos', () => {
       ...seedTeachers(),
       ...seedFound(),
       ...seedLost(),
+      ...seedSchedule(),
       ...seedCalendar(),
       ...seedWorkshops(),
       ...seedAnnouncements(),

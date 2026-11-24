@@ -16,8 +16,8 @@ import {
 import { daysInMonth } from '../../src/utils/format.js';
 
 describe('data/constants · navegación', () => {
-  it('define los 12 módulos de la plataforma', () => {
-    expect(NAV_ITEMS).toHaveLength(12);
+  it('define los 13 módulos de la plataforma', () => {
+    expect(NAV_ITEMS).toHaveLength(13);
     expect(NAV_ITEMS.map((item) => item.id)).toEqual([
       'dashboard',
       'grades',
@@ -25,6 +25,7 @@ describe('data/constants · navegación', () => {
       'teachers',
       'lostfound',
       'calendar',
+      'schedule',
       'workshops',
       'announcements',
       'tasks',

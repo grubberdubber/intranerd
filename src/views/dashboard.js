@@ -7,10 +7,12 @@ import {
   tasksRepo,
   workshopsRepo,
 } from '../services/resources.js';
+import { listScheduleBlocks } from '../services/schedule.js';
 import { getProfile } from '../services/session.js';
 import { el } from '../utils/dom.js';
 import { daysUntil, formatDate, formatNumber, relativeTime, toISODate } from '../utils/format.js';
 import { generalAverage } from '../utils/grades.js';
+import { blocksForDay, currentOrNextBlock, dayLabel, formatTimeRange } from '../utils/schedule.js';
 import { buildStudyPlan } from '../utils/studyPlan.js';
 import { icon } from '../components/icon.js';
 import { pageHeader } from '../components/pageHeader.js';
@@ -82,6 +84,23 @@ function announcementRow(post) {
       el('span', {
         class: 'activity-item__meta',
         text: `${post.author} · ${relativeTime(post.createdAt)}`,
+      }),
+    ),
+  );
+}
+
+function scheduleRow(block) {
+  return el(
+    'div',
+    { class: 'activity-item' },
+    el('span', { class: 'activity-item__icon', html: icon('clock', { size: 15 }) }),
+    el(
+      'div',
+      { class: 'activity-item__body' },
+      el('span', { class: 'activity-item__title', text: block.subject }),
+      el('span', {
+        class: 'activity-item__meta',
+        text: `${formatTimeRange(block)} · ${block.room || 'Sala por confirmar'}`,
       }),
     ),
   );
@@ -271,6 +290,10 @@ export async function mount(container) {
     const availableWorkshops = workshops.filter(
       (workshop) => (workshop.enrollments?.length || 0) < workshop.capacity,
     ).length;
+    const scheduleBlocks = listScheduleBlocks();
+    const weekday = new Date().getDay();
+    const todayBlocks = weekday >= 1 && weekday <= 5 ? blocksForDay(scheduleBlocks, weekday) : [];
+    const nextBlock = currentOrNextBlock(scheduleBlocks);
     const plan = buildStudyPlan({ tasks, events });
     const completed = tasks.length - pendingTasks.length;
     const completion = tasks.length ? Math.round((completed / tasks.length) * 100) : 0;
@@ -410,6 +433,86 @@ export async function mount(container) {
         'div',
         { class: 'quick-grid' },
         ...NAV_ITEMS.filter((item) => item.id !== 'dashboard').map(quickLink),
+      ),
+    );
+
+    const nextBlockLabel = !nextBlock
+      ? ''
+      : nextBlock.status === 'ongoing'
+        ? 'Clase en curso'
+        : nextBlock.status === 'today'
+          ? 'Próxima clase, hoy'
+          : nextBlock.status === 'tomorrow'
+            ? 'Próxima clase, mañana'
+            : `Próxima clase, ${dayLabel(nextBlock.block.day).toLowerCase()}`;
+
+    const scheduleCard = el(
+      'section',
+      { class: 'card' },
+      el(
+        'header',
+        { class: 'card__header' },
+        el(
+          'div',
+          {},
+          el(
+            'h2',
+            { class: 'card__title' },
+            el('span', { html: icon('clock', { size: 18 }) }),
+            'Tu horario',
+          ),
+          el('p', { class: 'card__subtitle', text: 'Clases de hoy y próxima sesión.' }),
+        ),
+        el('a', { class: 'btn btn--ghost btn--sm', href: '#/horario', text: 'Ver horario' }),
+      ),
+      el(
+        'div',
+        { class: 'card__body' },
+        nextBlock
+          ? el(
+              'div',
+              { class: 'dashboard-next' },
+              el('span', {
+                class: 'dashboard-next__icon',
+                html: icon('clock', { size: 17 }),
+                attrs: { 'aria-hidden': 'true' },
+              }),
+              el(
+                'div',
+                { class: 'dashboard-next__body' },
+                el('span', { class: 'dashboard-next__eyebrow', text: nextBlockLabel }),
+                el('strong', {
+                  class: 'dashboard-next__subject',
+                  text: nextBlock.block.subject,
+                }),
+                el('span', {
+                  class: 'dashboard-next__meta',
+                  text:
+                    `${dayLabel(nextBlock.block.day)} · ${formatTimeRange(nextBlock.block)}` +
+                    ` · ${nextBlock.block.room || 'Sala por confirmar'}`,
+                }),
+              ),
+            )
+          : null,
+        todayBlocks.length
+          ? el(
+              'div',
+              { class: 'activity-list mt-3' },
+              ...todayBlocks.map((block) => scheduleRow(block)),
+            )
+          : nextBlock
+            ? null
+            : emptyState({
+                iconName: 'clock',
+                title: 'Sin horario configurado',
+                text: 'Agrega tus bloques para ver aquí tus clases del día.',
+                action: el('a', {
+                  class: 'btn btn--ghost btn--sm',
+                  href: '#/horario',
+                  text: 'Crear horario',
+                }),
+                compact: true,
+              }),
       ),
     );
 
@@ -554,7 +657,7 @@ export async function mount(container) {
     const columns = el(
       'div',
       { class: 'dashboard-columns' },
-      el('div', { class: 'dashboard-stack' }, upcomingCard, announcementsCard),
+      el('div', { class: 'dashboard-stack' }, scheduleCard, upcomingCard, announcementsCard),
       el('div', { class: 'dashboard-stack' }, tasksCard),
     );
 

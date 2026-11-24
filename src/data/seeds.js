@@ -263,6 +263,42 @@ export function seedLost() {
   ];
 }
 
+export function seedSchedule() {
+  const blocks = [
+    [1, '08:00', '09:30', 'Matemáticas', 'Prof. Sebastián Moya', 'Sala 12'],
+    [1, '09:45', '11:15', 'Lenguaje y Comunicación', 'Prof. Valentina Ortega', 'Sala 12'],
+    [1, '11:30', '13:00', 'Ciencias Naturales', 'Prof. Antonia Fuentes', 'Laboratorio'],
+    [1, '14:00', '15:30', 'Educación Física', 'Prof. Diego Salazar', 'Gimnasio'],
+    [2, '08:00', '09:30', 'Historia', 'Prof. Tomás Villagrán', 'Sala 12'],
+    [2, '09:45', '11:15', 'Inglés', 'Prof. Camila Rojas', 'Sala 8'],
+    [2, '11:30', '13:00', 'Matemáticas', 'Prof. Sebastián Moya', 'Sala 12'],
+    [2, '14:00', '15:30', 'Tecnología', 'Prof. Nicolás Vera', 'Laboratorio'],
+    [3, '08:00', '09:30', 'Ciencias Naturales', 'Prof. Antonia Fuentes', 'Laboratorio'],
+    [3, '09:45', '11:15', 'Matemáticas', 'Prof. Sebastián Moya', 'Sala 12'],
+    [3, '11:30', '13:00', 'Lenguaje y Comunicación', 'Prof. Valentina Ortega', 'Sala 12'],
+    [3, '14:00', '15:30', 'Música', 'Prof. Nicolás Vera', 'Sala de música'],
+    [4, '08:00', '09:30', 'Inglés', 'Prof. Camila Rojas', 'Sala 8'],
+    [4, '09:45', '11:15', 'Historia', 'Prof. Tomás Villagrán', 'Sala 12'],
+    [4, '11:30', '13:00', 'Artes Visuales', 'Prof. Paula Contreras', 'Sala de artes'],
+    [4, '14:00', '15:30', 'Educación Física', 'Prof. Diego Salazar', 'Gimnasio'],
+    [5, '08:00', '09:30', 'Matemáticas', 'Prof. Sebastián Moya', 'Sala 12'],
+    [5, '09:45', '11:15', 'Lenguaje y Comunicación', 'Prof. Valentina Ortega', 'Sala 12'],
+    [5, '11:30', '13:00', 'Orientación', 'Prof. Josefa Ríos', 'Sala multiuso'],
+    [5, '14:00', '15:30', 'Filosofía', 'Prof. Tomás Villagrán', 'Sala 12'],
+  ];
+
+  return blocks.map(([day, start, end, subject, teacher, room]) => ({
+    id: uid('block'),
+    day,
+    start,
+    end,
+    subject,
+    teacher,
+    room,
+    createdAt: now(),
+  }));
+}
+
 export function seedCalendar() {
   return [
     {
