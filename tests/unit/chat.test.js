@@ -30,9 +30,9 @@ describe('services/chat · contactos y mensajes locales', () => {
       expect.arrayContaining(['profesor', 'alumno', 'inspector', 'direccion']),
     );
     expect(threads).toHaveLength(2);
-    expect(threads.every((thread) => contacts.some((contact) => contact.id === thread.contactId))).toBe(
-      true,
-    );
+    expect(
+      threads.every((thread) => contacts.some((contact) => contact.id === thread.contactId)),
+    ).toBe(true);
   });
 
   it('crea un contacto con su conversación vacía y lo persiste', () => {

@@ -54,9 +54,7 @@ describe('utils/menu · semanas y rotación', () => {
   });
 
   it('filtra comentarios por semana y día, y deja el más reciente primero', async () => {
-    const { commentsFor, commentCount, latestComment } = await import(
-      '../../src/utils/menu.js'
-    );
+    const { commentsFor, commentCount, latestComment } = await import('../../src/utils/menu.js');
     const comments = [
       { id: 'a', weekKey: '2026-W46', dayId: 'lunes', createdAt: '2026-11-10T10:00:00Z' },
       { id: 'b', weekKey: '2026-W46', dayId: 'lunes', createdAt: '2026-11-12T10:00:00Z' },

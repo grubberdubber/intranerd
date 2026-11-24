@@ -16,7 +16,9 @@ test.describe('Mensajes internos y páginas legales', () => {
     await modal.getByRole('button', { name: 'Agregar contacto' }).click();
 
     await expect(page.locator('.chat-panel__name')).toHaveText('Inspectora de prueba');
-    await expect(page.locator('.chat-panel__notice')).toContainText('no se envían a otras personas');
+    await expect(page.locator('.chat-panel__notice')).toContainText(
+      'no se envían a otras personas',
+    );
 
     await page.locator('#chat-input').fill('Hola, necesito apoyo en el patio durante el recreo.');
     await page.locator('#chat-form').getByRole('button', { name: 'Enviar' }).click();
@@ -25,9 +27,7 @@ test.describe('Mensajes internos y páginas legales', () => {
     );
 
     await reloadApp(page);
-    const savedContact = page
-      .locator('.chat-contact')
-      .filter({ hasText: 'Inspectora de prueba' });
+    const savedContact = page.locator('.chat-contact').filter({ hasText: 'Inspectora de prueba' });
     await expect(savedContact).toBeVisible();
     await savedContact.click();
     await expect(page.locator('.chat-message--me .chat-message__text')).toContainText(
@@ -46,7 +46,9 @@ test.describe('Mensajes internos y páginas legales', () => {
 
     await page.getByRole('button', { name: 'Política de seguridad' }).click();
     const securityModal = activeModal(page);
-    await expect(securityModal.getByRole('heading', { name: 'Política de seguridad' })).toBeVisible();
+    await expect(
+      securityModal.getByRole('heading', { name: 'Política de seguridad' }),
+    ).toBeVisible();
     await expect(securityModal).toContainText('Reporte responsable de vulnerabilidades');
   });
 });

@@ -501,8 +501,6 @@
     border-radius: var(--radius-md);
   }
 
-
-
   .chat-sidebar__header {
     padding: var(--space-4) var(--space-4) var(--space-2);
   }

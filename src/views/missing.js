@@ -77,7 +77,9 @@ function reportCard(report) {
       el('img', {
         src: photo,
         // Una imagen de ejemplo no debe presentarse como fotografía real.
-        alt: report.photo ? `Fotografía adjunta de ${report.name}` : 'Imagen de referencia del reporte',
+        alt: report.photo
+          ? `Fotografía adjunta de ${report.name}`
+          : 'Imagen de referencia del reporte',
         loading: 'lazy',
       }),
     ),
