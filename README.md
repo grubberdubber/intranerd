@@ -12,6 +12,8 @@ personas extraviadas, valoración de profesores, objetos perdidos, calendario de
 evaluaciones, comunicados, tareas, horario semanal, mensajes internos, menú
 semanal y contacto/soporte.
 
+Integrantes: Rodrigo Martinez, Snyder Martinez, Yhostin Rivera
+
 La aplicación es una **SPA offline-first**: toda la información se guarda en
 `localStorage`, por lo que funciona sin conexión y sin depender de un servidor.
 El repositorio incluye una **API REST** (Express 5 + SQLite) con su propia
