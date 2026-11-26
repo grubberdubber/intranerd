@@ -70,18 +70,19 @@ estilo.
 IntraNerd es la plataforma interna de nuestro colegio. Reúne en un solo lugar
 lo que antes estaba repartido en planillas, grupos de mensajes y papel:
 
-| Módulo                        | Qué resuelve                                              |
-| ----------------------------- | --------------------------------------------------------- |
-| **Panel general**             | Resumen del día: próximas pruebas, tareas y avisos        |
-| **Notas y promedios**         | Asignaturas, notas de cada semestre y promedio final      |
-| **Talleres**                  | Catálogo, horarios e inscripción con cupos                |
-| **Personas extraviadas**      | Reportes de seguridad dentro del recinto                  |
-| **Calificador de profesores** | Estrellas, opiniones y evidencias                         |
-| **Objetos perdidos**          | Panel de objetos encontrados y avisos de perdidos         |
-| **Calendario**                | Pruebas y evaluaciones por día, con feriados              |
-| **Comunicados**               | Tablón oficial de dirección, docentes y centro de alumnos |
-| **Tareas**                    | Deberes por asignatura y checklist personal               |
-| **Contacto**                  | Soporte, accesibilidad y consultas                        |
+| Módulo                        | Qué resuelve                                               |
+| ----------------------------- | ---------------------------------------------------------- |
+| **Panel general**             | Resumen del día: próximas pruebas, tareas y avisos         |
+| **Notas y promedios**         | Asignaturas, notas de cada semestre y promedio final       |
+| **Talleres**                  | Catálogo, horarios e inscripción con cupos                 |
+| **Personas extraviadas**      | Reportes de seguridad dentro del recinto                   |
+| **Calificador de profesores** | Estrellas, opiniones y evidencias                          |
+| **Objetos perdidos**          | Panel de objetos encontrados y avisos de perdidos          |
+| **Calendario**                | Pruebas y evaluaciones por día, con feriados               |
+| **Horario semanal**           | Clases de lunes a viernes, docentes, salas y próxima clase |
+| **Comunicados**               | Tablón oficial de dirección, docentes y centro de alumnos  |
+| **Tareas**                    | Deberes por asignatura y checklist personal                |
+| **Contacto**                  | Soporte, accesibilidad y consultas                         |
 
 La aplicación está pensada para funcionar **sin conexión**: guarda todo en el
 navegador. Además existe una API opcional para compartir datos entre equipos,
